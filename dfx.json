@@ -1,0 +1,29 @@
+{
+  "canisters": {
+    "Mushroom_Protocol_backend": {
+      "main": "src/Mushroom_Protocol_backend/main.mo",
+      "type": "motoko"
+    },
+    "Mushroom_Protocol_frontend": {
+      "dependencies": [
+        "Mushroom_Protocol_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/Mushroom_Protocol_frontend/src/index.html"
+      },
+      "source": [
+        "src/Mushroom_Protocol_frontend/assets",
+        "dist/Mushroom_Protocol_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
