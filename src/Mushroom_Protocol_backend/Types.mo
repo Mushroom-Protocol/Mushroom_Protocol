@@ -48,6 +48,8 @@ module{
         title: Text;
         area: Text;             //Posible uso de enumeraciones
         description: Text;
+        firstPresentation: Nat; //Timestamp fecha de ingreso
+        lastPresentation: Nat;  //Timestamp ultima solicitud de financiamiento
         status: ProjectStatus;
         assessment: ?Nat;        //valoración del monto de financiamiento en caso de estar aprovado el proyecto
         //Otros campos
