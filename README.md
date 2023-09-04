@@ -1,6 +1,7 @@
 
 
-# ![Mp trans](https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/c6ee17a7-bc56-499d-a462-95328773cbe9)
+# ![Mp vert trans verde](https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/78cf606a-3e75-4c7c-a56e-87e0a2f165f6)
+
 
 Welcome to Mushroom Protocol a platform that drives the Financial Revolution in Biotechnology
 
