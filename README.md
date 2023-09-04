@@ -20,13 +20,15 @@ Real impact on the advancement of medicine and science.
 Participation in the decentralized finance (DeFi) revolution.
 A passionate and diverse community of investors and scientists.
 
-🔍 # A quick guide through ourt platform:
+🔍 A quick guide through ourt platform:
+# Mushroom Protocol Platform
 
 <img width="1308" alt="Screenshot 2023-09-04 at 16 31 28" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/a6a093e3-84e5-43e6-be2c-7a3e26ba101e">
 
 # Funcionalities
 
-<img width="1142" alt="Screenshot 2023-09-04 at 16 35 01" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/1ae3ca96-1dd0-4ab9-898f-99c9e6fa9835">
+<img width="1136" alt="Screenshot 2023-09-04 at 16 42 32" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/63ecc0a2-4ece-447f-ad63-afcdcbc8dee2">
+
 
 # Roadmap
 
