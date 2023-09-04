@@ -21,7 +21,7 @@ Participation in the decentralized finance (DeFi) revolution.
 A passionate and diverse community of investors and scientists.
 
 
-# Mushroom Protocol Platform
+# [Mushroom Protocol Platform](https://mushroomprotocol.io)
 
 <img width="1035" alt="Screenshot 2023-09-04 at 16 51 58" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/55b891ad-ee09-42a9-a85e-80c34eb910b2">
 
@@ -36,3 +36,8 @@ A passionate and diverse community of investors and scientists.
 <img width="1131" alt="Screenshot 2023-09-04 at 16 39 19" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/2b4ce95e-4c02-48c9-9795-ee324731d616">
 
 
+# Follow us
+# [Linkedin](https://www.linkedin.com/company/mushroom-protocol/)
+# [Discord](https://discord.gg/xJQbPHxS7q)
+# [X](https://twitter.com/MushromProtocol?s=20)
+# [YouTube](https://www.youtube.com/@Mushroom_Protocol)
