@@ -12,7 +12,13 @@ actor Mushroom {
   //---- stable data --------
   stable var startupArray: [Startup] = [];
   stable var projectArray: [Project] = [];
-  //--------------------------------------
+
+  public shared ({caller}) func addController(cText: Text): async Text{
+    if(not Principal.isController(caller)){return "Acción denegada"};
+    if(Principal.isController(Principal.fromText(cText))){return "El principal ingresado ya es controller"};
+    //Principal.addController();
+    "Controlador agregado correctamente";
+  };
 
   func addToArray<T>(arr: [T], elem: T): [T]{
     var tempBuffer = Buffer.fromArray<T>(arr);
@@ -31,5 +37,6 @@ actor Mushroom {
     projectArray := addToArray<Project>(projectArray, p);
     return ?Array.size(projectArray);
   };
+
 
 };
