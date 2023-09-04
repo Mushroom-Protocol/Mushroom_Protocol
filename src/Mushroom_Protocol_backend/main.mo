@@ -8,6 +8,7 @@ actor Mushroom {
   //----- declaraciones de tipos ------
   type Startup = Types.Startup;
   type Project = Types.Project;
+  type ProjectStatus = Types.ProjectStatus;
 
   //---- stable data --------
   stable var startupArray: [Startup] = [];
@@ -19,7 +20,7 @@ actor Mushroom {
     //Principal.addController();
     "Controlador agregado correctamente";
   };
-
+  //----------- Agregar elementos ----------------
   func addToArray<T>(arr: [T], elem: T): [T]{
     var tempBuffer = Buffer.fromArray<T>(arr);
     tempBuffer.add(elem);
@@ -38,5 +39,33 @@ actor Mushroom {
     return ?Array.size(projectArray);
   };
 
+  //------------------ Geters -------------------------
+  public func getProjectsApproved(): async [Project]{
+    var tempBuffer = Buffer.Buffer<Project>(0);
+    for(p in projectArray.vals()){
+      if(p.status == #approved){
+        tempBuffer.add(p);
+      };
+    };
+    return Buffer.toArray(tempBuffer);
+  };
 
+  //-------- Modify Status Projects ---------------
+  public shared ({caller}) func setStatus(IDProject: Nat, s: ProjectStatus): async Bool{
+    if(not Principal.isController(caller)){return false};
+    if(IDProject >= Array.size(projectArray)){return false};
+    var tempBuffer = Buffer.fromArray<Project>(projectArray);
+    var currentProject = tempBuffer.remove(IDProject);
+    var update = {startup= currentProject.startup;
+                  title = currentProject.title;
+                  area = currentProject.area;
+                  description = currentProject.description;
+                  firstPresentation = currentProject.firstPresentation;
+                  lastPresentation = currentProject.lastPresentation;
+                  status = s;
+                  assessment = currentProject.assessment};
+    tempBuffer.insert(IDProject, update);
+    projectArray := Buffer.toArray(tempBuffer);
+    return true;
+  };
 };
