@@ -1,6 +1,6 @@
 # Mushroom_Protocol
 
-Welcome to Mushroom_Protocol a platform that drives the Financial Revolution in Biotechnology
+Welcome to Mushroom Protocol a platform that drives the Financial Revolution in Biotechnology
 
 🌍 Our Mission:
 At Mushroom Protocol, we are dedicated to democratizing access to biotechnology investment. Through asset tokenization and blockchain technology, we enable visionary investors from around the world to participate in innovative projects and start-ups within the biotechnology domain.
