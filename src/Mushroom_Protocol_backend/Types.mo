@@ -33,7 +33,8 @@ module{
         #funded: Nat8; //Porcentaje de financiamiento entregado
         #finalized;
     };
-
+//----- cambio de type por canister para cada startup ------
+/*
     public type Startup = {
         ID: Nat;                    // Corresponde al indice del Array de startup del canister main
         owner: Principal;
@@ -42,6 +43,15 @@ module{
         legalIdentity: Text;
         projectsPresented: [Nat];   //Lista de ID de proyectos (los proyectos se guardaran en un Array en el canister Main)
         approvedProjects: [Nat];    //De esta lista se extraerá la información sobre los subsidios asignados... etc
+    };
+    */
+//--------------------------------------------------
+    public type Settings_startup ={
+        ID: Nat;
+        owner: Principal;
+        name: Text;
+        country: Country;
+        legalIdentity: Text;
     };
     public type Project = {
         startup: Nat;           //ID de startup

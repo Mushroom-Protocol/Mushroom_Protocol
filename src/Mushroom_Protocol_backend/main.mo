@@ -3,11 +3,13 @@ import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Interface "ic-management-interface";
+import Cycles "mo:base/ExperimentalCycles";
+import Startup "Startup";
 
 actor Mushroom {
 
   //----- declaraciones de tipos ------
-  type Startup = Types.Startup;
+  //type Startup = Types.Startup;
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
   type CanisterStatus = { compute_allocation : Nat;
@@ -16,10 +18,10 @@ actor Mushroom {
                           memory_allocation : Nat};
 
   //---- stable data --------
-  stable var startupArray: [Startup] = [];
+  stable var startupArray: [Principal] = []; //Lista de los Pincipal ID de cada Startup
   stable var projectArray: [Project] = [];
 
-  //---------- Gestion del canister main ----------------------
+  //---------- Gestion del canister main ** MOVER A management_canisters ** ----------------------
   public func getCanisterStatus() : async CanisterStatus {
     let IC = "aaaaa-aa";
     let ic = actor(IC) : Interface.Self;
@@ -58,12 +60,26 @@ actor Mushroom {
     tempBuffer.add(elem);
     return Buffer.toArray(tempBuffer);
   };
-
+/*
   public shared ({caller}) func addStartup(s: Startup): async ?Nat {
     if(not Principal.isController(caller)){return null};
     startupArray := addToArray<Startup>(startupArray, s);
     return ?Array.size(startupArray);
   };
+  */
+
+//---- Hechas las validaciones para registrar una Startup, se crea el correspondiente canister----
+//--- ** MOVER A management_canisters ** ---------
+  func createCanisterStartup(init: Types.Settings_startup): async Text{ //
+    Cycles.add(13_846_199_230);
+    let newStartup = await Startup.Startup(init);
+    let principal = Principal.fromActor(newStartup);
+    var tempBuffer = Buffer.fromArray<Principal>(startupArray);
+    tempBuffer.add(principal);
+    startupArray := Buffer.toArray(tempBuffer);            
+    return Principal.toText(principal);
+  };
+  //----------------------------------------------------------------------------------------------
 
   public shared ({caller}) func addProject(p: Project): async ?Nat {
     if(not Principal.isController(caller)){return null};
