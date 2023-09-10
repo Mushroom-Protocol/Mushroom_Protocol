@@ -12,6 +12,8 @@ actor Mushroom {
   //type Startup = Types.Startup;
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
+  type Country = Types.Country;
+  type Settings_startup = Types.Settings_startup;
   type CanisterStatus = { compute_allocation : Nat;
                           controllers : [Principal];
                           freezing_threshold : Nat;
@@ -21,7 +23,7 @@ actor Mushroom {
   stable var startupArray: [Principal] = []; //Lista de los Pincipal ID de cada Startup
   stable var projectArray: [Project] = [];
 
-  //---------- Gestion del canister main ** MOVER A management_canisters ** ----------------------
+  //---------- Gestion del canister main ** MOVER A management_canisters.mo ** ----------------------
   public func getCanisterStatus() : async CanisterStatus {
     let IC = "aaaaa-aa";
     let ic = actor(IC) : Interface.Self;
@@ -58,7 +60,7 @@ actor Mushroom {
   func addToArray<T>(arr: [T], elem: T): [T]{
     var tempBuffer = Buffer.fromArray<T>(arr);
     tempBuffer.add(elem);
-    return Buffer.toArray(tempBuffer);
+    Buffer.toArray(tempBuffer);
   };
 /*
   public shared ({caller}) func addStartup(s: Startup): async ?Nat {
@@ -69,22 +71,31 @@ actor Mushroom {
   */
 
 //---- Hechas las validaciones para registrar una Startup, se crea el correspondiente canister----
-//--- ** MOVER A management_canisters ** ---------
-  func createCanisterStartup(init: Types.Settings_startup): async Text{ //
-    Cycles.add(13_846_199_230);
-    let newStartup = await Startup.Startup(init);
+//--- ** MOVER A management_canisters.mo ** ---------
+  func createCanisterStartup(owner: Principal, init: Types.Settings_startup): async Text{
+    Cycles.add(13_846_199_230);  
+    let newStartup = await Startup.Startup(owner, init);   //ver funcionamiento en mainnet
     let principal = Principal.fromActor(newStartup);
-    var tempBuffer = Buffer.fromArray<Principal>(startupArray);
-    tempBuffer.add(principal);
-    startupArray := Buffer.toArray(tempBuffer);            
-    return Principal.toText(principal);
+    startupArray := addToArray<Principal>(startupArray, principal);         
+    Principal.toText(principal);
   };
-  //----------------------------------------------------------------------------------------------
+  //----------------------------  se llamará desde el Frontend -------------------------------------------
+  public shared ({caller}) func signUpStartup(init: Settings_startup): async ?Text{
+    if(signUpOK(init) and not Principal.isAnonymous (caller)){return null};
+    let principalStartup = await createCanisterStartup(caller, init);
+    ?principalStartup;
+  };
+  //-------------------------------------------------------------------------------------
+  func signUpOK(data:Settings_startup): Bool{
+    //TODO
+    true;
+  };
+  //-------------------------------------------------------------------------------------
 
   public shared ({caller}) func addProject(p: Project): async ?Nat {
     if(not Principal.isController(caller)){return null};
     projectArray := addToArray<Project>(projectArray, p);
-    return ?Array.size(projectArray);
+    ?Array.size(projectArray);
   };
 
   //------------------ Geters -------------------------
@@ -95,7 +106,7 @@ actor Mushroom {
         tempBuffer.add(p);
       };
     };
-    return Buffer.toArray(tempBuffer);
+    Buffer.toArray(tempBuffer);
   };
 
   //-------- Modify Status Projects ---------------
@@ -115,6 +126,6 @@ actor Mushroom {
                   assessment = currentProject.assessment};
     tempBuffer.insert(IDProject, update);
     projectArray := Buffer.toArray(tempBuffer);
-    return true;
+    true;
   };
 };
