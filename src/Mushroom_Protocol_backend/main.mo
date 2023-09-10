@@ -10,8 +10,7 @@ actor Mushroom {
   type Startup = Types.Startup;
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
-
-  type CanisterStatus = { compute_allocation : Nat; //tambien definido en Interface.definite_canister_settings
+  type CanisterStatus = { compute_allocation : Nat;
                           controllers : [Principal];
                           freezing_threshold : Nat;
                           memory_allocation : Nat};
@@ -32,7 +31,7 @@ actor Mushroom {
     let IC = "aaaaa-aa";
     let ic = actor(IC) : Interface.Self;
     let canister_id = Principal.fromActor(Mushroom);
-    let settings = {controllers = ?_settings.controllers;   //tambien definido en Interface.canister_settings
+    let settings = {controllers = ?_settings.controllers;
                     compute_allocation = ?_settings.compute_allocation;
                     memory_allocation = ?_settings.memory_allocation;
                     freezing_threshold = ?_settings.freezing_threshold};

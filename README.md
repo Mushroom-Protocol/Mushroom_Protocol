@@ -24,7 +24,7 @@ A passionate and diverse community of investors and scientists.
 # [Mushroom Protocol Platform](https://mushroomprotocol.io)
 
 <img width="1035" alt="Screenshot 2023-09-04 at 16 51 58" src="https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/55b891ad-ee09-42a9-a85e-80c34eb910b2">
-
+Read our [deck](https://drive.google.com/file/d/1TWiGX7EYCwkefOV_Wk0zSs7fnyDp1o62/view?usp=sharing "deck")
 
 # Funcionalities
 
