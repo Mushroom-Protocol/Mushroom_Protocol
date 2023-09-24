@@ -31,6 +31,7 @@ module{
         #refused;
         #tokenized;
         #funded: Nat8; //Porcentaje de financiamiento entregado
+
         #finalized;
     };
 //----- cambio de type por canister para cada startup ------
@@ -46,13 +47,22 @@ module{
     };
     */
 //--------------------------------------------------
-    public type Settings_startup ={
-        ID: Nat;
-        owner: Principal;
+
+    public type initStartup ={
+        caller: Principal;
         name: Text;
         country: Country;
-        legalIdentity: Text;
+        legalIdentity: Text;   
+        email: Text;
+        aproved: Bool;
     };
+    // public type Settings_startup ={
+    //     ID: Nat;
+    //     name: Text;
+    //     country: Country;
+    //     legalIdentity: Text; //Sujeto a verificación
+    //     email: Text;         //Verificación requerida
+    // };
     public type Project = {
         startup: Nat;           //ID de startup
         title: Text;

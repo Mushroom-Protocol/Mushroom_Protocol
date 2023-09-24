@@ -13,14 +13,15 @@ actor Mushroom {
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
   type Country = Types.Country;
-  type Settings_startup = Types.Settings_startup;
+  type initStartup = Types.initStartup;
   type CanisterStatus = { compute_allocation : Nat;
                           controllers : [Principal];
                           freezing_threshold : Nat;
                           memory_allocation : Nat};
 
   //---- stable data --------
-  stable var startupArray: [Principal] = []; //Lista de los Pincipal ID de cada Startup
+  stable var startupArray: [Principal] = [];      //Lista de los Pincipal ID de cada Startup aprovada
+  stable var incomingStartup: [initStartup] = []; //Lista solicitantes a registrarse. Requiere proceso de verificación
   stable var projectArray: [Project] = [];
 
   //---------- Gestion del canister main ** MOVER A management_canisters.mo ** ----------------------
@@ -49,11 +50,11 @@ actor Mushroom {
     var tempBufferControllers = Buffer.fromArray<Principal>(canisterStatus.controllers);
     tempBufferControllers.add(Principal.fromText(cText));
 
-    let updateSetings = {controllers = Buffer.toArray(tempBufferControllers);
+    let updateSettings = {controllers = Buffer.toArray(tempBufferControllers);
                         compute_allocation = canisterStatus.compute_allocation;
                         memory_allocation = canisterStatus.memory_allocation;
                         freezing_threshold = canisterStatus.freezing_threshold};
-    await updateCanisterStatus(updateSetings);
+    await updateCanisterStatus(updateSettings);
     "Controlador agregado correctamente";
   };
   //----------- Agregar elementos ----------------
@@ -62,32 +63,41 @@ actor Mushroom {
     tempBuffer.add(elem);
     Buffer.toArray(tempBuffer);
   };
-/*
-  public shared ({caller}) func addStartup(s: Startup): async ?Nat {
+
+  public shared ({caller}) func addStartup(init: initStartup): async ?Text {
     if(not Principal.isController(caller)){return null};
-    startupArray := addToArray<Startup>(startupArray, s);
-    return ?Array.size(startupArray);
+    let newStartup = await createCanisterStartup(init);
+    startupArray := addToArray<Principal>(startupArray, Principal.fromText(newStartup));
+    return ?newStartup;
   };
-  */
+  
+//-------------- Validaciones para incorporar Startups al sistema ---------------------
 
 //---- Hechas las validaciones para registrar una Startup, se crea el correspondiente canister----
 //--- ** MOVER A management_canisters.mo ** ---------
-  func createCanisterStartup(owner: Principal, init: Types.Settings_startup): async Text{
+  func createCanisterStartup(init: initStartup): async Text{
     Cycles.add(13_846_199_230);  
-    let newStartup = await Startup.Startup(owner, init);   //ver funcionamiento en mainnet
+    let newStartup = await Startup.Startup(init);   //ver funcionamiento en mainnet
     let principal = Principal.fromActor(newStartup);
     startupArray := addToArray<Principal>(startupArray, principal);         
     Principal.toText(principal);
   };
-  //----------------------------  se llamará desde el Frontend -------------------------------------------
-  public shared ({caller}) func signUpStartup(init: Settings_startup): async ?Text{
-    if(signUpOK(init) and not Principal.isAnonymous (caller)){return null};
-    let principalStartup = await createCanisterStartup(caller, init);
-    ?principalStartup;
+  // Con esta función ejecutada desde el frontend se registrarán las solicitudes de perfil de Startup 
+  //para su posterior aprobación y creación del correspondiente Canister
+  public shared ({caller}) func signUpStartup(name: Text,
+                                              country: Country,
+                                              legalIdentity: Text,   
+                                              email: Text): async Bool{
+    let data = {caller; name; country; legalIdentity; email; aproved = true};
+    if(signUpOK(data) and not Principal.isAnonymous (caller)){
+      incomingStartup := addToArray<initStartup>(incomingStartup, data);
+      return true;
+    };
+    return false;  
   };
   //-------------------------------------------------------------------------------------
-  func signUpOK(data:Settings_startup): Bool{
-    //TODO
+  func signUpOK(data: initStartup): Bool{
+    //Verificación de correo mediante el envio y solicitud de token 
     true;
   };
   //-------------------------------------------------------------------------------------
