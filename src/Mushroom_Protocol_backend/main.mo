@@ -14,6 +14,7 @@ actor Mushroom {
   type ProjectStatus = Types.ProjectStatus;
   type Country = Types.Country;
   type initStartup = Types.initStartup;
+  //Esta estructura es solo para poder agregar controladores al canister main 
   type CanisterStatus = { compute_allocation : Nat;
                           controllers : [Principal];
                           freezing_threshold : Nat;
@@ -42,13 +43,13 @@ actor Mushroom {
                     freezing_threshold = ?_settings.freezing_threshold};
     await ic.update_settings({ canister_id; settings });
   };
-  public shared ({caller}) func addController(cText: Text): async Text{
+  public shared ({caller}) func addController(cText: Principal): async Text{
     if(not Principal.isController(caller)){return "Acción denegada"};
-    if(Principal.isController(Principal.fromText(cText))){return "El principal ingresado ya es controller"};
+    if(Principal.isController(cText)){return "El principal ingresado ya es controller"};
     let canisterStatus = await getCanisterStatus();
 
     var tempBufferControllers = Buffer.fromArray<Principal>(canisterStatus.controllers);
-    tempBufferControllers.add(Principal.fromText(cText));
+    tempBufferControllers.add(cText);
 
     let updateSettings = {controllers = Buffer.toArray(tempBufferControllers);
                         compute_allocation = canisterStatus.compute_allocation;
@@ -138,4 +139,5 @@ actor Mushroom {
     projectArray := Buffer.toArray(tempBuffer);
     true;
   };
+
 };
