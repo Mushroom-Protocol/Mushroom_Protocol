@@ -1,10 +1,12 @@
 import Types "Types";
+import TypeNftProfile "TypeNftProfile";
 import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Interface "ic-management-interface";
 import Cycles "mo:base/ExperimentalCycles";
 import Startup "Startup";
+import nftprofile "nftprofile";
 
 actor Mushroom {
 
@@ -14,50 +16,66 @@ actor Mushroom {
   type ProjectStatus = Types.ProjectStatus;
   type Country = Types.Country;
   type initStartup = Types.initStartup;
-  //Esta estructura es solo para poder agregar controladores al canister main 
-  type CanisterStatus = { compute_allocation : Nat;
-                          controllers : [Principal];
-                          freezing_threshold : Nat;
-                          memory_allocation : Nat};
+  type Mode = Types.Mode;
 
   //---- stable data --------
   stable var startupArray: [Principal] = [];      //Lista de los Pincipal ID de cada Startup aprovada
   stable var incomingStartup: [initStartup] = []; //Lista solicitantes a registrarse. Requiere proceso de verificación
   stable var projectArray: [Project] = [];
+  stable var profilesCanisterId: Principal = Principal.fromText("");
 
-  //---------- Gestion del canister main ** MOVER A management_canisters.mo ** ----------------------
-  public func getCanisterStatus() : async CanisterStatus {
+  //----------- Gestion del canisater principal -----------
+  func safeUpdateControllers(controllers : [Principal], mode: Mode) : async Bool {
     let IC = "aaaaa-aa";
-    let ic = actor(IC) : Interface.Self;
+    let ic = actor (IC) : Interface.Self;
     let canister_id = Principal.fromActor(Mushroom);
-    let canisterStatus = await ic.canister_status({ canister_id });
-    canisterStatus.settings;
-  };
-  func updateCanisterStatus(_settings: CanisterStatus):async (){
-    let IC = "aaaaa-aa";
-    let ic = actor(IC) : Interface.Self;
-    let canister_id = Principal.fromActor(Mushroom);
-    let settings = {controllers = ?_settings.controllers;
-                    compute_allocation = ?_settings.compute_allocation;
-                    memory_allocation = ?_settings.memory_allocation;
-                    freezing_threshold = ?_settings.freezing_threshold};
+    let status = await ic.canister_status({ canister_id });
+    var oldSettings = status.settings;
+    var tempBufferControllers = Buffer.fromArray<Principal>(oldSettings.controllers);
+
+    switch(mode){
+      case(#Add){
+        for (c in controllers.vals()) tempBufferControllers.add(c);
+      };
+      case(#Remove){
+        for (rem in controllers.vals()) {
+          var i = 0;
+          while(i < tempBufferControllers.size()){
+            if(rem == tempBufferControllers.get(i)){
+              ignore tempBufferControllers.remove(i);
+              i := tempBufferControllers.size();
+            };
+            i += 1;
+          };
+        };
+      };
+      case(_){};
+    };
+    
+    let settings = {
+      controllers = ?Buffer.toArray(tempBufferControllers);
+      compute_allocation = ?oldSettings.compute_allocation;
+      memory_allocation = ?oldSettings.memory_allocation;
+      freezing_threshold = ?oldSettings.freezing_threshold;
+    };
     await ic.update_settings({ canister_id; settings });
+    return true;
   };
-  public shared ({caller}) func addController(cText: Principal): async Text{
-    if(not Principal.isController(caller)){return "Acción denegada"};
-    if(Principal.isController(cText)){return "El principal ingresado ya es controller"};
-    let canisterStatus = await getCanisterStatus();
+    //Para que el siguiente grupo de funciones se puedan ejecutar exitosamente se debe agregar el Principal de 
+    //este mismo canister a la lista de controllers, desde el CLI dfx y usando la identity con la que fue desplegado
+    //el canister. El siguiente comando: "dfx canister update-settings --add-controller <canisterID> <canisterID>"
+    //agrega el principal del canister a su propia lista de controllers y eso permite la ejecución de la función 
+    //privada safeUpdateControllers() 
 
-    var tempBufferControllers = Buffer.fromArray<Principal>(canisterStatus.controllers);
-    tempBufferControllers.add(cText);
-
-    let updateSettings = {controllers = Buffer.toArray(tempBufferControllers);
-                        compute_allocation = canisterStatus.compute_allocation;
-                        memory_allocation = canisterStatus.memory_allocation;
-                        freezing_threshold = canisterStatus.freezing_threshold};
-    await updateCanisterStatus(updateSettings);
-    "Controlador agregado correctamente";
+  public shared ({caller}) func addController(controllers: [Principal]): async Bool{
+    if(not Principal.isController(caller)){return false};
+    return await safeUpdateControllers(controllers, #Add);
   };
+  public shared ({caller}) func removeControllers(controllers: [Principal]): async Bool{
+    if(not Principal.isController(caller)){return false};
+    return await safeUpdateControllers(controllers, #Remove);
+  };
+//----------------------------------------------------------------
   //----------- Agregar elementos ----------------
   func addToArray<T>(arr: [T], elem: T): [T]{
     var tempBuffer = Buffer.fromArray<T>(arr);
@@ -65,17 +83,20 @@ actor Mushroom {
     Buffer.toArray(tempBuffer);
   };
 
-  public shared ({caller}) func addStartup(init: initStartup): async ?Text {
-    if(not Principal.isController(caller)){return null};
+  public shared ({caller}) func getIncomingStartup(): async [initStartup]{incomingStartup};
+
+// ---- Esta funcion llamada desde un controlles se encarga de generar un canister para una
+//----- Startup luego de que se haya pasado exitosamente por la instancia de aprovación -----
+  public shared ({caller}) func addStartup(index: Nat): async ?Text {
+    if(not Principal.isController(caller)){return null}; 
+
+    var tempBuffer = Buffer.fromArray<initStartup>(incomingStartup);
+    let init = tempBuffer.remove(index);
     let newStartup = await createCanisterStartup(init);
     startupArray := addToArray<Principal>(startupArray, Principal.fromText(newStartup));
+    incomingStartup := Buffer.toArray(tempBuffer);
     return ?newStartup;
   };
-  
-//-------------- Validaciones para incorporar Startups al sistema ---------------------
-
-//---- Hechas las validaciones para registrar una Startup, se crea el correspondiente canister----
-//--- ** MOVER A management_canisters.mo ** ---------
   func createCanisterStartup(init: initStartup): async Text{
     Cycles.add(13_846_199_230);  
     let newStartup = await Startup.Startup(init);   //ver funcionamiento en mainnet
@@ -90,19 +111,13 @@ actor Mushroom {
                                               legalIdentity: Text,   
                                               email: Text): async Bool{
     let data = {caller; name; country; legalIdentity; email; aproved = true};
-    if(signUpOK(data) and not Principal.isAnonymous (caller)){
+    if(not Principal.isAnonymous (caller)){
       incomingStartup := addToArray<initStartup>(incomingStartup, data);
       return true;
     };
     return false;  
   };
-  //-------------------------------------------------------------------------------------
-  func signUpOK(data: initStartup): Bool{
-    //Verificación de correo mediante el envio y solicitud de token 
-    true;
-  };
-  //-------------------------------------------------------------------------------------
-
+  // -------------------------------------------------------------------------------------------------
   public shared ({caller}) func addProject(p: Project): async ?Nat {
     if(not Principal.isController(caller)){return null};
     projectArray := addToArray<Project>(projectArray, p);
@@ -139,5 +154,32 @@ actor Mushroom {
     projectArray := Buffer.toArray(tempBuffer);
     true;
   };
+
+  //Esta funcion se encargará de desplegar el canister para la coleccion de prifileNFT y tendrá efecto solo
+  //la primera vez que sea ejecutada, en posteriores llamas se limitará a devolver el princial de dicha coleccion
+
+  public shared ({caller}) func createCollectionProfile(
+    _logo: TypeNftProfile.Logo, 
+    _name: Text,
+    _symbol: Text
+    ):  async ?Principal{
+    if(not Principal.isController(caller)) return null;
+    if(profilesCanisterId != Principal.fromText("")){ //Singleton Patern
+      return ?profilesCanisterId;
+    };
+    Cycles.add(7_692_307_692 + 6_153_891_538 + 3_150); //Fee para crear el canister
+    let profileCanister = await nftprofile.ProfileNFT(caller, {logo = _logo; name = _name; symbol = _symbol});
+    profilesCanisterId := Principal.fromActor(profileCanister);
+    return ?profilesCanisterId; 
+  };
+
+  //------------- Funcion para crer una collección de NFT MP de investigacion ----------
+  public shared ({caller}) func createCollectionNFT(): async ?Principal{
+
+    //TODO 
+    //Crear un canister para la coleccion en base a un actor class propio o un standard dip721 modificado
+    
+    null;
+  }
 
 };

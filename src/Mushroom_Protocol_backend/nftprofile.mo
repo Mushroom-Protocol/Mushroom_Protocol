@@ -3,18 +3,21 @@ import Buffer "mo:base/Buffer";
 import Principal "mo:base/Principal";
 
 shared ({ caller }) actor class ProfileNFT(custodian: Principal, init : TypeNftProfile.ProfileNftInit) {
+
+  type Nft = TypeNftProfile.Nft;
+  type ProfileNftInit = TypeNftProfile.ProfileNftInit;
+  type Data = TypeNftProfile.Data;
+  type TypeImg = TypeNftProfile.TypeImg;
+
   stable var logo = init.logo;
   stable var name = init.name;
   stable var symbol = init.symbol;
 
   stable var profiles : [Nft] = [];
   stable var custodians = [custodian];
-  stable var lastID : Nat64 = 27182; // Porque soy un poco nerd
-
-  type Nft = TypeNftProfile.Nft;
-  type ProfileNftInit = TypeNftProfile.ProfileNftInit;
-  type Data = TypeNftProfile.Data;
-  type TypeImg = TypeNftProfile.TypeImg;
+  let bias = 27182; // Porque soy un poco nerd
+  stable var lastID = bias; 
+  
   //Esta funcion se debe modificar cuando el numero de usuarios sea elevado (> 31416)
   func addProfile(profile : Nft) : () {
     var tempBuffer = Buffer.fromArray<Nft>(profiles);
@@ -52,7 +55,7 @@ shared ({ caller }) actor class ProfileNFT(custodian: Principal, init : TypeNftP
   };
   public func getNftFromID (i: Nat): async ?Nft{
     if(profiles.size() <= i) return null;
-    return ?profiles[i];    
+    return ?profiles[i - bias];    
   };
 
   public shared ({ caller }) func addCustodian(c : Principal) : async Bool {

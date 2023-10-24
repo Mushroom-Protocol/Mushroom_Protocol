@@ -56,6 +56,12 @@ module{
         email: Text;
         aproved: Bool;
     };
+    public type Mode = {
+        #Add;
+        #Remove;
+        #Override;
+        #Clear;
+    };
     // public type Settings_startup ={
     //     ID: Nat;
     //     name: Text;
