@@ -1,10 +1,5 @@
 {
   "canisters": {
-    "testNFT": {
-      "type": "motoko",
-      "main": "src/Mushroom_Protocol_backend/testNFTProfile.mo"
-
-    },
     "Mushroom_Protocol_backend": {
       "main": "src/Mushroom_Protocol_backend/main.mo",
       "type": "motoko"

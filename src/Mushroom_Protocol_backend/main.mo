@@ -29,7 +29,7 @@ actor Mushroom {
   stable var incomingStartup : [initStartup] = []; //Lista solicitantes a registrarse. Requiere proceso de verificación
   stable var projectArray : [Project] = [];
   stable var collections = List.nil<P>();
-  stable var profilesCanisterId : P = Principal.fromText("");
+  stable var profilesCanisterId : P = Principal.fromText("aaaaa-aa");
 
   //----------- Gestion del canisater principal -----------
   func safeUpdateControllers(controllers : [P], mode : Mode) : async Bool {
@@ -118,7 +118,7 @@ actor Mushroom {
     country : Country,
     legalIdentity : Text,
     email : Text,
-  ) : async Bool {
+    ) : async Bool {
     let data = { caller; name; country; legalIdentity; email; aproved = true };
     if (not Principal.isAnonymous(caller)) {
       incomingStartup := addToArray<initStartup>(incomingStartup, data);
