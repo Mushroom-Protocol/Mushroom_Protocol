@@ -1,4 +1,4 @@
-module types {
+module Types {
   public type ProfileNftInit = {
     //este tipo de dato es para inicializar la colección de NFTProfile
     logo : Logo;
