@@ -9,12 +9,12 @@ import Blob "mo:base/Blob";
 import Iter "mo:base/Iter";
 
 shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.Metadata) = {
-    //----declaraciones de tipos ---
+    //---------- declaraciones de tipos ------------
     type Nft = Types.Nft;
     type Result<Ok, Err> = { #ok : Ok; #err : Err };
     type TokenId = Nat;
     type Logo = Types.Logo;
-    //------------------------------
+    //----------------------------------------------
     stable let startupOwner = to;
     stable let rootPrincipal = caller;
     stable var metadata = data;
@@ -22,39 +22,33 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
     stable var minted = List.nil<Nft>();
     stable var lastId = 0;
 
-    public query func getLogo() : async Logo { metadata.logo };
-    public query func getTtle() : async Text { metadata.title };
-    public query func getSymbol() : async Text { metadata.symbol };
+
+
+    func rand16x16Bits(): async [Nat]{
+        let rand : [Nat8] = Blob.toArray(await Random.blob());
+        var result = Buffer.fromArray<Nat>([]);
+        for(i in Iter.range(0, 15)){
+            result.add(Nat8.toNat(rand[i*2]) *256 + Nat8.toNat(rand[i*2 +1]))
+        };
+        return Buffer.toArray(result);
+    };
 
     public shared ({ caller }) func mint(to : Principal, qty : Nat) : async Result<[TokenId], Text> {
         if (caller == rootPrincipal) return #err("Unauthorized caller"); //Minteable solo desde el canister principal
         var available = metadata.images.size();
         if (qty > available) return #err("La cantidad disponible es de " # Nat.toText(available) # "NFT");
 
-        let random : [Nat8] = Blob.toArray(await Random.blob());
         var temBufferImages = Buffer.fromArray<Blob>(metadata.images);
         var result = Buffer.fromArray<Nat>([]);
 
         // asignacion random de los "qty" nft solicitados
-        var currentNat = 0;
-        var incomplete = false;
-
-        //--- generación de todos los numeros aleatorios a partir de un solo Blob de 32 Nat8
-        for (i in Iter.range(1, 2 * qty -1)) {     
-            if (incomplete) {
-                //Si no hay un valor de 16 incompleto se cominezza a crear uno
-                currentNat += Nat8.toNat(random[i]);
-                incomplete := true;
-            } else {
-                //Si hay un valor de 16 bit incompleto se lo termina de generar
-                currentNat := currentNat * 256 + Nat8.toNat(random[i]); //el bitwise solo funciona con Int
-                //se escala el valor generado a un valor dentro del rango de de la lista
-                let index = currentNat * temBufferImages.size() / 65536; 
-                let image = temBufferImages.remove(index);
-                minted := List.push<Nft>({ owner = to; id = lastId; data = image;}, minted);
-                result.add(lastId);  
-                lastId += 1;
-            };
+        let random = await rand16x16Bits();
+        for (i in Iter.range(0, qty -1)) {     
+            let index = random[i] * temBufferImages.size() / 65536; 
+            let image = temBufferImages.remove(index);
+            minted := List.push<Nft>({ owner = to; id = lastId; data = image;}, minted);
+            result.add(lastId);  
+            lastId += 1;   
         };
         metadata := {
             owner = metadata.owner;
@@ -66,9 +60,30 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
             symbol = metadata.symbol;
             logo = metadata.logo;
         };
-        return #ok(Buffer.toArray(result));//devuelve los id de los NFT minteados en la operación
-
+        return #ok(Buffer.toArray(result)); //devuelve los id de los NFT minteados en la operación
     };
+
+    //--------------------- getters --------------------------------
+
+    public query func getLogo() : async Logo { metadata.logo };
+
+    public query func getTitle() : async Text { metadata.title };
+
+    public query func getSymbol() : async Text { metadata.symbol };
+
+    public shared ({caller}) func getSamples(): async [Blob]{
+        if(caller != rootPrincipal){return []};
+        if(metadata.images.size() <= 10){return metadata.images};
+        let random = await rand16x16Bits();
+        var tempBufferImages = Buffer.fromArray<Blob>(metadata.images);
+        var result = Buffer.fromArray<Blob>([]);
+        for(i in Iter.range(0,9)){
+            let index = random[i] * tempBufferImages.size() / 65536;
+            result.add(tempBufferImages.remove(index));
+        };
+        return Buffer.toArray(tempBufferImages);
+    };
+
     public query func getMaxLimit() : async Nat {
         return maxLimit;
     };
@@ -85,8 +100,4 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
             case(?value) {#ok(value)};
         };
     };
-    
-
-
-
 };

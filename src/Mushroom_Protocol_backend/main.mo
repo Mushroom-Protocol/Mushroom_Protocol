@@ -18,6 +18,7 @@ actor Mushroom {
   type P = Principal;
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
+  type Nft = TypesProjectNft.Nft;
   type Country = Types.Country;
   type initStartup = Types.initStartup;
   type Mode = Types.Mode;
@@ -90,7 +91,7 @@ actor Mushroom {
     Buffer.toArray(tempBuffer);
   };
 
-  public query func getIncomingStartup() : async [initStartup] {incomingStartup;};
+
 
   // ---- Esta funcion llamada desde un controllers se encarga de generar un canister para una
   //----- Startup luego de que se haya pasado exitosamente por la instancia de aprovación -----
@@ -135,14 +136,22 @@ actor Mushroom {
 
   //------------------ Geters -------------------------
   public query func getProjectsApproved() : async [Project] {
-    var tempBuffer = Buffer.Buffer<Project>(0);
-    for (p in projectArray.vals()) {
-      if (p.status == #approved) {
-        tempBuffer.add(p);
-      };
-    };
-    Buffer.toArray(tempBuffer);
+    Array.filter<Project>(projectArray, func p = p.status == #approved);
   };
+
+  public query func getStartups() : async [P] {startupArray};
+
+  public func getRandomNFTProyect(collection: P): async [Nft]{
+    let remoteCollection = actor (Principal.toText(collection)) : actor { getSamples : shared () -> async [Nft]; };
+    let samples = await remoteCollection.getSamples();
+    return samples;
+  };
+  
+  public query func getIncomingStartup() : async [initStartup] {incomingStartup;};
+
+  public query func getProjectArray() : async [Project] {projectArray};
+
+  public query func getCollections() : async [P] {List.toArray(collections)};
 
   //-------- Modify Status Projects ---------------
   public shared ({ caller }) func setStatus(IDProject : Nat, s : ProjectStatus) : async Bool {
