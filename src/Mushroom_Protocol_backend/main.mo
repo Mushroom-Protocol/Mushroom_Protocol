@@ -1,10 +1,10 @@
+import Principal "mo:base/Principal";
 import List "mo:base/List";
+import Buffer "mo:base/Buffer";
+import Array "mo:base/Array";
 import Types "types/Types";
 import TypesProjectNft "types/TypesProjectNFT";
 import TypesSoulbound "types/TypesSoulbound";
-import Principal "mo:base/Principal";
-import Buffer "mo:base/Buffer";
-import Array "mo:base/Array";
 import Interface "ic-management-interface";
 import Cycles "mo:base/ExperimentalCycles";
 import Startup "Startup";
@@ -90,9 +90,9 @@ actor Mushroom {
     Buffer.toArray(tempBuffer);
   };
 
-  public shared ({ caller }) func getIncomingStartup() : async [initStartup] {incomingStartup;};
+  public query func getIncomingStartup() : async [initStartup] {incomingStartup;};
 
-  // ---- Esta funcion llamada desde un controlles se encarga de generar un canister para una
+  // ---- Esta funcion llamada desde un controllers se encarga de generar un canister para una
   //----- Startup luego de que se haya pasado exitosamente por la instancia de aprovación -----
   public shared ({ caller }) func addStartup(index : Nat) : async ?Text {
     if (not Principal.isController(caller)) { return null };
@@ -134,7 +134,7 @@ actor Mushroom {
   };
 
   //------------------ Geters -------------------------
-  public func getProjectsApproved() : async [Project] {
+  public query func getProjectsApproved() : async [Project] {
     var tempBuffer = Buffer.Buffer<Project>(0);
     for (p in projectArray.vals()) {
       if (p.status == #approved) {
@@ -171,7 +171,7 @@ actor Mushroom {
 
   public shared ({ caller }) func createCollectionProfile(_logo: Logo, _name: Text, _symbol: Text,): async ?P {
     if (not Principal.isController(caller)) return null;
-    if (profilesCanisterId != Principal.fromText("")) {
+    if (profilesCanisterId != Principal.fromText("aaaaa-aa")) {
       //Singleton Pattern
       return ?profilesCanisterId;
     };
@@ -195,6 +195,7 @@ actor Mushroom {
   public shared ({caller}) func mintNftCollection(project: P, qty: Nat): async Result<[Nat], Text>{
     if(Principal.isAnonymous(caller)) return #err("Inicie sesión");
     if(qty > 10) return #err("La cantidad maxima por operación de minteo es de 10 NFT"); //quitar el 10 y poner una variable 
+    
     let remoteCollection = actor (Principal.toText(project)) : actor { mint : shared (Principal, Nat) -> async [Nat]; };
     let remoteProfiles = actor (Principal.toText(profilesCanisterId)) : actor {
       getTokenIdForUser : shared (P) -> async ?TypesSoulbound.TokenId;
