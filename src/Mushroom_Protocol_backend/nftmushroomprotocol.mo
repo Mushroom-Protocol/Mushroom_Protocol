@@ -7,6 +7,7 @@ import Nat "mo:base/Nat";
 import Nat8 "mo:base/Nat8";
 import Blob "mo:base/Blob";
 import Iter "mo:base/Iter";
+import Time "mo:base/Time";
 
 shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.Metadata) = {
     //---------- declaraciones de tipos ------------
@@ -21,8 +22,6 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
     stable let maxLimit = metadata.images.size();
     stable var minted = List.nil<Nft>();
     stable var lastId = 0;
-
-
 
     func rand16x16Bits(): async [Nat]{
         let rand : [Nat8] = Blob.toArray(await Random.blob());
@@ -40,13 +39,14 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
 
         var temBufferImages = Buffer.fromArray<Blob>(metadata.images);
         var result = Buffer.fromArray<Nat>([]);
+        let timestamp = Time.now();
 
         // asignacion random de los "qty" nft solicitados
         let random = await rand16x16Bits();
         for (i in Iter.range(0, qty -1)) {     
             let index = random[i] * temBufferImages.size() / 65536; 
             let image = temBufferImages.remove(index);
-            minted := List.push<Nft>({ owner = to; id = lastId; data = image;}, minted);
+            minted := List.push<Nft>({ owner = to; id = lastId; data = image; mintedTime = timestamp}, minted);
             result.add(lastId);  
             lastId += 1;   
         };
@@ -60,6 +60,7 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
             symbol = metadata.symbol;
             logo = metadata.logo;
         };
+
         return #ok(Buffer.toArray(result)); //devuelve los id de los NFT minteados en la operación
     };
 
@@ -100,4 +101,8 @@ shared ({ caller }) actor class MushroomNFTProject(to : Principal, data : Types.
             case(?value) {#ok(value)};
         };
     };
+
+    //---------------  Funciones de transferencia de NFT ----------------------
+
+    //-------------------------------------------------------------------------
 };

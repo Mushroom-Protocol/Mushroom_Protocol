@@ -32,5 +32,6 @@ module {
         owner: Principal;
         id: TokenId;
         data: Blob;
-    }
+        mintedTime: Int;
+    };
 }

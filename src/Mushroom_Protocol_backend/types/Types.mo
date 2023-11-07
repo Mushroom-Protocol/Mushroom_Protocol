@@ -48,13 +48,21 @@ module{
     */
 //--------------------------------------------------
 
-    public type initStartup ={
+    public type AprovedStartUp ={
         caller: Principal;
         name: Text;
         country: Country;
-        legalIdentity: Text;   
+        legalIdentity: Text;
         email: Text;
         aproved: Bool;
+        //agregar campos necesarios
+    };
+    public type IncommingStartUp = {
+        name: Text;
+        country: Country;
+        titular: Text;
+        telefono: Nat;
+        email: Text;
     };
     public type Mode = {
         #Add;
@@ -70,6 +78,7 @@ module{
     //     email: Text;         //Verificación requerida
     // };
     public type Project = {
+        owner: Principal;
         startup: Nat;           //ID de startup
         title: Text;
         area: Text;             //Posible uso de enumeraciones
