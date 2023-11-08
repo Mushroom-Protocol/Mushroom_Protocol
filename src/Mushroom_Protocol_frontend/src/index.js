@@ -3,8 +3,6 @@ import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 let back = Mushroom_Protocol_backend;
 
-
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const loginButton = document.getElementById("login");
@@ -24,22 +22,32 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         const identity = authClient.getIdentity();
         console.log(identity);
+        
         const agent = new HttpAgent({ identity });
         back = createActor(process.env.CANISTER_ID_MUSHROOM_PROTOCOL_BACKEND, {
             agent,
         });
-        principal = (await back.whoami()).toString();
+        principal = await back.whoami();
+        if(await back.iAmInWhiteList()){
+            document.getElementById("AddMeToWhiteList").style.visibility = "hidden"
+            document.getElementById("inWhiteList").style.visibility = "visible";
+        }
+        else{
+            document.getElementById("inWhiteList").style.visibility = "hidden";
+            document.getElementById("AddMeToWhiteList").style.visibility = "visible"
+        }
         document.getElementById("id").innerText = principal;
         
         return false;
     };
 
-    var contenidoDinamico = document.getElementById("dinamic-content");
+    const contenidoDinamico = document.getElementById("dinamic-content");
     cargarContenidoDinamico("pages/home.html")
+
     let nav = document.getElementsByTagName("nav")[0];
     let view = "home";
 
-    nav.addEventListener("click", function(event){
+    nav.addEventListener("click", async function(event){
         event.preventDefault();
         let event_id = event.target.id 
         if (event_id === view) { return };
@@ -47,8 +55,42 @@ document.addEventListener("DOMContentLoaded", function () {
             cargarContenidoDinamico("pages/"+ event_id);
             view = event_id 
         };
+        if(event_id === "AddMeToWhiteList"){
+            let email = prompt("Por favor, ingresa tu correo electrónico:");
+            if (email != "" && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)){
+                return
+            };
+            const success = await back.addMeToWhiteList(email);
+            document.getElementById("AddMeToWhiteList").style.visibility = "hidden";
+            document.getElementById("inWhiteList").style.visibility = "visible";
+        };
         return;     
     });
+
+    // const menu_admin = document.getElementById("menu-admin");
+    // menu_admin.addEventListener("click", async function(event){
+    //     event.preventDefault();
+    //     let event_id = event.target.id;
+    //     const admin_body = contenidoDinamico.getElementById("admin-body");
+        
+    //     switch(event_id){
+    //         case "whitelist":
+    //             alert(await back.getWhiteList());
+    //             break;
+    //         case "startup-request":
+    //             alert(await back.getIncomingStartup());
+    //             break;
+    //         case "startup":
+    //             alert(await back.getStartups());
+    //             break;
+    //         case "project-request":
+    //             alert(await back.getProjectsPresented());
+    //             break;
+    //         case "project":
+    //             alert(await back.getProjectsApproved());
+    //             break;        
+    //     };
+    // });
 
     contenidoDinamico.addEventListener("click", async function (event){
         let event_id = event.target.id;
@@ -95,8 +137,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         xhr.send();
     }; 
-
- 
 
     function formOK(form) {
         const campos = form.querySelectorAll("input[required]");

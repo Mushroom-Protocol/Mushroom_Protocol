@@ -1,4 +1,5 @@
 import Principal "mo:base/Principal";
+import Nat "mo:base/Nat";
 import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
@@ -20,20 +21,27 @@ actor Mushroom {
   type ProjectStatus = Types.ProjectStatus;
   type Nft = TypesProjectNft.Nft;
   type Country = Types.Country;
+  
    
   //type initStartup = Types.initStartup;
   type IncommingStartUp = Types.IncommingStartUp;
-  type AprovedStartUp = Types.AprovedStartUp;
+  type ApprovedStartUp = Types.ApprovedStartUp;
   type Mode = Types.Mode;
   type Logo = TypesSoulbound.Logo;
+  type UserType = Types.UserType;
   type Result<Ok, Err> = { #ok : Ok; #err : Err };
 
   //---- stable data --------
-  stable var startupArray : [P] = []; //Lista de los Pincipal ID de cada Startup aprovada
+  //stable var startupArray : [P] = []; //Considerar la conveniencia de no generar un canister para cada startup
+  
+  stable var whiteList: [(P, Text)] = [];
   stable var requestId: Nat = 0;
   stable var incomingStartup : [(Principal,IncommingStartUp)] = []; //Lista solicitantes a registrarse. Requiere proceso de verificación
+  stable var approvedStartUp : [ApprovedStartUp] = [];  //Lista de startup aprovadas
+  stable var startUpId: Nat = 0;
   stable var projectArray : [Project] = [];
   stable var collections = List.nil<P>();
+  stable var minterUser : [P] = [];
   stable var profilesCanisterId : P = Principal.fromText("aaaaa-aa");
 
   //----------- Gestion del canisater principal -----------
@@ -88,23 +96,43 @@ actor Mushroom {
     await safeUpdateControllers(controllers, #Remove);
   };
   //----------------------------------------------------------------
-  //----------- Agregar elementos ----------------
+  //----------- Agregar y quitar elementos ----------------
   func addToArray<T>(arr : [T], elem : T) : [T] {
     var tempBuffer = Buffer.fromArray<T>(arr);
     tempBuffer.add(elem);
     Buffer.toArray(tempBuffer);
   };
+  func removeFromArray<T>(arr: [T], index: Nat): [T]{
+    var tempBuffer = Buffer.fromArray<T>(arr);
+    ignore tempBuffer.remove(index);
+    Buffer.toArray<T>(tempBuffer);
+  };
 
   public shared ({caller}) func whoami():async Text{Principal.toText(caller)};
 
+  public shared ({caller}) func userType():async (Text,UserType){
+    assert not Principal.isAnonymous(caller);
+    if(Principal.isController(caller)){ return (Principal.toText(caller), #Controller)};
+    for(st in approvedStartUp.vals()){
+      if(st.owner == caller){return (Principal.toText(caller), #Startup)}
+    };
+    for(user in minterUser.vals()){
+      if(user == caller){return (Principal.toText(caller), #MinterUser)}
+    };
+    for(req in incomingStartup.vals()){
+      if(req.0 == caller){ return (Principal.toText(caller), #Requester)}
+    };
+    return (Principal.toText(caller), #Visitor)
+  };
 
   // ---- Esta funcion llamada desde un controllers se encarga de generar un canister para una
   //----- Startup luego de que se haya pasado exitosamente por la instancia de aprovación -----
+  /*
   public shared ({ caller }) func createStartUpCanister(cycles: Nat, indexIncomming : Nat, data:AprovedStartUp) : async ?Text {
     assert Principal.isController(caller);
     var tempBuffer = Buffer.fromArray<(Principal,IncommingStartUp)>(incomingStartup);
     let init = tempBuffer.remove(indexIncomming);
-    if(not(init.0 == data.caller and init.1.name == data.name)){
+    if(not(init.0 == data.owner and init.1.name == data.name)){
       return ?"Los datos no coinciden";
     };
     Cycles.add(cycles); //13_846_199_230
@@ -113,6 +141,18 @@ actor Mushroom {
     startupArray := addToArray<Principal>(startupArray, startupCanisterId);    
     incomingStartup := Buffer.toArray(tempBuffer);
     ?Principal.toText(startupCanisterId);
+  };
+  */
+
+  public shared ({caller}) func approveStartUp(indexIncomming : Nat, data: ApprovedStartUp): async Text{
+    assert Principal.isController(caller);
+    if(incomingStartup[indexIncomming].0 != data.owner){
+      return "Inconsistencia de datos"
+    };
+    incomingStartup := removeFromArray(incomingStartup, indexIncomming);
+    approvedStartUp := addToArray<ApprovedStartUp>(approvedStartUp, data); 
+    startUpId += 1;
+    return "StartUp aprobada: Id -> " # Nat.toText(startUpId -1);
   };
 
   // Con esta función ejecutada desde el frontend se registrarán las solicitudes de perfil de Startup
@@ -123,19 +163,43 @@ actor Mushroom {
     "Su solicitud ha sido ingresada exitosamente, en los próximos días será contactado por email"
   };
 
-  // -------------------------------------------------------------------------------------------------
+  // ----------------------- White List----------------------------------------------------------------
+  public shared ({caller}) func addMeToWhiteList(email: Text): async Bool{
+    assert not Principal.isAnonymous(caller);
+    if(await inWhiteList(caller)) return true;
+    whiteList := addToArray(whiteList, (caller, email));
+    return true;
+  };
+  public shared ({caller}) func iAmInWhiteList(): async Bool{
+    return await inWhiteList(caller);
+  };
+  public shared ({caller}) func inWhiteList(user: P): async Bool{
+    assert Principal.isController(caller);
+    for(i in whiteList.vals()){
+      if(i.0 == user) return true;
+    };
+    return false;
+  };
+//------------------------------------------------------------------------------------------------------
   public shared ({ caller }) func addProject(p : Project) : async ?Nat {
     if (not Principal.isController(caller)) { return null };
     projectArray := addToArray<Project>(projectArray, p);
     ?Array.size(projectArray);
   };
 
-  //------------------ Geters -------------------------
+  //------------------ Getters publicos-------------------------
+
   public query func getProjectsApproved() : async [Project] {
     Array.filter<Project>(projectArray, func p = p.status == #approved);
   };
 
-  public query func getStartups() : async [P] {startupArray};
+  public query func getProjectsPresented() : async [Project] {
+    Array.filter<Project>(projectArray, func p = p.status == #presented);
+  };
+
+  public query func getProjectArray() : async [Project] {projectArray};
+
+
 
   public func getRandomNFTCollection(collectionId: Nat): async [Nft]{
     let collection = switch(List.get<P>(collections,collectionId)){
@@ -146,12 +210,21 @@ actor Mushroom {
     let samples = await remoteCollection.getSamples();
     return samples;
   };
-  
-  public query func getIncomingStartup() : async [(Principal,IncommingStartUp)] {incomingStartup;};
-
-  public query func getProjectArray() : async [Project] {projectArray};
 
   public query func getCollections() : async [P] {List.toArray(collections)};
+  
+  //------ Getters Only Controlers ------------------
+
+  public shared ({caller}) func getWhiteList():async [(P, Text)]{
+    assert Principal.isController(caller);
+    whiteList;
+  };
+
+  public shared ({caller}) func getIncomingStartup() : async [(Principal,IncommingStartUp)] {
+    assert Principal.isController(caller);
+    incomingStartup;
+  };
+  public query func getStartups() : async [ApprovedStartUp] {approvedStartUp};
 
   //-------- Modify Status Projects ---------------
   public shared ({ caller }) func setStatus(IDProject : Nat, s : ProjectStatus) : async Bool {

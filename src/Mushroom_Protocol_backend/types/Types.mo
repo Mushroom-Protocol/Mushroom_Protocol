@@ -31,7 +31,6 @@ module{
         #refused;
         #tokenized;
         #funded: Nat8; //Porcentaje de financiamiento entregado
-
         #finalized;
     };
 //----- cambio de type por canister para cada startup ------
@@ -48,13 +47,14 @@ module{
     */
 //--------------------------------------------------
 
-    public type AprovedStartUp ={
-        caller: Principal;
+    public type ApprovedStartUp ={
+        owner: Principal;
         name: Text;
         country: Country;
+        titular: Text;     
         legalIdentity: Text;
+        telefono: Nat;
         email: Text;
-        aproved: Bool;
         //agregar campos necesarios
     };
     public type IncommingStartUp = {
@@ -89,5 +89,14 @@ module{
         assessment: ?Nat;        //valoración del monto de financiamiento en caso de estar aprovado el proyecto
         //Otros campos
     };
+
+    public type UserType = {
+        #Controller;
+        #Startup;
+        #Requester;
+        #MinterUser;
+        #Visitor;
+
+    }
 
 }
