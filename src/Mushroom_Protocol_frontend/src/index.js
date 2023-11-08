@@ -28,13 +28,13 @@ document.addEventListener("DOMContentLoaded", function () {
             agent,
         });
         principal = await back.whoami();
+        document.getElementById("AddMeToWhiteList").style.visibility = "hidden"
+        document.getElementById("inWhiteList").style.visibility = "hidden";
         const inList = await back.iAmInWhiteList();
         if(inList){
-            document.getElementById("AddMeToWhiteList").style.visibility = "hidden"
             document.getElementById("inWhiteList").style.visibility = "visible";
         }
         else{
-            document.getElementById("inWhiteList").style.visibility = "hidden";
             document.getElementById("AddMeToWhiteList").style.visibility = "visible"
         }
         document.getElementById("id").innerText = principal;
