@@ -28,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
             agent,
         });
         principal = await back.whoami();
-        if(await back.iAmInWhiteList()){
+        const inList = await back.iAmInWhiteList();
+        if(inList){
             document.getElementById("AddMeToWhiteList").style.visibility = "hidden"
             document.getElementById("inWhiteList").style.visibility = "visible";
         }

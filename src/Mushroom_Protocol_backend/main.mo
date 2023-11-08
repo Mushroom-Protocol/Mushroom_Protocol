@@ -173,8 +173,7 @@ actor Mushroom {
   public shared ({caller}) func iAmInWhiteList(): async Bool{
     return await inWhiteList(caller);
   };
-  public shared ({caller}) func inWhiteList(user: P): async Bool{
-    assert Principal.isController(caller);
+  func inWhiteList(user: P): async Bool{
     for(i in whiteList.vals()){
       if(i.0 == user) return true;
     };
