@@ -9,13 +9,15 @@
 
 # dfx temporary files
 .dfx/
+deps/
 
 # generated files
 src/declarations/
+src/
 
 # frontend code
 node_modules/
-dist/
+dist/Mushroom_Protocol_backend/residuos radioactivos/
 
 # environment variables
 .env

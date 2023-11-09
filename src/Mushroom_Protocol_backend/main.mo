@@ -96,7 +96,7 @@ actor Mushroom {
     await safeUpdateControllers(controllers, #Remove);
   };
   //----------------------------------------------------------------
-  //----------- Agregar y quitar elementos ----------------
+  //----------- Agregar y quitar elementos de un Array -------------------
   func addToArray<T>(arr : [T], elem : T) : [T] {
     var tempBuffer = Buffer.fromArray<T>(arr);
     tempBuffer.add(elem);
@@ -107,22 +107,26 @@ actor Mushroom {
     ignore tempBuffer.remove(index);
     Buffer.toArray<T>(tempBuffer);
   };
-
+// -----------------------------------------------------------
   public shared ({caller}) func whoami():async Text{Principal.toText(caller)};
 
-  public shared ({caller}) func userType():async (Text,UserType){
-    assert not Principal.isAnonymous(caller);
-    if(Principal.isController(caller)){ return (Principal.toText(caller), #Controller)};
-    for(st in approvedStartUp.vals()){
-      if(st.owner == caller){return (Principal.toText(caller), #Startup)}
+  public shared ({caller}) func whatami():async (P,Text)/*UserType*/{ //evaluar devolución de variantes UserType
+    assert not Principal.isAnonymous(caller); 
+    (caller, userType(caller));
+  };
+
+  func userType(p: P): Text{
+    if(Principal.isController(p)){ return ("Controller")};
+    for(user in approvedStartUp.vals()){
+      if(user.owner == p){return "Startup"}
     };
     for(user in minterUser.vals()){
-      if(user == caller){return (Principal.toText(caller), #MinterUser)}
+      if(user == p){return "MinterUser"}
     };
     for(req in incomingStartup.vals()){
-      if(req.0 == caller){ return (Principal.toText(caller), #Requester)}
+      if(req.0 == p){ return "Requester"}
     };
-    return (Principal.toText(caller), #Visitor)
+    return "Visitor"
   };
 
   // ---- Esta funcion llamada desde un controllers se encarga de generar un canister para una
@@ -158,9 +162,23 @@ actor Mushroom {
   // Con esta función ejecutada desde el frontend se registrarán las solicitudes de perfil de Startup
   //para su posterior aprobación y creación del correspondiente Canister
   public shared ({ caller }) func signUpStartup(data: IncommingStartUp) : async Text{
+    //Evaluar el retorno de un indice en lugar de Text
     assert not Principal.isAnonymous(caller);
+    var i = 0;
+    for(req in incomingStartup.vals()){
+      if(req.0 == caller){return "Usted ya tiene pendiente una solicitud, y se encuentra en espera en la posicion " # Nat.toText(i)};
+      i += 1;
+    };
     incomingStartup := addToArray<(Principal,IncommingStartUp)>(incomingStartup, (caller,data));
     "Su solicitud ha sido ingresada exitosamente, en los próximos días será contactado por email"
+  };
+
+  public shared ({caller}) func incomingProject(data: Project):async (){
+    assert not Principal.isAnonymous(caller);
+    assert userType(caller) == "Startup";
+    // Verificación de eventual solicitud duplicada según similitud de campos
+    // Posible necesidad de usar variantes para facilitar deteccion de duplicados
+    /* TODO */
   };
 
   // ----------------------- White List----------------------------------------------------------------
@@ -198,8 +216,6 @@ actor Mushroom {
 
   public query func getProjectArray() : async [Project] {projectArray};
 
-
-
   public func getRandomNFTCollection(collectionId: Nat): async [Nft]{
     let collection = switch(List.get<P>(collections,collectionId)){
       case null{return []};
@@ -212,7 +228,7 @@ actor Mushroom {
 
   public query func getCollections() : async [P] {List.toArray(collections)};
   
-  //------ Getters Only Controlers ------------------
+  //----------------- Getters Only Controllers ------------------
 
   public shared ({caller}) func getWhiteList():async [(P, Text)]{
     assert Principal.isController(caller);

@@ -30,6 +30,8 @@ nav {
     justify-content: space-around;
 }
 
+
+
 nav li,
 button {
     padding: 15px;
@@ -50,6 +52,11 @@ nav ul {
     align-items: center;
 }
 
+#nav_admin {
+    position: initial;
+    flex-direction: row;
+}
+
 #dinamic-content {
     display: flex;
     flex-direction: row;
@@ -60,6 +67,13 @@ nav ul {
 
 #id {
     margin: 10px auto;
+}
+#menu-admin {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    color: #fff;
 }
 
 form {

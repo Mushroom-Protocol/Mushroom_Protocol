@@ -2,11 +2,14 @@ import { createActor, Mushroom_Protocol_backend } from "../../declarations/Mushr
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 let back = Mushroom_Protocol_backend;
+let principal = "";
+let userType = "Anonimo"
 
 document.addEventListener("DOMContentLoaded", function () {
 
     const loginButton = document.getElementById("login");
-    let principal = "Anonimo";
+    
+
     loginButton.onclick = async (e) => {
         e.preventDefault();
         let authClient = await AuthClient.create();
@@ -27,16 +30,23 @@ document.addEventListener("DOMContentLoaded", function () {
         back = createActor(process.env.CANISTER_ID_MUSHROOM_PROTOCOL_BACKEND, {
             agent,
         });
-        principal = await back.whoami();
+        document.getElementById("id").innerText = "";
         document.getElementById("AddMeToWhiteList").style.visibility = "hidden"
         document.getElementById("inWhiteList").style.visibility = "hidden";
-        const inList = await back.iAmInWhiteList();
-        if(inList){
+
+        [principal, userType] = await back.whatami();
+
+        if(userType === "Controller"){
+            cargarContenidoDinamico("pages/admin.html");
+        };
+
+        //const inList = await back.iAmInWhiteList();
+        if(await back.iAmInWhiteList()){
             document.getElementById("inWhiteList").style.visibility = "visible";
         }
         else{
             document.getElementById("AddMeToWhiteList").style.visibility = "visible"
-        }
+        };
         document.getElementById("id").innerText = principal;
         
         return false;
@@ -95,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     contenidoDinamico.addEventListener("click", async function (event){
         let event_id = event.target.id;
+        console.log(event_id);
         if(event_id.endsWith(".html")){
             cargarContenidoDinamico("pages/" + event_id);
             return
@@ -119,7 +130,23 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(response);
 
 
+        }
+        else if(event_id === "whitelist"){
+            alert(await back.getWhiteList());
+        }
+        else if(event === "startup-request"){
+            alert(await back.getIncomingStartup());
+        }
+        else if(event === "startup"){
+            alert(await back.getStartups());
+        }
+        else if(event === "project-request"){
+            alert(await back.getProjectsPresented());
+        }
+        else if(event === "project"){
+            alert(await back.getProjectsApproved());
         };
+
     });
 
     function cargarContenidoDinamico(url) {
