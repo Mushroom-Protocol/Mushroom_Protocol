@@ -235,7 +235,7 @@ actor Mushroom {
     whiteList;
   };
 
-  public shared ({caller}) func getIncomingStartup() : async [(Principal,IncommingStartUp)] {
+  public shared ({caller}) func getIncomingStartup() : async [(Principal,IncommingStartUp)]/*ver typo de retorno*/ {
     assert Principal.isController(caller);
     incomingStartup;
   };
@@ -267,12 +267,12 @@ actor Mushroom {
   //Esta funcion se encargará de desplegar el canister para la coleccion de prifileNFT y tendrá efecto solo
   //la primera vez que sea ejecutada, en posteriores llamas se limitará a devolver el princial de dicha coleccion
 
-  public shared ({ caller }) func createCollectionProfile(_logo: Logo, _name: Text, _symbol: Text,): async P {
+  public shared ({ caller }) func createCollectionProfile(cycles: Nat, _logo: Logo, _name: Text, _symbol: Text): async P {
     assert Principal.isController(caller);
     if (profilesCanisterId != Principal.fromText("aaaaa-aa")) {//Singleton Pattern
       return profilesCanisterId;
     };
-    Cycles.add(7_692_307_692 + 6_153_891_538 + 3_150); //Fee para crear el canister
+    Cycles.add(cycles); //Fee para crear el canister 7_692_307_692 + 6_153_891_538 + 3_150
     let profilesCanister = await soulboundProfileToken.SoulboundToken(_name, _symbol, _logo);
     profilesCanisterId := Principal.fromActor(profilesCanister);
     return profilesCanisterId;

@@ -129,13 +129,12 @@ document.addEventListener("DOMContentLoaded", function () {
             let response = await back.signUpStartup(args);
             alert(response);
 
-
         }
         else if(event_id === "whitelist"){
             alert(await back.getWhiteList());
         }
         else if(event === "startup-request"){
-            alert(await back.getIncomingStartup());
+            alert(await back.getIncomingStartup()); //No funciona
         }
         else if(event === "startup"){
             alert(await back.getStartups());
