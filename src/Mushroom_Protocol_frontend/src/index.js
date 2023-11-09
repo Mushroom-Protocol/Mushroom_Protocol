@@ -8,8 +8,6 @@ let userType = "Anonimo"
 document.addEventListener("DOMContentLoaded", function () {
 
     const loginButton = document.getElementById("login");
-    
-
     loginButton.onclick = async (e) => {
         e.preventDefault();
         let authClient = await AuthClient.create();
@@ -24,8 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
         const identity = authClient.getIdentity();
-        console.log(identity);
-        
+
         const agent = new HttpAgent({ identity });
         back = createActor(process.env.CANISTER_ID_MUSHROOM_PROTOCOL_BACKEND, {
             agent,
@@ -105,7 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     contenidoDinamico.addEventListener("click", async function (event){
         let event_id = event.target.id;
-        console.log(event_id);
         if(event_id.endsWith(".html")){
             cargarContenidoDinamico("pages/" + event_id);
             return
@@ -134,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(await back.getWhiteList());
         }
         else if(event === "startup-request"){
-            alert(await back.getIncomingStartup()); //No funciona
+            alert(await back.getIncomingStartup()); //No funciona ,posiblemente por el tipo de retorno
         }
         else if(event === "startup"){
             alert(await back.getStartups());
