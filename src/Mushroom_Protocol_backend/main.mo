@@ -206,6 +206,8 @@ actor Mushroom {
 
   //------------------ Getters publicos-------------------------
 
+  public query func usersInWhiteList(): async Nat{whiteList.size()};
+
   public query func getProjectsApproved() : async [Project] {
     Array.filter<Project>(projectArray, func p = p.status == #approved);
   };
