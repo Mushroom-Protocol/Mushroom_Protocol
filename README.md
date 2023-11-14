@@ -16,7 +16,7 @@ So... in the same terminal or in the terminal integrated with VCCode...
 
 To deploy the local Internet_Identity canister
 
-```npm instal dotenv```
+```npm install dotenv```
 
 ```dfx deps pull```
 
