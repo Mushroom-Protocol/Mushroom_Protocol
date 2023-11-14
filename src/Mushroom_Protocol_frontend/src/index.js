@@ -67,9 +67,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (await back.iAmInWhiteList()) {
                 inWhiteList = true;
                 document.getElementById("inWhiteList").style.display = "block";
+                document.getElementById("AddMeToWhiteList").style.display = "none";
             }
             else {
-                document.getElementById("AddMeToWhiteList").style.display = "none";
+                document.getElementById("AddMeToWhiteList").style.display = "block";
             }
             //let shortID = principal.slice(0, 6) + "..." + principal.slice(-6);
             document.getElementById("id").innerText = principal;
@@ -88,14 +89,24 @@ document.addEventListener("DOMContentLoaded", function () {
     let view = "home";
 
     nav.addEventListener("click", async function (event) {
-        event.preventDefault();
+        
+        //event.preventDefault();
         let event_id = event.target.id;
         if (event_id === view) { return };
 
         if (event_id.endsWith(".html")) {
             cargarContenidoDinamico("pages/" + event_id);
             view = event_id;
-        };
+        }
+        else if (event_id === "AddMeToWhiteList") {
+            let email = prompt("Por favor, ingresa tu correo electrónico:");
+            if (email != "" && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
+                return
+            };
+            const success = await back.addMeToWhiteList(email);
+            document.getElementById("AddMeToWhiteList").style.display = "none";
+            document.getElementById("inWhiteList").style.display = "block";
+        }
         return;
     });
 
@@ -152,15 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(response);
 
         }
-        else if (event_id === "AddMeToWhiteList") {
-            let email = prompt("Por favor, ingresa tu correo electrónico:");
-            if (email != "" && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
-                return
-            };
-            const success = await back.addMeToWhiteList(email);
-            document.getElementById("AddMeToWhiteList").style.display = "none";
-            document.getElementById("inWhiteList").style.display = "block";
-        }
+        
         else if (event_id === "whitelist") {
             alert(await back.getWhiteList());
         }

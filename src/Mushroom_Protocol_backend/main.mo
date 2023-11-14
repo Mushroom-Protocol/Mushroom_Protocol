@@ -14,16 +14,15 @@ import projectCollection "nftmushroomprotocol";
 
 actor Mushroom {
 
-  //----- declaraciones de tipos ------
+  //----- type declarations ------
   //type Startup = Types.Startup;
+  //type initStartup = Types.initStartup;
+
   type P = Principal;
   type Project = Types.Project;
   type ProjectStatus = Types.ProjectStatus;
   type Nft = TypesProjectNft.Nft;
   type Country = Types.Country;
-  
-   
-  //type initStartup = Types.initStartup;
   type IncommingStartUp = Types.IncommingStartUp;
   type ApprovedStartUp = Types.ApprovedStartUp;
   type Mode = Types.Mode;
@@ -32,19 +31,19 @@ actor Mushroom {
   type Result<Ok, Err> = { #ok : Ok; #err : Err };
 
   //---- stable data --------
-  //stable var startupArray : [P] = []; //Considerar la conveniencia de no generar un canister para cada startup
+  //stable var startupArray : [P] = []; //Consider the convenience of not generating a canister for each startup
   
   stable var whiteList: [(P, Text)] = [];
   stable var requestId: Nat = 0;
-  stable var incomingStartup : [(Principal,IncommingStartUp)] = []; //Lista solicitantes a registrarse. Requiere proceso de verificación
-  stable var approvedStartUp : [ApprovedStartUp] = [];  //Lista de startup aprovadas
+  stable var incomingStartup : [(Principal,IncommingStartUp)] = []; // Array of startup applicants for admission.
+  stable var approvedStartUp : [ApprovedStartUp] = [];  // Array of approved startups
   stable var startUpId: Nat = 0;
   stable var projectArray : [Project] = [];
   stable var collections = List.nil<P>();
   stable var minterUser : [P] = [];
-  stable var profilesCanisterId : P = Principal.fromText("aaaaa-aa");
+  stable var profilesCanisterId : P = Principal.fromText("aaaaa-aa"); 
 
-  //----------- Gestion del canisater principal -----------
+  //----------- Management of the main Canister (this)-----------
   func safeUpdateControllers(controllers : [P], mode : Mode) : async Bool {
     let IC = "aaaaa-aa";
     let ic = actor (IC) : Interface.Self;
@@ -81,11 +80,11 @@ actor Mushroom {
     await ic.update_settings({ canister_id; settings });
     return true;
   };
-  //Para que el siguiente grupo de funciones se puedan ejecutar exitosamente se debe agregar el Principal de
-  //este mismo canister a la lista de controllers, desde el CLI dfx y usando la identity con la que fue desplegado
-  //el canister. El siguiente comando: "dfx canister update-settings --add-controller <canisterID> <canisterID>"
-  //agrega el principal del canister a su propia lista de controllers y eso permite la ejecución de la función
-  //privada safeUpdateControllers()
+  //For the next group of functions to be executed successfully, the Principal must be added
+   //this same canister to the list of controllers, from the dfx CLI and using the identity with which it was deployed
+   //the canister. The following command: "dfx canister update-settings --add-controller <canisterID> <canisterID>"
+   //adds the main of the canister to its own list of controllers and that allows the function to be executed
+   //private safeUpdateControllers()
 
   public shared ({ caller }) func addController(controllers : [P]) : async Bool {
     assert(Principal.isController(caller));
@@ -96,7 +95,7 @@ actor Mushroom {
     await safeUpdateControllers(controllers, #Remove);
   };
   //----------------------------------------------------------------
-  //----------- Agregar y quitar elementos de un Array -------------------
+  //----------- Add and remove elements from an Array -------------------
   func addToArray<T>(arr : [T], elem : T) : [T] {
     var tempBuffer = Buffer.fromArray<T>(arr);
     tempBuffer.add(elem);
@@ -110,7 +109,7 @@ actor Mushroom {
 // -----------------------------------------------------------
   public shared ({caller}) func whoami():async Text{Principal.toText(caller)};
 
-  public shared ({caller}) func whatami():async (P,Text)/*UserType*/{ //evaluar devolución de variantes UserType
+  public shared ({caller}) func whatami():async (P,Text)/*UserType*/{ //evaluate return of UserType variants
     assert not Principal.isAnonymous(caller); 
     (caller, userType(caller));
   };
@@ -129,8 +128,8 @@ actor Mushroom {
     return "Visitor"
   };
 
-  // ---- Esta funcion llamada desde un controllers se encarga de generar un canister para una
-  //----- Startup luego de que se haya pasado exitosamente por la instancia de aprovación -----
+  // ---- This function called from a controllers is responsible for generating a canister for a
+  //----- Startup after it has successfully passed through the approval process -----
   /*
   public shared ({ caller }) func createStartUpCanister(cycles: Nat, indexIncomming : Nat, data:AprovedStartUp) : async ?Text {
     assert Principal.isController(caller);
@@ -159,10 +158,10 @@ actor Mushroom {
     return "StartUp aprobada: Id -> " # Nat.toText(startUpId -1);
   };
 
-  // Con esta función ejecutada desde el frontend se registrarán las solicitudes de perfil de Startup
-  //para su posterior aprobación y creación del correspondiente Canister
+  // With this function, Startup profile requests will be recorded for later
+  // approval and creation of the corresponding registry (or eventually your own Canister)
   public shared ({ caller }) func signUpStartup(data: IncommingStartUp) : async Text{
-    //Evaluar el retorno de un indice en lugar de Text
+    //Evaluate the return of an index instead of Text
     assert not Principal.isAnonymous(caller);
     var i = 0;
     for(req in incomingStartup.vals()){
@@ -176,8 +175,8 @@ actor Mushroom {
   public shared ({caller}) func incomingProject(data: Project):async (){
     assert not Principal.isAnonymous(caller);
     assert userType(caller) == "Startup";
-    // Verificación de eventual solicitud duplicada según similitud de campos
-    // Posible necesidad de usar variantes para facilitar deteccion de duplicados
+    // Verification of possible duplicate request according to similarity of fields
+    // Possible need to use variants to facilitate duplicate detection
     /* TODO */
   };
 
@@ -204,7 +203,7 @@ actor Mushroom {
     ?Array.size(projectArray);
   };
 
-  //------------------ Getters publicos-------------------------
+  //------------------ Public Getters -------------------------
 
   public query func usersInWhiteList(): async Nat{whiteList.size()};
 
@@ -230,7 +229,7 @@ actor Mushroom {
 
   public query func getCollections() : async [P] {List.toArray(collections)};
   
-  //----------------- Getters Only Controllers ------------------
+  //-----------------  Only Controllers Getters ------------------
 
   public shared ({caller}) func getWhiteList():async [(P, Text)]{
     assert Principal.isController(caller);
@@ -266,21 +265,21 @@ actor Mushroom {
     true;
   };
 
-  //Esta funcion se encargará de desplegar el canister para la coleccion de prifileNFT y tendrá efecto solo
-  //la primera vez que sea ejecutada, en posteriores llamas se limitará a devolver el princial de dicha coleccion
+  //This function will be responsible for deploying the canister for the profileNFT collection and will only take effect
+  //the first time it is executed, in subsequent calls it will be limited to returning the principal of said collection
 
   public shared ({ caller }) func createCollectionProfile(cycles: Nat, _logo: Logo, _name: Text, _symbol: Text): async P {
     assert Principal.isController(caller);
     if (profilesCanisterId != Principal.fromText("aaaaa-aa")) {//Singleton Pattern
       return profilesCanisterId;
     };
-    Cycles.add(cycles); //Fee para crear el canister 7_692_307_692 + 6_153_891_538 + 3_150
+    Cycles.add(cycles); //Fee to create the canister 7_692_307_692 + 6_153_891_538 + 3_150
     let profilesCanister = await soulboundProfileToken.SoulboundToken(_name, _symbol, _logo);
     profilesCanisterId := Principal.fromActor(profilesCanister);
     return profilesCanisterId;
   };
   //---------------------------------------------------------------------------
-  //------------- Funcion para crer una collección de NFT MP de investigacion ----------
+  //------------- Function to create a collection of research NFT MP ----------
   public shared ({ caller }) func createCollectionNFT(cycles : Nat, project : Project, metadata : TypesProjectNft.Metadata) : async Principal {
     assert Principal.isController(caller);
     //(to : Principal, data : Types.Metadata)
@@ -292,8 +291,8 @@ actor Mushroom {
   };
 
   public shared ({caller}) func mintNftCollection(project: P, qty: Nat): async Result<[Nat], Text>{
-    if(Principal.isAnonymous(caller)) return #err("Inicie sesión");
-    if(qty > 10) return #err("La cantidad maxima por operación de minteo es de 10 NFT"); //quitar el 10 y poner una variable 
+    if(Principal.isAnonymous(caller)) return #err("Sign in");
+    if(qty > 10) return #err("The maximum amount per mining operation is 10 NFT"); //remove the 10 and put a variable 
     
     let remoteCollection = actor (Principal.toText(project)) : actor { mint : shared (Principal, Nat) -> async [Nat]; };
     let remoteProfiles = actor (Principal.toText(profilesCanisterId)) : actor {

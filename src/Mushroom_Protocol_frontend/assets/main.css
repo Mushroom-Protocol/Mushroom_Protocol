@@ -33,7 +33,7 @@ nav {
 }
 
 nav li,
-button {
+button, a {
     font-size: 1.5rem;
     padding: 15px;
     margin-right: 5px;
