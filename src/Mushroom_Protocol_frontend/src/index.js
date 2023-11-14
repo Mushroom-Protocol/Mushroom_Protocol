@@ -4,7 +4,7 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/candid/lib/cjs/idl";
 let back = Mushroom_Protocol_backend;
 let principal = "";
-let userType = "Anonimo"
+let userType = ""
 let inWhiteList = false;
 let login = false;
 // let usersInWL = await usersInWhiteList();
@@ -12,8 +12,9 @@ let login = false;
 // async function usersInWhiteList(){
 //     return await back.usersInWhiteList();
 // }
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     // document.getElementById("numUsers").innerText = usersInWL;
+    document.getElementById("numUsers").innerText = await  back.usersInWhiteList() + " In WhiteList"; //Evaluate the use of web sockets
 
     const loginButton = document.getElementById("login");
     loginButton.onclick = async (e) => {
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (login) {
             back = Mushroom_Protocol_backend;
             resetFront();
-            loginButton.innerText = "Conectar";
+            loginButton.innerText = "Connect";
             cargarContenidoDinamico("pages/home.html")
             login = false;
             return;
@@ -49,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
             resetFront();
 
             [principal, userType] = await back.whatami();
-            document.getElementById("userType").innerText = "Tipo de usuario: " + userType;
+            document.getElementById("userType").innerText = "Type of user: " + userType;
             document.getElementById("userType").style.display = "block";
 
             if (userType === "Controller") {
@@ -75,12 +76,13 @@ document.addEventListener("DOMContentLoaded", function () {
             //let shortID = principal.slice(0, 6) + "..." + principal.slice(-6);
             document.getElementById("id").innerText = principal;
             login = true;
-            loginButton.innerText = "Desconectar";
+            loginButton.innerText = "Disconnect";
             loginButton.style.visibility = "visible";
             ocultarSpinner();
             return false;
         };
     };
+
 
     const contenidoDinamico = document.getElementById("dinamic-content");
     cargarContenidoDinamico("pages/home.html")
@@ -99,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
             view = event_id;
         }
         else if (event_id === "AddMeToWhiteList") {
-            let email = prompt("Por favor, ingresa tu correo electrónico:");
+            let email = prompt("Please enter your email:");
             if (email != "" && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)) {
                 return
             };
@@ -145,8 +147,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event_id === "submitFormStartUp") {
             event.preventDefault();
             const dataStartUp = document.getElementById("signupStartup");
-            if (principal === "Anonimo") {
-                alert("Identifíquese");
+            if (principal === "") {
+                alert("Please connect");
                 return
             };
             if (!formOK(dataStartUp)) { return };
@@ -155,9 +157,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 caller: principal,
                 name: formData.get("nameStartup"),
                 country: { [formData.get("country")]: null },
-                titular: formData.get("titular"),
-                telefono: parseInt(formData.get("telefono")),
-                email: formData.get("email"),
+                titular: formData.get("owner's name"),
+                telefono: parseInt(formData.get("owner's phone")),
+                email: formData.get("owner's email"),
             };
             let response = await back.signUpStartup(args);
             alert(response);
@@ -165,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         else if (event_id === "whitelist") {
-            alert(await back.getWhiteList());
+            alert(await back.getWhiteList()); // OK
         }
         else if (event === "startup-request") {
             alert(await back.getIncomingStartup()); //No funciona ,posiblemente por el tipo de retorno
@@ -243,6 +245,5 @@ document.addEventListener("DOMContentLoaded", function () {
         const spinner = document.getElementById('loading-spinner');
         spinner.style.display = 'none';
     }
-
 });
 

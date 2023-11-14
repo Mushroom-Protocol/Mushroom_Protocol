@@ -9,11 +9,10 @@
 
 # dfx temporary files
 .dfx/
-deps/
 
 # generated files
 src/declarations/
-src/
+
 
 # frontend code
 node_modules/
