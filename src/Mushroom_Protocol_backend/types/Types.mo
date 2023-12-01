@@ -96,7 +96,6 @@ module{
         #Requester;
         #MinterUser;
         #Visitor;
-
-    }
+    };
 
 }
