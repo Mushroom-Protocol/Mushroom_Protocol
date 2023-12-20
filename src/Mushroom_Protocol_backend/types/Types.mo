@@ -47,22 +47,41 @@ module{
     */
 //--------------------------------------------------
 
-    public type ApprovedStartUp ={
+    public type ApprovedStartUp = {
         owner: Principal;
-        name: Text;
-        country: Country;
-        titular: Text;     
-        legalIdentity: Text;
-        telefono: Nat;
-        email: Text;
-        //agregar campos necesarios
+        dataStartUp: IncommingStartUp;
+        valoration: Nat;
     };
+
     public type IncommingStartUp = {
-        name: Text;
-        country: Country;
-        titular: Text;
-        telefono: Nat;
+        startUpName: Text;
         email: Text;
+        website: Text;
+        startUpSlogan: Text;
+        shortDes: Text;
+        logo: Blob;
+        startupStatus: Text;
+        tlr: Nat;
+        fullNameTl: Text;
+        specializationTL: Text;
+        linkedinTL: Text;
+        industry: Text;
+        country: Text;    
+    };
+
+    public type Industry = {
+        #HealthTech;
+        #Agri_FoodTech;
+        #GreenTech;
+        #SyntheticTech;
+        #MiningTech;
+    };
+
+    public type StartUpStatus = {
+        #Research_stage;
+        #Early_Start_Up;
+        #Pre_seed;
+        #Seed;
     };
     public type Mode = {
         #Add;
@@ -78,8 +97,25 @@ module{
     //     email: Text;         //Verificación requerida
     // };
     public type Project = {
+        startupID: Nat;
+        projectTitle: Text;
+        status: ProjectStatus;
+        problemSolving: Text;
+        yoursolution: Text;
+        impact: Text;
+        productStatus: Text;
+        fundsRequired: Nat;
+        projectDuration: Nat; //Número de meses
+        implementation: Text;
+        milestones: [Text];
+        budget: [Text];
+        team: [Text]; //Miembros del equipo
+
+        /*
+        projectID: Nat;
+
         owner: Principal;
-        startup: Nat;           //ID de startup
+        startupID: Nat;           //ID de startup
         title: Text;
         area: Text;             //Posible uso de enumeraciones
         description: Text;
@@ -88,6 +124,7 @@ module{
         status: ProjectStatus;
         assessment: ?Nat;        //valoración del monto de financiamiento en caso de estar aprovado el proyecto
         //Otros campos
+        */
     };
 
     public type UserType = {

@@ -58,6 +58,7 @@ nav ul {
     justify-content: space-around;
     align-items: center;
     color: #fff;
+    margin-bottom: 100px;
 }
 
 #id {
@@ -107,11 +108,12 @@ input, select {
 }
 
 #loading-spinner {
-    border: 8px solid rgba(255, 255, 255, 0.3);
-    border-top: 8px solid #48ff00;
+    box-shadow: 0 0 40px #48ff00;
+    border: 12px solid rgba(255, 255, 255, 0.3);
+    border-top: 12px solid #48ff00;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     animation: spin 1s linear infinite;
     position: fixed;
     top: 50%;

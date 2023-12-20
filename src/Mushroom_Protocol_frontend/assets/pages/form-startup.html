@@ -1,8 +1,19 @@
 <form id="signupStartup">
     <div class="form-section">
         <h2>Datos de la StartUp</h2>
-        <input type="text" id="name" name="nameStartup" required placeholder="Nombre de la Startup">
-        <select name="country" id="country">
+        <input type="text" name="nameStartup" id="nameStartup" required placeholder="Nombre de la Startup">
+        <input type="email" name="email" id="email" required placeholder="Email">
+        <input type="text" name="website" id="website" placeholder="website">
+        <input type="text" name="slogan" id="slogan" placeholder="slogan">
+        <input type="text" name="shortDes" id="shortDes" placeholder="shortDes">
+        <input type="file" name= "logo" id="logo" placeholder="logo">    <!-- [] [Uint8Array],  Asegúrate de proporcionar un array válido aquí -->
+        <input type="text" name="startupStatus" id="startupStatus" placeholder="startupStatus">
+        <input type="text" name="tlr" id="tlr" required placeholder="TLR">
+        <input type="text" name="fullNameTl" id="fullNameTL" placeholder="fullNameTL">
+        <input type="text" name="specializationTL" id="specializationTL" placeholder="specializationTL">
+        <input type="text" name="linkedinTL" id="linkedinTL" placeholder="linkedinTL">
+        <input type="text" name="industry" id="industry" placeholder="industry">
+        <select name="country" id="country" aria-placeholder="country">
             <option value="Argentina">Argentina</option>
             <option value="Belice">Belice</option>
             <option value="Bolivia">Bolivia</option>
@@ -31,13 +42,8 @@
 
     </div>
     <hr>
-    <div class="form-section">
-        <h2>Datos del responzable</h2>
-        <input type="text" id="titular" name="titular" required placeholder="Nombre completo del responzable">
-        <input type="tel" id="telefono" name="telefono" required placeholder="Teléfono">
-        <input type="email" id="email" name="email" required placeholder="Correo electrónico">
-    </div>
-    <button id="submitFormStartUp" type="submit" class="submit">Solicitar regstro</button>
+
+    <button id="submitFormStartUp" type="submit" class="submit">Solicitar registro</button>
 </form>
 
 

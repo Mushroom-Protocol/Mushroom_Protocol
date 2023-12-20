@@ -108,24 +108,38 @@ actor Mushroom {
 // -----------------------------------------------------------
   public shared ({caller}) func whoami():async Text{Principal.toText(caller)};
 
-  public shared ({caller}) func whatami():async UserType{ 
+  public shared ({caller}) func whatami():async (Principal, Text){ 
     assert not Principal.isAnonymous(caller); 
-    userType(caller);
+    let userType = getUserType(caller);
+    (caller, userType);
   };
-
-  func userType(p: Principal): UserType{
-    if(Principal.isController(p)){ return #Controller};
+  func getUserType(p: Principal): Text{
+    if(Principal.isController(p)){ return "Controller"};
     for(user in approvedStartUp.vals()){
-      if(user.owner == p){return #Startup}
+      if(user.owner == p){return "Startup"}
     };
     for(user in minterUser.vals()){
-      if(user == p){return #MinterUser}
+      if(user == p){return "MinterUser"}
     };
     for(req in incomingStartup.vals()){
-      if(req.0 == p){ return #Requester}
+      if(req.0 == p){ return "Requester"}
     };
-    return #Visitor
+    return "Visitor"
   };
+
+  // func getUserType(p: Principal): UserType{
+  //   if(Principal.isController(p)){ return #Controller};
+  //   for(user in approvedStartUp.vals()){
+  //     if(user.owner == p){return #Startup}
+  //   };
+  //   for(user in minterUser.vals()){
+  //     if(user == p){return #MinterUser}
+  //   };
+  //   for(req in incomingStartup.vals()){
+  //     if(req.0 == p){ return #Requester}
+  //   };
+  //   return #Visitor
+  // };
 
   // ---- This function called from a controllers is responsible for generating a canister for a
   //----- Startup after it has successfully passed through the approval process -----
@@ -153,9 +167,11 @@ actor Mushroom {
     //assert( caller == DAO);
     assert Principal.isController(caller);
     if(incomingStartup[indexIncomming].0 != data.owner){
+      //Previene que ante dos controllers aprovando la misma solicitud, se duplique una startup aprovada y se elimine
+      //la solicitud de la siguiente
       return "Inconsistencia de datos"
     };
-    incomingStartup := removeFromArray(incomingStartup, indexIncomming);
+    incomingStartup := removeFromArray<(Principal,IncommingStartUp)>(incomingStartup, indexIncomming);
     approvedStartUp := addToArray<ApprovedStartUp>(approvedStartUp, data); 
     startUpId += 1;
     return "StartUp aprobada: Id -> " # Nat.toText(startUpId -1);
@@ -164,8 +180,9 @@ actor Mushroom {
   // With this function, Startup profile requests will be recorded for later
   // approval and creation of the corresponding registry (or eventually your own Canister)
   public shared ({ caller }) func signUpStartup(data: IncommingStartUp) : async Text{
-    //Evaluate the return of an index instead of Text
-    assert not Principal.isAnonymous(caller);
+    //Se recomienda comprimir/recortar en el front la imagen correspondiente al campo logo a un formato de 250x250 px
+    //y la misma se debe enviar en formato Blob 
+   assert not Principal.isAnonymous(caller);
     var i = 0;
     for(req in incomingStartup.vals()){
       if(req.0 == caller){return "Usted ya tiene pendiente una solicitud, y se encuentra en espera en la posicion " # Nat.toText(i)};
@@ -177,7 +194,7 @@ actor Mushroom {
 
   public shared ({caller}) func incomingProject(data: Project):async (){
     assert not Principal.isAnonymous(caller);
-    assert userType(caller) == #Startup;
+    assert getUserType(caller) == "Startup";
     // Verification of possible duplicate request according to similarity of fields
     // Possible need to use variants to facilitate duplicate detection
     /* TODO */
@@ -240,28 +257,35 @@ actor Mushroom {
   };
 
   public shared ({caller}) func getIncomingStartup() : async [(Principal,IncommingStartUp)]/*ver typo de retorno*/ {
+    //contract: ic0.msg_reply_data_append: application payload size cannot be larger than 2097152
+    //comprimir imagenes para evitar exceder el limite de carga util
     assert Principal.isController(caller);
+
     incomingStartup;
   };
   public query func getStartups() : async [ApprovedStartUp] {approvedStartUp};
 
   //-------- Modify Status Projects ---------------
-  public shared ({ caller }) func setStatus(IDProject : Nat, s : ProjectStatus) : async Bool {
+  public shared ({ caller }) func setStatus(IDProject : Nat, newStatus : ProjectStatus) : async Bool {
     assert Principal.isController(caller);
     assert IDProject >= Array.size(projectArray);
 
     var tempBuffer = Buffer.fromArray<Project>(projectArray);
     let currentProject = tempBuffer.remove(IDProject);
     let update = {
-      startup = currentProject.startup;
-      title = currentProject.title;
-      area = currentProject.area;
-      description = currentProject.description;
-      firstPresentation = currentProject.firstPresentation;
-      lastPresentation = currentProject.lastPresentation;
-      owner = currentProject.owner;
-      status = s;
-      assessment = currentProject.assessment;
+      startupID = currentProject.startupID;
+      projectTitle = currentProject.projectTitle;
+      status = newStatus;
+      problemSolving = currentProject.problemSolving;
+      yoursolution = currentProject.yoursolution;
+      impact = currentProject.impact;
+      productStatus = currentProject.productStatus;
+      fundsRequired = currentProject.fundsRequired;
+      projectDuration = currentProject.projectDuration; //Número de meses
+      implementation = currentProject.implementation;
+      milestones = currentProject.milestones;
+      budget = currentProject.budget;
+      team = currentProject.team;//Miembros del equipo
     };
     tempBuffer.insert(IDProject, update);
     projectArray := Buffer.toArray(tempBuffer);
@@ -287,7 +311,7 @@ actor Mushroom {
     assert Principal.isController(caller);
     //(to : Principal, data : Types.Metadata)
     Cycles.add(cycles);
-    let collectionCanister = await projectCollection.MushroomNFTProject(project.owner, metadata);
+    let collectionCanister = await projectCollection.MushroomNFTProject(approvedStartUp[project.startupID].owner, metadata);
     let collectionCanisterId = Principal.fromActor(collectionCanister);
     collections := List.push<Principal>(collectionCanisterId, collections);
     return collectionCanisterId;

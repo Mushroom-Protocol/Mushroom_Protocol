@@ -23284,7 +23284,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   init: () => (/* binding */ init)
 /* harmony export */ });
 const idlFactory = ({ IDL }) => {
-  const P = IDL.Principal;
   const ProjectStatus__1 = IDL.Variant({
     'funded' : IDL.Nat8,
     'approved' : IDL.Null,
@@ -23304,40 +23303,25 @@ const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'firstPresentation' : IDL.Nat,
   });
-  const Country = IDL.Variant({
-    'Uruguay' : IDL.Null,
-    'EstadosUnidos' : IDL.Null,
-    'Guyana' : IDL.Null,
-    'Panama' : IDL.Null,
-    'CostaRica' : IDL.Null,
-    'Surinam' : IDL.Null,
-    'Cuba' : IDL.Null,
-    'Peru' : IDL.Null,
-    'Guatemala' : IDL.Null,
-    'Venezuela' : IDL.Null,
-    'Mexico' : IDL.Null,
-    'Brasil' : IDL.Null,
-    'Paraguay' : IDL.Null,
-    'Colombia' : IDL.Null,
-    'Ecuador' : IDL.Null,
-    'Nicaragua' : IDL.Null,
-    'ElSalvador' : IDL.Null,
-    'Bolivia' : IDL.Null,
-    'Argentina' : IDL.Null,
-    'Belice' : IDL.Null,
-    'Chile' : IDL.Null,
-    'RepublicaDominicana' : IDL.Null,
-    'Canada' : IDL.Null,
-    'Honduras' : IDL.Null,
+  const IncommingStartUp__1 = IDL.Record({
+    'tlr' : IDL.Nat,
+    'startUpSlogan' : IDL.Text,
+    'fullNameTl' : IDL.Text,
+    'specializationTL' : IDL.Text,
+    'country' : IDL.Text,
+    'logo' : IDL.Vec(IDL.Nat8),
+    'email' : IDL.Text,
+    'website' : IDL.Text,
+    'startupStatus' : IDL.Text,
+    'linkedinTL' : IDL.Text,
+    'shortDes' : IDL.Text,
+    'startUpName' : IDL.Text,
+    'industry' : IDL.Text,
   });
   const ApprovedStartUp = IDL.Record({
-    'country' : Country,
     'owner' : IDL.Principal,
-    'name' : IDL.Text,
-    'email' : IDL.Text,
-    'legalIdentity' : IDL.Text,
-    'titular' : IDL.Text,
-    'telefono' : IDL.Nat,
+    'valoration' : IDL.Nat,
+    'dataStartUp' : IncommingStartUp__1,
   });
   const Area = IDL.Variant({ 'Botanica' : IDL.Null, 'Genetica' : IDL.Null });
   const Extension__1 = IDL.Variant({
@@ -23371,11 +23355,19 @@ const idlFactory = ({ IDL }) => {
     'logo_type' : Extension,
   });
   const IncommingStartUp = IDL.Record({
-    'country' : Country,
-    'name' : IDL.Text,
+    'tlr' : IDL.Nat,
+    'startUpSlogan' : IDL.Text,
+    'fullNameTl' : IDL.Text,
+    'specializationTL' : IDL.Text,
+    'country' : IDL.Text,
+    'logo' : IDL.Vec(IDL.Nat8),
     'email' : IDL.Text,
-    'titular' : IDL.Text,
-    'telefono' : IDL.Nat,
+    'website' : IDL.Text,
+    'startupStatus' : IDL.Text,
+    'linkedinTL' : IDL.Text,
+    'shortDes' : IDL.Text,
+    'startUpName' : IDL.Text,
+    'industry' : IDL.Text,
   });
   const TokenId = IDL.Nat;
   const Nft = IDL.Record({
@@ -23394,7 +23386,7 @@ const idlFactory = ({ IDL }) => {
     'refused' : IDL.Null,
   });
   return IDL.Service({
-    'addController' : IDL.Func([IDL.Vec(P)], [IDL.Bool], []),
+    'addController' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'addMeToWhiteList' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'addProject' : IDL.Func([Project], [IDL.Opt(IDL.Nat)], []),
     'approveStartUp' : IDL.Func([IDL.Nat, ApprovedStartUp], [IDL.Text], []),
@@ -23405,10 +23397,10 @@ const idlFactory = ({ IDL }) => {
       ),
     'createCollectionProfile' : IDL.Func(
         [IDL.Nat, Logo, IDL.Text, IDL.Text],
-        [P],
+        [IDL.Principal],
         [],
       ),
-    'getCollections' : IDL.Func([], [IDL.Vec(P)], ['query']),
+    'getCollections' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'getIncomingStartup' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IncommingStartUp))],
@@ -23419,15 +23411,19 @@ const idlFactory = ({ IDL }) => {
     'getProjectsPresented' : IDL.Func([], [IDL.Vec(Project)], ['query']),
     'getRandomNFTCollection' : IDL.Func([IDL.Nat], [IDL.Vec(Nft)], []),
     'getStartups' : IDL.Func([], [IDL.Vec(ApprovedStartUp)], ['query']),
-    'getWhiteList' : IDL.Func([], [IDL.Vec(IDL.Tuple(P, IDL.Text))], []),
+    'getWhiteList' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Text))],
+        [],
+      ),
     'iAmInWhiteList' : IDL.Func([], [IDL.Bool], []),
     'incomingProject' : IDL.Func([Project], [], []),
-    'mintNftCollection' : IDL.Func([P, IDL.Nat], [Result], []),
-    'removeControllers' : IDL.Func([IDL.Vec(P)], [IDL.Bool], []),
+    'mintNftCollection' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
+    'removeControllers' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'setStatus' : IDL.Func([IDL.Nat, ProjectStatus], [IDL.Bool], []),
     'signUpStartup' : IDL.Func([IncommingStartUp], [IDL.Text], []),
     'usersInWhiteList' : IDL.Func([], [IDL.Nat], ['query']),
-    'whatami' : IDL.Func([], [P, IDL.Text], []),
+    'whatami' : IDL.Func([], [IDL.Principal, IDL.Text], []),
     'whoami' : IDL.Func([], [IDL.Text], []),
   });
 };
@@ -24456,10 +24452,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 let back = _declarations_Mushroom_Protocol_backend__WEBPACK_IMPORTED_MODULE_0__.Mushroom_Protocol_backend;
-let principal = "";
+let userPID = "";
 let userType = ""
 let inWhiteList = false;
 let login = false;
+let industry = "#GreenTech";
+console.log(industry);
+
+//<input type="file" webkitdirectory multiple Cargar directorio></input>
+
 // let usersInWL = await usersInWhiteList();
 
 // async function usersInWhiteList(){
@@ -24467,7 +24468,7 @@ let login = false;
 // }
 document.addEventListener("DOMContentLoaded", async function () {
     // document.getElementById("numUsers").innerText = usersInWL;
-    document.getElementById("numUsers").innerText = await  back.usersInWhiteList() + " In WhiteList"; //Evaluate the use of web sockets
+    document.getElementById("numUsers").innerText = await back.usersInWhiteList() + " In WhiteList"; //Evaluate the use of web sockets
 
     const loginButton = document.getElementById("login");
     loginButton.onclick = async (e) => {
@@ -24501,8 +24502,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 agent,
             });
             resetFront();
+            cargarContenidoDinamico("pages/form-startup.html");
 
-            [principal, userType] = await back.whatami();
+            [userPID, userType] = await back.whatami();
             document.getElementById("userType").innerText = "Type of user: " + userType;
             document.getElementById("userType").style.display = "block";
 
@@ -24527,7 +24529,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.getElementById("AddMeToWhiteList").style.display = "block";
             }
             //let shortID = principal.slice(0, 6) + "..." + principal.slice(-6);
-            document.getElementById("id").innerText = principal;
+            document.getElementById("id").innerText = userPID;
             login = true;
             loginButton.innerText = "Disconnect";
             loginButton.style.visibility = "visible";
@@ -24544,7 +24546,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let view = "home";
 
     nav.addEventListener("click", async function (event) {
-        
+
         //event.preventDefault();
         let event_id = event.target.id;
         if (event_id === view) { return };
@@ -24600,38 +24602,117 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (event_id === "submitFormStartUp") {
             event.preventDefault();
             const dataStartUp = document.getElementById("signupStartup");
-            if (principal === "") {
-                alert("Please connect");
-                return
-            };
-            if (!formOK(dataStartUp)) { return };
-            const formData = new FormData(dataStartUp);
-            const args = {
-                caller: principal,
-                name: formData.get("nameStartup"),
-                country: { [formData.get("country")]: null },
-                titular: formData.get("owner's name"),
-                telefono: parseInt(formData.get("owner's phone")),
-                email: formData.get("owner's email"),
-            };
-            let response = await back.signUpStartup(args);
-            alert(response);
 
+            if (userPID === "") {
+                alert("Please connect");
+                return;
+            }
+
+            if (!formOK(dataStartUp)) {
+                return;
+            }
+
+            const formData = new FormData(dataStartUp);
+            const logoFile = formData.get("logo");
+
+            if (logoFile instanceof File) {
+                try {
+                    // Comprimir la imagen antes de convertirla a blob
+                    const compressedImage = await compressImage(logoFile, 400, 400);
+
+                    // Convertir la imagen comprimida a un array de bytes (Uint8Array)
+                    const byteArray = base64ToBlob(compressedImage);
+
+                    console.log(formData.get("email"));
+                    const args = {
+                        startUpName: formData.get("nameStartup"),
+                        email: formData.get("email"),
+                        website: formData.get("website"),
+                        startUpSlogan: formData.get("slogan"),
+                        shortDes: formData.get("shortDes"),
+                        logo: byteArray,
+                        startupStatus: formData.get("startupStatus"),
+                        tlr: parseInt(formData.get("tlr")),
+                        fullNameTl: formData.get("fullNameTl"),
+                        specializationTL: formData.get("specializationTL"),
+                        linkedinTL: formData.get("linkedinTL"),
+                        industry: formData.get("industry"),
+                        country: "#" + formData.get("country"),
+                    };
+
+                    let response = await back.signUpStartup(args);
+                    alert(response);
+                } catch (error) {
+                    console.error("Error comprimiendo la imagen:", error);
+                }
+            } else {
+                console.error("El campo logo no es un archivo válido.");
+            }
         }
-        
+
         else if (event_id === "whitelist") {
             alert(await back.getWhiteList()); // OK
         }
-        else if (event === "startup-request") {
-            alert(await back.getIncomingStartup()); //No funciona ,posiblemente por el tipo de retorno
+        else if (event_id === "startup-request") {
+            cargarContenidoDinamico("pages/viewIncomingStartup.html")
+            mostrarSpinner();
+            let incomingStartupArray = await back.getIncomingStartup();
+            let incomingStartupList = document.getElementById("incomingStartup");
+            console.log(incomingStartupArray);
+            let index = 0;
+            for (const st of incomingStartupArray) {
+                console.log(st[1].startUpName);
+                const tagStartup = document.createElement("div");
+                const h2Element = document.createElement("h2");
+                const aproveBtn = document.createElement("button");
+                aproveBtn.innerText = "Aprobar";
+                aproveBtn.value = index;
+
+                aproveBtn.addEventListener("click", async function (){
+                    let _valoration = prompt("Establezca la valoación inicial de 1 a 10")
+                    let args = {
+                        owner: st[0],
+                        dataStartUp: st[1],
+                        valoration: parseInt(_valoration)
+                    };
+                    console.log(index);
+                    let result = await back.approveStartUp(parseInt(aproveBtn.value), args);
+                    alert(result);
+
+                })
+                const logo = document.createElement("div");
+
+                logo.style.width = "350px"; 
+                logo.style.height = "350px";
+
+                // Corrige la sintaxis de backgroundImage y establece el tamaño del contenedor
+                let dataImg = "data:image/png;base64," + blobToBase64(st[1].logo);
+                logo.style.backgroundImage = 'url("' + dataImg + '")';
+                logo.style.backgroundSize = 'cover';
+                logo.style.backgroundRepeat = 'no-repeat'
+
+                h2Element.textContent = st[1].startUpName;
+                
+                for(let elem of [h2Element,logo,aproveBtn]){
+                    tagStartup.appendChild(elem);
+                };
+                
+                incomingStartupList.appendChild(tagStartup);
+                index += 1;
+            }
+            ocultarSpinner();
         }
-        else if (event === "startup") {
-            alert(await back.getStartups());
+        else if (event_id === "startup") {
+            let startupList = await back.getStartups();
+            for(let i of startupList){
+                console.log(i.dataStartUp.startUpName);
+                console.log(i.dataStartUp.email)
+            };
         }
-        else if (event === "project-request") {
+        else if (event_id === "project-request") {
             alert(await back.getProjectsPresented());
         }
-        else if (event === "project") {
+        else if (event_id === "project") {
             alert(await back.getProjectsApproved());
         };
 
@@ -24678,9 +24759,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     function resetFront() {
         document.getElementById("id").innerText = "";
         document.getElementById("userType").style.display = "none";
-        
+
         let formButtom = document.getElementById("form-startup.html");
-        if(formButtom) formButtom.style.display = "none";
+        if (formButtom) formButtom.style.display = "none";
         document.getElementById("inWhiteList").style.display = "none";
 
         let adminLi = document.getElementById("admin.html")
@@ -24698,6 +24779,80 @@ document.addEventListener("DOMContentLoaded", async function () {
         const spinner = document.getElementById('loading-spinner');
         spinner.style.display = 'none';
     }
+
+    //--------------------- funciones para codificar y decodificar imagenes entre base64 y Blob -----------------
+    function base64ToBlob(dataUrl) {
+        var base64Content = dataUrl.split(',')[1];  // Extraer el contenido codificado en base64 de la URL de datos
+        var byteCharacters = atob(base64Content);   // Convertir el contenido base64 a un array de bytes (Uint8Array)
+        var byteArray = new Uint8Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) {
+            byteArray[i] = byteCharacters.charCodeAt(i);
+        }
+        return byteArray;
+    };
+
+    function blobToBase64(buffer) {
+        var binary = '';
+        var bytes = new Uint8Array(buffer);
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    };
+
+    // Función para comprimir una imagen
+    function compressImage(file, maxWidth, maxHeight) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            // Cuando la lectura se completa
+            reader.onload = function (e) {
+                const img = new Image();
+
+                // Cuando la imagen se carga
+                img.onload = function () {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    // Calcular las nuevas dimensiones manteniendo la proporción original
+                    let newWidth, newHeight;
+                    if (img.width > img.height) {
+                        newWidth = maxWidth;
+                        newHeight = (maxWidth / img.width) * img.height;
+                    } else {
+                        newHeight = maxHeight;
+                        newWidth = (maxHeight / img.height) * img.width;
+                    }
+
+                    // Establecer el tamaño del canvas a las nuevas dimensiones
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Dibujar la imagen en el canvas con las nuevas dimensiones
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                    // Obtener el contenido del canvas como una imagen en formato base64
+                    const compressedImageData = canvas.toDataURL("image/jpeg", 0.9); // 0.8 es la calidad de compresión
+
+                    // Resolver la promesa con la imagen comprimida
+                    resolve(compressedImageData);
+                };
+
+                // Establecer la fuente de la imagen como la URL de datos del archivo
+                img.src = e.target.result;
+            };
+
+            // Leer el contenido del archivo como una URL de datos
+            reader.readAsDataURL(file);
+
+            // Manejar errores de lectura
+            reader.onerror = function (error) {
+                reject(error);
+            };
+        });
+    }
+    // -----------------------------------------------------------------------------------------------------------
 });
 
 
