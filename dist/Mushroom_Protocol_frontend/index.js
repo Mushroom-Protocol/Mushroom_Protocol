@@ -23294,14 +23294,18 @@ const idlFactory = ({ IDL }) => {
   });
   const Project = IDL.Record({
     'status' : ProjectStatus__1,
-    'title' : IDL.Text,
-    'lastPresentation' : IDL.Nat,
-    'assessment' : IDL.Opt(IDL.Nat),
-    'startup' : IDL.Nat,
-    'owner' : IDL.Principal,
-    'area' : IDL.Text,
-    'description' : IDL.Text,
-    'firstPresentation' : IDL.Nat,
+    'impact' : IDL.Text,
+    'projectDuration' : IDL.Nat,
+    'startupID' : IDL.Nat,
+    'problemSolving' : IDL.Text,
+    'team' : IDL.Vec(IDL.Text),
+    'implementation' : IDL.Text,
+    'yoursolution' : IDL.Text,
+    'productStatus' : IDL.Text,
+    'projectTitle' : IDL.Text,
+    'fundsRequired' : IDL.Nat,
+    'budget' : IDL.Vec(IDL.Text),
+    'milestones' : IDL.Vec(IDL.Text),
   });
   const IncommingStartUp__1 = IDL.Record({
     'tlr' : IDL.Nat,
