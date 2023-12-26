@@ -198,23 +198,27 @@ actor Mushroom {
     "Su solicitud ha sido ingresada exitosamente, en los próximos días será contactado por email";
   };
 
-  public shared ({ caller }) func approveStartUp(indexIncomming : Nat, data : ApprovedStartUp) : async Text {
+  public shared ({ caller }) func approveStartUp(index : Nat, data : ApprovedStartUp) : async Text {
     //Esta funcion, en una instancia posterior del proyecto, deberá ser ejecutada únicamente desde el principal Id
     //de una DAO desarrollada para dicho proposio y luego de ser aprovado el correspondiente proyecto por votación
     //Evaluar el tipo de retorno para un mejor manejo de los resultados
     //assert( caller == DAO);
     assert Principal.isController(caller);
-    if (incomingStartup[indexIncomming].0 != data.owner) {
+    if (incomingStartup[index].0 != data.owner) {
       //Previene que ante dos controllers aprovando la misma solicitud, se duplique una startup aprovada y se elimine
       //la solicitud de la siguiente
       return "Inconsistencia de datos";
     };
-    incomingStartup := removeFromArray<(Principal, IncommingStartUp)>(incomingStartup, indexIncomming);
+    incomingStartup := removeFromArray<(Principal, IncommingStartUp)>(incomingStartup, index);
     approvedStartUp := addToArray<ApprovedStartUp>(approvedStartUp, data);
     startUpId += 1;
     return "StartUp aprobada: Id -> " # Nat.toText(startUpId -1);
   };
 
+  public shared ({caller}) func rejectStartUp(index: Nat): async (){
+    assert Principal.isController(caller);
+    incomingStartup := removeFromArray<(Principal,IncommingStartUp)>(incomingStartup,index);
+  };
   public shared ({ caller }) func newProjectRequest(data : Project) : async Text {
     assert not Principal.isAnonymous(caller);
     assert getUserType(caller) == "Startup";
@@ -233,22 +237,22 @@ actor Mushroom {
     return "Su solicitud fue ingresada correctamente y se encuentra en lista de espera en la posicion " # position;
   };
 
-  public shared ({ caller }) func approveProject(incomingIndex: Nat, p : Project) : async ?Nat {
+  public shared ({ caller }) func approveProject(index: Nat, p : Project) : async ?Nat {
     if (not Principal.isController(caller)) { return null };
-    if (incomingProjects[incomingIndex].0 != approvedStartUp[p.startupID].owner){
+    if (incomingProjects[index].0 != approvedStartUp[p.startupID].owner){
       return null; //retornar result<Nat,Text> en lugar de opt Nat TODO
     };
     approvedProjects := addToArray<Project>(approvedProjects, p);
-    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,incomingIndex);
+    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,index);
     ?Array.size(approvedProjects);
   };
 
-  public shared ({ caller }) func rejectProject(incomingIndex: Nat, p: Project): async (){
+  public shared ({ caller }) func rejectProject(index: Nat, p: Project): async (){
     if (not Principal.isController(caller)) { return };
-    if (incomingProjects[incomingIndex].0 != approvedStartUp[p.startupID].owner){
+    if (incomingProjects[index].0 != approvedStartUp[p.startupID].owner){
       return;
     };
-    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,incomingIndex);
+    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,index);
   };
 
   //------------------ Public Getters -------------------------
