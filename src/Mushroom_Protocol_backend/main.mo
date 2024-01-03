@@ -44,6 +44,8 @@ actor Mushroom {
   stable var profilesCanisterId = Principal.fromText("aaaaa-aa");
 
   //----------- Management of the main Canister (this)-----------
+
+
   func safeUpdateControllers(controllers : [Principal], mode : Mode) : async Bool {
     let IC = "aaaaa-aa";
     let ic = actor (IC) : Interface.Self;
@@ -298,6 +300,10 @@ actor Mushroom {
     incomingStartup;
   };
   public query func getStartups() : async [ApprovedStartUp] { approvedStartUp };
+
+  public shared ({caller}) func getProjectsPresented(): async [(Principal,Project)] {
+    incomingProjects;
+  };
 
   //-------- Modify Status Projects ---------------
   public shared ({ caller }) func setStatusProject(IDProject : Nat, newStatus : ProjectStatus) : async Bool {

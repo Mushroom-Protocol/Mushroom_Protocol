@@ -1,0 +1,30 @@
+<form id="form-incomming-project">
+    <div class="form-section">
+        <h2>Datos del proyecto</h2>
+        <input type="text" name="name" id="name" placeholder="name">
+        <input type="text" name="projectTitle" id="projectTitle" placeholder="Project Title">
+        <input type="text" name="problemSolving" id="problemSolving" placeholder="Problem Solving">
+        <input type="text" name="yoursolution" id="yoursolution" placeholder="Your Solution">
+        <input type="text" name="impact" id="impact" placeholder="Impact">
+        <select name="productStatus" id="productStatus">
+            <option value="ResearchPhase" selected>Research Phase</option>
+            <option value="ProductPrototype">Product Prototype</option>
+            <option value="EarlyAdoption">Early Adoption</option>
+            <option value="BusinessModelValidation">Business Model Validation</option>
+            <option value="Product-Market Fit">Product-Market Fit</option>
+        </select>
+        <input type="text" name="fundsRequired" id="fundsRequired" placeholder="Funds Required">
+        <input type="text" name="projectDuration" id="projectDuration" placeholder="Project Duration (months)">
+        <input type="text" name="implementation" id="implementation" placeholder="Implementation">
+
+        <!-- Puedes usar textarea para campos de array -->
+        <textarea name="milestones" id="milestones" placeholder="Milestones"></textarea>
+        <textarea name="budget" id="budget" placeholder="Budget"></textarea>
+        <textarea name="team" id="team" placeholder="Team Members"></textarea>
+    </div>
+
+    </div>
+    <hr>
+
+    <button id="submit-incomming-project" type="submit" class="submit">Enviar Solicitud</button>
+</form>

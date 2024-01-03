@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 agent,
             });
             resetFront();
-            cargarContenidoDinamico("pages/form-startup.html");
+            
 
             [userPID, userType] = await back.whatami();
             document.getElementById("userType").innerText = "Type of user: " + userType;
@@ -67,7 +67,21 @@ document.addEventListener("DOMContentLoaded", async function () {
                 menu_nav.appendChild(admin_li);
             }
             else if (userType === "Visitor" | userType === "MinterUser") {
+                cargarContenidoDinamico("pages/home.html");                
+                const menu_nav = document.getElementById('menu_nav');                
+                const incommingStartUpBtn = document.createElement('Button');
+                incommingStartUpBtn.id = "form-startup.html";
+                incommingStartUpBtn.textContent = "Registra tu StartUp";
+                menu_nav.appendChild(incommingStartUpBtn);
 
+            }
+            else if (userType === "Startup"){
+                cargarContenidoDinamico("pages/home.html");                
+                const menu_nav = document.getElementById('menu_nav');
+                const incommingProjectBtn = document.createElement('Button');
+                incommingProjectBtn.id = "form-project.html";
+                incommingProjectBtn.textContent = "Registra tu Proyecto";
+                menu_nav.appendChild(incommingProjectBtn);
             }
 
             //const inList = await back.iAmInWhiteList();
@@ -103,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (event_id === view) { return };
 
         if (event_id.endsWith(".html")) {
+            console.log(event_id);
             cargarContenidoDinamico("pages/" + event_id);
             view = event_id;
         }
@@ -200,6 +215,28 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.error("El campo logo no es un archivo válido.");
             }
         }
+        else if (event_id === "submit-incomming-project") {
+
+            event.preventDefault();
+
+            const project = {
+                startupID: parseInt(userPID), 
+                projectTitle: document.getElementById("name").value,
+                status: document.getElementById("productStatus").value,
+                problemSolving: document.getElementById("problemSolving").value,
+                yoursolution: document.getElementById("yoursolution").value,
+                impact: document.getElementById("impact").value,
+                productStatus: document.getElementById("productStatus").value,
+                fundsRequired: parseInt(document.getElementById("fundsRequired").value, 10),
+                projectDuration: parseInt(document.getElementById("projectDuration").value, 10),
+                implementation: document.getElementById("implementation").value,
+                milestones: document.getElementById("milestones").value.split(","),
+                budget: document.getElementById("budget").value.split(","),
+                team: document.getElementById("team").value.split(","),
+            };
+           console.log(await back.newProjectRequest(project));
+   
+        }
 
         else if (event_id === "whitelist") {
             alert(await back.getWhiteList()); // OK
@@ -219,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 aproveBtn.innerText = "Aprobar";
                 aproveBtn.value = index;
 
-                aproveBtn.addEventListener("click", async function (){
+                aproveBtn.addEventListener("click", async function () {
                     let _valoration = prompt("Establezca la valoación inicial de 1 a 10")
                     let args = {
                         owner: st[0],
@@ -233,7 +270,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 })
                 const logo = document.createElement("div");
 
-                logo.style.width = "350px"; 
+                logo.style.width = "350px";
                 logo.style.height = "350px";
 
                 // Corrige la sintaxis de backgroundImage y establece el tamaño del contenedor
@@ -243,11 +280,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 logo.style.backgroundRepeat = 'no-repeat'
 
                 h2Element.textContent = st[1].startUpName;
-                
-                for(let elem of [h2Element,logo,aproveBtn]){
+
+                for (let elem of [h2Element, logo, aproveBtn]) {
                     tagStartup.appendChild(elem);
                 };
-                
+
                 incomingStartupList.appendChild(tagStartup);
                 index += 1;
             }
@@ -255,7 +292,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
         else if (event_id === "startup") {
             let startupList = await back.getStartups();
-            for(let i of startupList){
+            for (let i of startupList) {
                 console.log(i.dataStartUp.startUpName);
                 console.log(i.dataStartUp.email)
             };

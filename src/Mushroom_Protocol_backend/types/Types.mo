@@ -97,19 +97,18 @@ module{
     //     email: Text;         //Verificación requerida
     // };
     public type Project = {
-        startupID: Nat;
-        projectTitle: Text;
-        status: ProjectStatus;
-        problemSolving: Text;
-        yoursolution: Text;
-        impact: Text;
-        productStatus: Text;
-        fundsRequired: Nat;
-        projectDuration: Nat; //Número de meses
-        implementation: Text;
-        milestones: [Text];
-        budget: [Text];
-        team: [Text]; //Miembros del equipo
+            startupID: Nat;
+            projectTitle: Text;
+            problemSolving: Text;
+            yoursolution: Text;
+            impact: Text;
+            productStatus: Text;
+            fundsRequired: Nat;
+            projectDuration: Nat; //Número de meses
+            implementation: Text;
+            milestones: [Text];
+            budget: [Text];
+            team: [Text]; //Miembros del equipo
 
         /*
         projectID: Nat;

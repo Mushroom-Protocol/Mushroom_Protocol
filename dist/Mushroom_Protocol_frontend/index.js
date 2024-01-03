@@ -23284,16 +23284,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   init: () => (/* binding */ init)
 /* harmony export */ });
 const idlFactory = ({ IDL }) => {
-  const ProjectStatus__1 = IDL.Variant({
-    'funded' : IDL.Nat8,
-    'approved' : IDL.Null,
-    'presented' : IDL.Null,
-    'finalized' : IDL.Null,
-    'tokenized' : IDL.Null,
-    'refused' : IDL.Null,
-  });
   const Project = IDL.Record({
-    'status' : ProjectStatus__1,
     'impact' : IDL.Text,
     'projectDuration' : IDL.Nat,
     'startupID' : IDL.Nat,
@@ -23392,7 +23383,7 @@ const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'addController' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'addMeToWhiteList' : IDL.Func([IDL.Text], [IDL.Bool], []),
-    'addProject' : IDL.Func([Project], [IDL.Opt(IDL.Nat)], []),
+    'approveProject' : IDL.Func([IDL.Nat, Project], [IDL.Opt(IDL.Nat)], []),
     'approveStartUp' : IDL.Func([IDL.Nat, ApprovedStartUp], [IDL.Text], []),
     'createCollectionNFT' : IDL.Func(
         [IDL.Nat, Project, Metadata],
@@ -23405,14 +23396,22 @@ const idlFactory = ({ IDL }) => {
         [],
       ),
     'getCollections' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+    'getIncomingProjects' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, Project))],
+        ['query'],
+      ),
     'getIncomingStartup' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IncommingStartUp))],
         [],
       ),
-    'getProjectArray' : IDL.Func([], [IDL.Vec(Project)], ['query']),
     'getProjectsApproved' : IDL.Func([], [IDL.Vec(Project)], ['query']),
-    'getProjectsPresented' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+    'getProjectsPresented' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, Project))],
+        [],
+      ),
     'getRandomNFTCollection' : IDL.Func([IDL.Nat], [IDL.Vec(Nft)], []),
     'getStartups' : IDL.Func([], [IDL.Vec(ApprovedStartUp)], ['query']),
     'getWhiteList' : IDL.Func(
@@ -23421,10 +23420,12 @@ const idlFactory = ({ IDL }) => {
         [],
       ),
     'iAmInWhiteList' : IDL.Func([], [IDL.Bool], []),
-    'incomingProject' : IDL.Func([Project], [], []),
     'mintNftCollection' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
+    'newProjectRequest' : IDL.Func([Project], [IDL.Text], []),
+    'rejectProject' : IDL.Func([IDL.Nat, Project], [], []),
+    'rejectStartUp' : IDL.Func([IDL.Nat], [], []),
     'removeControllers' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
-    'setStatus' : IDL.Func([IDL.Nat, ProjectStatus], [IDL.Bool], []),
+    'setStatusProject' : IDL.Func([IDL.Nat, ProjectStatus], [IDL.Bool], []),
     'signUpStartup' : IDL.Func([IncommingStartUp], [IDL.Text], []),
     'usersInWhiteList' : IDL.Func([], [IDL.Nat], ['query']),
     'whatami' : IDL.Func([], [IDL.Principal, IDL.Text], []),
@@ -24506,7 +24507,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 agent,
             });
             resetFront();
-            cargarContenidoDinamico("pages/form-startup.html");
+            
 
             [userPID, userType] = await back.whatami();
             document.getElementById("userType").innerText = "Type of user: " + userType;
@@ -24520,7 +24521,21 @@ document.addEventListener("DOMContentLoaded", async function () {
                 menu_nav.appendChild(admin_li);
             }
             else if (userType === "Visitor" | userType === "MinterUser") {
+                cargarContenidoDinamico("pages/home.html");                
+                const menu_nav = document.getElementById('menu_nav');                
+                const incommingStartUpBtn = document.createElement('Button');
+                incommingStartUpBtn.id = "form-startup.html";
+                incommingStartUpBtn.textContent = "Registra tu StartUp";
+                menu_nav.appendChild(incommingStartUpBtn);
 
+            }
+            else if (userType === "Startup"){
+                cargarContenidoDinamico("pages/home.html");                
+                const menu_nav = document.getElementById('menu_nav');
+                const incommingProjectBtn = document.createElement('Button');
+                incommingProjectBtn.id = "form-project.html";
+                incommingProjectBtn.textContent = "Registra tu Proyecto";
+                menu_nav.appendChild(incommingProjectBtn);
             }
 
             //const inList = await back.iAmInWhiteList();
@@ -24556,6 +24571,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (event_id === view) { return };
 
         if (event_id.endsWith(".html")) {
+            console.log(event_id);
             cargarContenidoDinamico("pages/" + event_id);
             view = event_id;
         }
@@ -24653,6 +24669,28 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.error("El campo logo no es un archivo válido.");
             }
         }
+        else if (event_id === "submit-incomming-project") {
+
+            event.preventDefault();
+
+            const project = {
+                startupID: parseInt(userPID), 
+                projectTitle: document.getElementById("name").value,
+                status: document.getElementById("productStatus").value,
+                problemSolving: document.getElementById("problemSolving").value,
+                yoursolution: document.getElementById("yoursolution").value,
+                impact: document.getElementById("impact").value,
+                productStatus: document.getElementById("productStatus").value,
+                fundsRequired: parseInt(document.getElementById("fundsRequired").value, 10),
+                projectDuration: parseInt(document.getElementById("projectDuration").value, 10),
+                implementation: document.getElementById("implementation").value,
+                milestones: document.getElementById("milestones").value.split(","),
+                budget: document.getElementById("budget").value.split(","),
+                team: document.getElementById("team").value.split(","),
+            };
+           console.log(await back.newProjectRequest(project));
+   
+        }
 
         else if (event_id === "whitelist") {
             alert(await back.getWhiteList()); // OK
@@ -24672,7 +24710,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 aproveBtn.innerText = "Aprobar";
                 aproveBtn.value = index;
 
-                aproveBtn.addEventListener("click", async function (){
+                aproveBtn.addEventListener("click", async function () {
                     let _valoration = prompt("Establezca la valoación inicial de 1 a 10")
                     let args = {
                         owner: st[0],
@@ -24686,7 +24724,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 })
                 const logo = document.createElement("div");
 
-                logo.style.width = "350px"; 
+                logo.style.width = "350px";
                 logo.style.height = "350px";
 
                 // Corrige la sintaxis de backgroundImage y establece el tamaño del contenedor
@@ -24696,11 +24734,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 logo.style.backgroundRepeat = 'no-repeat'
 
                 h2Element.textContent = st[1].startUpName;
-                
-                for(let elem of [h2Element,logo,aproveBtn]){
+
+                for (let elem of [h2Element, logo, aproveBtn]) {
                     tagStartup.appendChild(elem);
                 };
-                
+
                 incomingStartupList.appendChild(tagStartup);
                 index += 1;
             }
@@ -24708,7 +24746,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
         else if (event_id === "startup") {
             let startupList = await back.getStartups();
-            for(let i of startupList){
+            for (let i of startupList) {
                 console.log(i.dataStartUp.startUpName);
                 console.log(i.dataStartUp.email)
             };
