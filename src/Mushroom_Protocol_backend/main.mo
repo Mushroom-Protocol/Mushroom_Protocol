@@ -18,7 +18,8 @@ actor Mushroom {
   //type Startup = Types.Startup;
   //type initStartup = Types.initStartup;
 
-  type Project = Types.Project;
+  type DataProject = Types.DataProject;
+  type ApprovedProject = Types.ApprovedProject;
   type ProjectStatus = Types.ProjectStatus;
   type Nft = TypesProjectNft.Nft;
   type Country = Types.Country;
@@ -37,8 +38,8 @@ actor Mushroom {
   stable var incomingStartup : [(Principal, IncommingStartUp)] = []; // Array of startup applicants for admission.
   stable var approvedStartUp : [ApprovedStartUp] = []; // Array of approved startups
   stable var startUpId : Nat = 0;
-  stable var incomingProjects : [(Principal,Project)] = [];
-  stable var approvedProjects : [Project] = [];
+  stable var incomingProjects : [(Principal,DataProject)] = [];
+  stable var approvedProjects : [ApprovedProject] = [];
   stable var collections = List.nil<Principal>();
   stable var minterUser : [Principal] = [];
   stable var profilesCanisterId = Principal.fromText("aaaaa-aa");
@@ -221,7 +222,7 @@ actor Mushroom {
     assert Principal.isController(caller);
     incomingStartup := removeFromArray<(Principal,IncommingStartUp)>(incomingStartup,index);
   };
-  public shared ({ caller }) func newProjectRequest(data : Project) : async Text {
+  public shared ({ caller }) func newProjectRequest(data : DataProject) : async Text {
     assert not Principal.isAnonymous(caller);
     assert getUserType(caller) == "Startup";
     // Verification of possible duplicate request according to similarity of fields
@@ -234,38 +235,42 @@ actor Mushroom {
       };
       i += 1;
     };
-    incomingProjects := addToArray<(Principal,Project)>(incomingProjects, (caller, data));
+    incomingProjects := addToArray<(Principal,DataProject)>(incomingProjects, (caller, data));
     let position = Nat.toText(incomingProjects.size());
     return "Su solicitud fue ingresada correctamente y se encuentra en lista de espera en la posicion " # position;
   };
 
-  public shared ({ caller }) func approveProject(index: Nat, p : Project) : async ?Nat {
+  public shared ({ caller }) func approveProject(index: Nat, p : DataProject) : async ?Nat {
     if (not Principal.isController(caller)) { return null };
     if (incomingProjects[index].0 != approvedStartUp[p.startupID].owner){
       return null; //retornar result<Nat,Text> en lugar de opt Nat TODO
     };
-    approvedProjects := addToArray<Project>(approvedProjects, p);
-    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,index);
+    let project = {
+      status = #approved;
+      data = p;
+    };
+    approvedProjects := addToArray<ApprovedProject>(approvedProjects, project);
+    incomingProjects := removeFromArray<(Principal,DataProject)>(incomingProjects,index);
     ?Array.size(approvedProjects);
   };
 
-  public shared ({ caller }) func rejectProject(index: Nat, p: Project): async (){
+  public shared ({ caller }) func rejectProject(index: Nat, p: DataProject): async (){
     if (not Principal.isController(caller)) { return };
     if (incomingProjects[index].0 != approvedStartUp[p.startupID].owner){
       return;
     };
-    incomingProjects := removeFromArray<(Principal,Project)>(incomingProjects,index);
+    incomingProjects := removeFromArray<(Principal,DataProject)>(incomingProjects,index);
   };
 
   //------------------ Public Getters -------------------------
 
   public query func usersInWhiteList() : async Nat { whiteList.size() };
 
-  public query func getProjectsApproved() : async [Project] {
+  public query func getProjectsApproved() : async [ApprovedProject] {
     approvedProjects;
   };
 
-  public query func getIncomingProjects() : async [(Principal,Project)] {
+  public query func getIncomingProjects() : async [(Principal,DataProject)] {
     incomingProjects;
   };
 
@@ -301,7 +306,7 @@ actor Mushroom {
   };
   public query func getStartups() : async [ApprovedStartUp] { approvedStartUp };
 
-  public shared ({caller}) func getProjectsPresented(): async [(Principal,Project)] {
+  public shared ({caller}) func getProjectsPresented(): async [(Principal,DataProject)] {
     incomingProjects;
   };
 
@@ -310,22 +315,11 @@ actor Mushroom {
     assert Principal.isController(caller);
     assert IDProject >= Array.size(approvedProjects);
 
-    var tempBuffer = Buffer.fromArray<Project>(approvedProjects);
+    var tempBuffer = Buffer.fromArray<ApprovedProject>(approvedProjects);
     let currentProject = tempBuffer.remove(IDProject);
     let update = {
-      startupID = currentProject.startupID;
-      projectTitle = currentProject.projectTitle;
       status = newStatus;
-      problemSolving = currentProject.problemSolving;
-      yoursolution = currentProject.yoursolution;
-      impact = currentProject.impact;
-      productStatus = currentProject.productStatus;
-      fundsRequired = currentProject.fundsRequired;
-      projectDuration = currentProject.projectDuration; //Número de meses
-      implementation = currentProject.implementation;
-      milestones = currentProject.milestones;
-      budget = currentProject.budget;
-      team = currentProject.team; //Miembros del equipo
+      data = currentProject.data;
     };
     tempBuffer.insert(IDProject, update);
     approvedProjects := Buffer.toArray(tempBuffer);
@@ -348,11 +342,11 @@ actor Mushroom {
   };
   //---------------------------------------------------------------------------
   //------------- Function to create a collection of research NFT MP ----------
-  public shared ({ caller }) func createCollectionNFT(cycles : Nat, project : Project, metadata : TypesProjectNft.Metadata) : async Principal {
+  public shared ({ caller }) func createCollectionNFT(cycles : Nat, project : ApprovedProject, metadata : TypesProjectNft.Metadata) : async Principal {
     assert Principal.isController(caller);
     //(to : Principal, data : Types.Metadata)
     Cycles.add(cycles);
-    let collectionCanister = await projectCollection.MushroomNFTProject(approvedStartUp[project.startupID].owner, metadata);
+    let collectionCanister = await projectCollection.MushroomNFTProject(approvedStartUp[project.data.startupID].owner, metadata);
     let collectionCanisterId = Principal.fromActor(collectionCanister);
     collections := List.push<Principal>(collectionCanisterId, collections);
     return collectionCanisterId;

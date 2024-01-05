@@ -23284,7 +23284,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   init: () => (/* binding */ init)
 /* harmony export */ });
 const idlFactory = ({ IDL }) => {
-  const Project = IDL.Record({
+  const DataProject = IDL.Record({
     'impact' : IDL.Text,
     'projectDuration' : IDL.Nat,
     'startupID' : IDL.Nat,
@@ -23317,6 +23317,32 @@ const idlFactory = ({ IDL }) => {
     'owner' : IDL.Principal,
     'valoration' : IDL.Nat,
     'dataStartUp' : IncommingStartUp__1,
+  });
+  const ProjectStatus__1 = IDL.Variant({
+    'funded' : IDL.Nat8,
+    'approved' : IDL.Null,
+    'presented' : IDL.Null,
+    'finalized' : IDL.Null,
+    'tokenized' : IDL.Null,
+    'refused' : IDL.Null,
+  });
+  const DataProject__1 = IDL.Record({
+    'impact' : IDL.Text,
+    'projectDuration' : IDL.Nat,
+    'startupID' : IDL.Nat,
+    'problemSolving' : IDL.Text,
+    'team' : IDL.Vec(IDL.Text),
+    'implementation' : IDL.Text,
+    'yoursolution' : IDL.Text,
+    'productStatus' : IDL.Text,
+    'projectTitle' : IDL.Text,
+    'fundsRequired' : IDL.Nat,
+    'budget' : IDL.Vec(IDL.Text),
+    'milestones' : IDL.Vec(IDL.Text),
+  });
+  const ApprovedProject = IDL.Record({
+    'status' : ProjectStatus__1,
+    'data' : DataProject__1,
   });
   const Area = IDL.Variant({ 'Botanica' : IDL.Null, 'Genetica' : IDL.Null });
   const Extension__1 = IDL.Variant({
@@ -23383,10 +23409,10 @@ const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'addController' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'addMeToWhiteList' : IDL.Func([IDL.Text], [IDL.Bool], []),
-    'approveProject' : IDL.Func([IDL.Nat, Project], [IDL.Opt(IDL.Nat)], []),
+    'approveProject' : IDL.Func([IDL.Nat, DataProject], [IDL.Opt(IDL.Nat)], []),
     'approveStartUp' : IDL.Func([IDL.Nat, ApprovedStartUp], [IDL.Text], []),
     'createCollectionNFT' : IDL.Func(
-        [IDL.Nat, Project, Metadata],
+        [IDL.Nat, ApprovedProject, Metadata],
         [IDL.Principal],
         [],
       ),
@@ -23398,7 +23424,7 @@ const idlFactory = ({ IDL }) => {
     'getCollections' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'getIncomingProjects' : IDL.Func(
         [],
-        [IDL.Vec(IDL.Tuple(IDL.Principal, Project))],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, DataProject))],
         ['query'],
       ),
     'getIncomingStartup' : IDL.Func(
@@ -23406,10 +23432,10 @@ const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Principal, IncommingStartUp))],
         [],
       ),
-    'getProjectsApproved' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+    'getProjectsApproved' : IDL.Func([], [IDL.Vec(ApprovedProject)], ['query']),
     'getProjectsPresented' : IDL.Func(
         [],
-        [IDL.Vec(IDL.Tuple(IDL.Principal, Project))],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, DataProject))],
         [],
       ),
     'getRandomNFTCollection' : IDL.Func([IDL.Nat], [IDL.Vec(Nft)], []),
@@ -23421,8 +23447,8 @@ const idlFactory = ({ IDL }) => {
       ),
     'iAmInWhiteList' : IDL.Func([], [IDL.Bool], []),
     'mintNftCollection' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
-    'newProjectRequest' : IDL.Func([Project], [IDL.Text], []),
-    'rejectProject' : IDL.Func([IDL.Nat, Project], [], []),
+    'newProjectRequest' : IDL.Func([DataProject], [IDL.Text], []),
+    'rejectProject' : IDL.Func([IDL.Nat, DataProject], [], []),
     'rejectStartUp' : IDL.Func([IDL.Nat], [], []),
     'removeControllers' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'setStatusProject' : IDL.Func([IDL.Nat, ProjectStatus], [IDL.Bool], []),
