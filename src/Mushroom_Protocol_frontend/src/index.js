@@ -220,8 +220,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             event.preventDefault();
 
             const project = {
-                startupID: parseInt(userPID), 
-                projectTitle: document.getElementById("name").value,
+                startupID: BigInt(8), 
+                projectTitle: document.getElementById("projectTitle").value,
                 status: document.getElementById("productStatus").value,
                 problemSolving: document.getElementById("problemSolving").value,
                 yoursolution: document.getElementById("yoursolution").value,
