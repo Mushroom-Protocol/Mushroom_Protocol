@@ -1,0 +1,165 @@
+type UserId = text;
+type User = 
+ record {
+   admissionDate: int;
+   avatar: opt blob;
+   email: text;
+   name: text;
+   principalID: principal;
+   roles: vec Role;
+   userId: UserId;
+   verified: variant {
+               Code: text;
+               Success;
+             };
+ };
+type StartupCard = 
+ record {
+   logo: blob;
+   owner: principal;
+   shortDes: text;
+   startUpName: text;
+   startupId: text;
+ };
+type Startup = 
+ record {
+   admissionDate: int;
+   country: text;
+   documents: vec blob;
+   email: text;
+   fullNameTl: text;
+   industry: text;
+   linkedinTL: text;
+   logo: blob;
+   owner: principal;
+   projects: vec text;
+   shortDes: text;
+   specializationTL: text;
+   startUpName: text;
+   startUpSlogan: text;
+   startupId: text;
+   startupStatus: text;
+   tlr: nat;
+   valoration: nat;
+   website: text;
+ };
+type Role = 
+ variant {
+   Admin;
+   Minter: vec text;
+   Startup: vec text;
+ };
+type Result_2 = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: DataProject;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok: IncomingStartUp;
+ };
+type Report = 
+ record {
+   images: vec blob;
+   markDown: text;
+   timestamp: int;
+ };
+type ProjectCard = 
+ record {
+   coverImage: opt blob;
+   owner: principal;
+   pojectID: text;
+   problemSolving: text;
+   projectTitle: text;
+   startupName: text;
+ };
+type Project = 
+ record {
+   approvalDate: int;
+   budget: vec text;
+   coverImage: opt blob;
+   documents: vec blob;
+   fundsRequired: nat;
+   impact: text;
+   implementation: text;
+   milestones: vec text;
+   nftCollections: vec principal;
+   problemSolving: text;
+   productStatus: text;
+   projectDuration: nat;
+   projectId: text;
+   projectTitle: text;
+   startupID: text;
+   team: vec text;
+   tokenAddress: vec principal;
+   weeklyReports: vec Report;
+   yoursolution: text;
+ };
+type IncomingStartUp = 
+ record {
+   country: text;
+   email: text;
+   fullNameTl: text;
+   industry: text;
+   linkedinTL: text;
+   logo: blob;
+   shortDes: text;
+   specializationTL: text;
+   startUpName: text;
+   startUpSlogan: text;
+   startupStatus: text;
+   tlr: nat;
+   website: text;
+ };
+type DataProject = 
+ record {
+   budget: vec text;
+   coverImage: opt blob;
+   fundsRequired: nat;
+   impact: text;
+   implementation: text;
+   milestones: vec text;
+   problemSolving: text;
+   productStatus: text;
+   projectDuration: nat;
+   projectTitle: text;
+   startupID: text;
+   team: vec text;
+   yoursolution: text;
+ };
+service : {
+  addControllers: (vec principal) -> (bool);
+  approveProject: (principal) -> (Result_2);
+  approveStartUp: (IncomingStartUp, nat, principal) -> (Result_2);
+  editProfile: (opt text, opt text, opt blob) -> (opt User);
+  enterVerificationCode: (text) -> (Result_2);
+  expandProject: (text) -> (opt Project) query;
+  getCodeVerification: () -> (Result_2);
+  getIncomingProjectByOwner: (principal) -> (Result_1);
+  getIncomingProjects: () -> (vec ProjectCard);
+  getIncomingStartUps: () -> (vec StartupCard);
+  getIncomingStartupByOwner: (principal) -> (Result);
+  getMyUser: () -> (opt User);
+  getProjectByID: (text) -> (opt Project);
+  getProjectsFromStartup: (text) -> (vec Project);
+  getProjectsPreview: () -> (vec ProjectCard) query;
+  getStartUpByID: (text) -> (opt Startup);
+  getUsers: () -> (vec record {
+                         principal;
+                         User;
+                       });
+  loadAvatar: (opt blob) -> (opt User);
+  registerProject: (DataProject) -> (text);
+  registerStartUp: (IncomingStartUp) -> (text);
+  rejectProject: (principal) -> (opt DataProject);
+  rejectStartUp: (principal) -> (opt IncomingStartUp);
+  removeControllers: (vec principal) -> (bool);
+  signUp: (text, text, opt blob) -> (opt User);
+  whoAmi: () -> (text);
+}

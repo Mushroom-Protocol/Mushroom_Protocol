@@ -1,49 +1,31 @@
 {
-  "name": "Mushroom_Protocol_frontend",
-  "version": "0.2.0",
-  "description": "Internet Computer starter application",
-  "keywords": [
-    "Internet Computer",
-    "Motoko",
-    "JavaScript",
-    "Canister"
-  ],
+  "name": "mrp-react-2024",
+  "version": "0.0.0",
   "scripts": {
-    "build": "webpack",
-    "prebuild": "dfx generate",
-    "start": "webpack serve --mode development --env development",
-    "deploy:local": "dfx deploy --network=local",
-    "deploy:ic": "dfx deploy --network=ic",
-    "generate": "dfx generate Mushroom_Protocol_backend"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.19.2",
-    "@dfinity/auth-client": "^0.19.3",
-    "@dfinity/candid": "^0.19.2",
-    "@dfinity/principal": "^0.19.2"
+    "@bundly/ic-core-js": "^0.4.2",
+    "@bundly/ic-react": "^0.4.2",
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@connect2ic/core": "^0.1.1",
+    "@connect2ic/react": "^0.1.0",
+    "@dfinity/agent": "^0.11.3",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-icons": "^5.0.1",
+    "react-router-dom": "^6.21.3"
   },
   "devDependencies": {
-    "assert": "2.0.0",
-    "buffer": "6.0.3",
-    "copy-webpack-plugin": "^11.0.0",
-    "dotenv": "^16.3.1",
-    "events": "3.3.0",
-    "html-webpack-plugin": "5.5.0",
-    "process": "0.11.10",
-    "stream-browserify": "3.0.0",
-    "terser-webpack-plugin": "^5.3.3",
-    "util": "0.12.4",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.8.1"
-  },
-  "engines": {
-    "node": "^12 || ^14 || ^16 || ^18"
-  },
-  "browserslist": [
-    "last 2 chrome version",
-    "last 2 firefox version",
-    "last 2 safari version",
-    "last 2 edge version"
-  ]
+    "@types/node": "^17.0.45",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.5",
+    "@vitejs/plugin-react-refresh": "^1.3.6",
+    "buffer": "^6.0.3",
+    "typescript": "^4.4.3",
+    "vite": "^2.9.9"
+  }
 }
