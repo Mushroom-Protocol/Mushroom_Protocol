@@ -61,6 +61,7 @@ export interface ProjectCard {
   'startupName' : string,
   'pojectID' : string,
 }
+export type ProjectID = string;
 export interface Report {
   'markDown' : string,
   'timestamp' : bigint,
@@ -103,6 +104,7 @@ export interface StartupCard {
   'shortDes' : string,
   'startUpName' : string,
 }
+export type StartupID = string;
 export interface User {
   'verified' : { 'Code' : string } |
     { 'Success' : null },
@@ -135,9 +137,11 @@ export interface _SERVICE {
   'getIncomingStartupByOwner' : ActorMethod<[Principal], Result>,
   'getMyUser' : ActorMethod<[], [] | [User]>,
   'getProjectByID' : ActorMethod<[string], [] | [Project]>,
+  'getProjectsByStartup' : ActorMethod<[string], [] | [Array<ProjectID>]>,
   'getProjectsFromStartup' : ActorMethod<[string], Array<Project>>,
   'getProjectsPreview' : ActorMethod<[], Array<ProjectCard>>,
   'getStartUpByID' : ActorMethod<[string], [] | [Startup]>,
+  'getStartUpsByPrincipal' : ActorMethod<[Principal], Array<StartupID>>,
   'getUsers' : ActorMethod<[], Array<[Principal, User]>>,
   'loadAvatar' : ActorMethod<[[] | [Uint8Array | number[]]], [] | [User]>,
   'registerProject' : ActorMethod<[DataProject], string>,

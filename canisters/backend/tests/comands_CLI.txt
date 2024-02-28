@@ -1,0 +1,39 @@
+
+canister calls from dfx CLI:
+
+
+dfx canister call backend signUp '("Ariel Robotti", "arielrobotti@gmail.com", null)'
+
+
+dfx canister call backend registerStartUp '(record {startUpName = "StartUp uno";
+    email = "Email@gmail.com";  
+    website = "sitio.com";
+    startUpSlogan = "Slogan";
+    shortDes = "Descrippcion muy corta";
+    logo = blob "\ff\d8\ff\e0\00\10\4a\46\49\46\00\01\01\00\00\01\00\01\00\00\ff";
+    startupStatus = "inicio";
+    tlr = 9;
+    fullNameTl = "Ariel Gustavo Robotti";
+    specializationTL = "Motoko";
+    linkedinTL = "linkedin.com";
+    industry = "Informatica";
+    country = "Argentina";})'
+
+
+dfx canister call backend registerProject '(record {    
+        startupID = "??????";
+        projectTitle = "Proyecto de prueba de backend";
+        coverImage = null;
+        problemSolving = "Prueba de backend";
+        yoursolution = "Usar dfx CLI directamente";
+        impact = "Positivo";
+        productStatus = "Probando";
+        fundsRequired = 1787;
+        projectDuration = 3;
+        implementation = "Motoko";
+        milestones = vec {"Milestone Uno"; "Milestone dos"; "Milestone tres"};
+        budget = vec{"Budget uno"; "Budget dos"; "Budget tres"};
+        team = vec{ "Tomas"; "Esteban"; "Ariel"; "Alfonso"}
+    }
+)'
+

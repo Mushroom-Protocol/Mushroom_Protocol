@@ -89,6 +89,7 @@ export const idlFactory = ({ IDL }) => {
     'startUpName' : IDL.Text,
   });
   const Result = IDL.Variant({ 'ok' : IncomingStartUp, 'err' : IDL.Text });
+  const ProjectID = IDL.Text;
   const Startup = IDL.Record({
     'tlr' : IDL.Nat,
     'startUpSlogan' : IDL.Text,
@@ -110,6 +111,7 @@ export const idlFactory = ({ IDL }) => {
     'startUpName' : IDL.Text,
     'industry' : IDL.Text,
   });
+  const StartupID = IDL.Text;
   return IDL.Service({
     'addControllers' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Bool], []),
     'approveProject' : IDL.Func([IDL.Principal], [Result_2], []),
@@ -132,9 +134,19 @@ export const idlFactory = ({ IDL }) => {
     'getIncomingStartupByOwner' : IDL.Func([IDL.Principal], [Result], []),
     'getMyUser' : IDL.Func([], [IDL.Opt(User)], []),
     'getProjectByID' : IDL.Func([IDL.Text], [IDL.Opt(Project)], []),
+    'getProjectsByStartup' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(IDL.Vec(ProjectID))],
+        [],
+      ),
     'getProjectsFromStartup' : IDL.Func([IDL.Text], [IDL.Vec(Project)], []),
     'getProjectsPreview' : IDL.Func([], [IDL.Vec(ProjectCard)], ['query']),
     'getStartUpByID' : IDL.Func([IDL.Text], [IDL.Opt(Startup)], []),
+    'getStartUpsByPrincipal' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(StartupID)],
+        [],
+      ),
     'getUsers' : IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Principal, User))], []),
     'loadAvatar' : IDL.Func([IDL.Opt(IDL.Vec(IDL.Nat8))], [IDL.Opt(User)], []),
     'registerProject' : IDL.Func([DataProject], [IDL.Text], []),

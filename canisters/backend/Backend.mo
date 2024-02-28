@@ -61,6 +61,34 @@ actor Mushroom {
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
 
+    ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
+
+    stable let newslettersEmailSubs = Set.new<Text>();
+    stable let mailsToAlertActivity = Set.new<Text>();
+
+    public shared ({caller}) func subscribeNewsletter(): async Bool{
+        assert userVerified(caller);
+        let user = HashMap.get(users, phash, caller);
+        switch user{
+            case (?user){
+                Set.add<Text>(newslettersEmailSubs, thash, user.email);
+                true
+            };
+            case null {false}
+        }   
+    };
+
+    public shared ({caller}) func unSubscribeNewsletter(): async Bool{
+        assert userVerified(caller);
+        let user = HashMap.get(users, phash, caller);
+        switch user{
+            case (?user){
+                Set.remove<Text>(newslettersEmailSubs, thash, user.email);     
+            };
+            case null {false}
+        }   
+    };
+
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
     func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
@@ -322,8 +350,8 @@ actor Mushroom {
                         ?user;
                     };
                     case (#Code(_)){
-                        ?({user with verified = #Code("******")})
-                        // ?user
+                        // ?({user with verified = #Code("******")})
+                        ?user
                     }
                 }
             }
@@ -407,7 +435,29 @@ actor Mushroom {
         HashMap.get(startUps, thash, id);
     };
 
-
+    public shared ({caller}) func getStartUpsByPrincipal(p: Principal): async [StartupID]{
+        assert authorizedCaller(caller);       
+        switch (getUser(p)){
+            case null {[]};
+            case (?user){
+                for (r in user.roles.vals()){
+                    switch r{
+                        case (#Startup(ids)){
+                            return ids
+                        };
+                        case _ {};
+                    }
+                };
+                return [];
+            }
+        }
+    };
+    public func getProjectsByStartup(p: Text): async ?[ProjectID]{
+        return switch (await getStartUpByID(p)) {
+            case null { null};
+            case (?stu){  ?stu.projects }
+        };
+    };
 
     ///////////////////////////  Functions for managing permissions and approvals  //////////////////////////////
 

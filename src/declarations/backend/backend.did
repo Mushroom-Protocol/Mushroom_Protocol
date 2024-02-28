@@ -13,6 +13,7 @@ type User =
                Success;
              };
  };
+type StartupID = text;
 type StartupCard = 
  record {
    logo: blob;
@@ -70,6 +71,7 @@ type Report =
    markDown: text;
    timestamp: int;
  };
+type ProjectID = text;
 type ProjectCard = 
  record {
    coverImage: opt blob;
@@ -147,9 +149,11 @@ service : {
   getIncomingStartupByOwner: (principal) -> (Result);
   getMyUser: () -> (opt User);
   getProjectByID: (text) -> (opt Project);
+  getProjectsByStartup: (text) -> (opt vec ProjectID);
   getProjectsFromStartup: (text) -> (vec Project);
   getProjectsPreview: () -> (vec ProjectCard) query;
   getStartUpByID: (text) -> (opt Startup);
+  getStartUpsByPrincipal: (principal) -> (vec StartupID);
   getUsers: () -> (vec record {
                          principal;
                          User;
