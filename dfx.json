@@ -19,6 +19,18 @@
         "dist/"
       ],
       "type": "assets"
+    },
+    "assets-v2": {
+      "dependencies": [
+        "backend"
+      ],
+      "frontend": {
+        "entrypoint": "nextjs/dist/index.html"
+      },
+      "source": [
+        "nextjs/dist/"
+      ],
+      "type": "assets"
     }
   },
   "defaults": {
