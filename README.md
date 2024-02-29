@@ -1,30 +1,38 @@
 
-### Canister url. Test Frontend &emsp;&emsp; https://h4ggk-fiaaa-aaaal-qcjha-cai.icp0.io/
+#### Canister url. Test Frontend &emsp;&emsp; https://h4ggk-fiaaa-aaaal-qcjha-cai.icp0.io/
 
 #### Starting
-&emsp;```git clone https://github.com/Mushroom-Protocol/Mushroom_Protocol.git```
+#### ```git clone https://github.com/Mushroom-Protocol/Mushroom_Protocol.git```
 
-```cd Mushroom_Protocol```
+#### ```cd Mushroom_Protocol```
 
 Optional open VSCode in current directory
 
-```code .``` 
+### ```code .```
+
+To install node_modules
+
+#### ```npm install ```
+
+To install mops packages
+
+#### ```mops install```
 
 So... in the same terminal or in the terminal integrated with VCCode...
 
-```dfx start --clean --background```
+#### ```dfx start --clean --background```
 
 To deploy the local Internet_Identity canister
 
-```npm install dotenv```
+#### ```dfx deps deploy```
 
-```dfx deps pull```
+To generate candid files
 
-```dfx deps deploy``` 
+#### ```dfx generate```
 
-```dfx generate```
+To deploy project
 
-```dfx deploy```
+#### ```dfx deploy ```
 
 
 # ![Mp vert trans verde](https://github.com/ArielRobotti/Mushroom_Protocol/assets/144057345/78cf606a-3e75-4c7c-a56e-87e0a2f165f6)
