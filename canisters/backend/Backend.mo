@@ -144,6 +144,17 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         await safeUpdateControllers(controllers, #Remove);
     };
 
+    public shared ({caller}) func addAdmin(p: Principal): async Bool{
+        assert isAdmin(caller);
+        Set.put(admins, phash, p);
+    };
+
+    public shared ({caller}) func removeAdmin(p: Principal): async Bool{
+        assert caller == deployer and deployer != p;
+        Set.remove(admins, phash, p);
+    };
+    
+
     //////////////////////////////////////  private functions  //////////////////////////////////////////////////
 
     func availableId(id : Text) : Bool {
