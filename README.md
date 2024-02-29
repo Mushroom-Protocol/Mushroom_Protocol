@@ -8,7 +8,7 @@
 
 Optional open VSCode in current directory
 
-### ```code .```
+#### ```code .```
 
 To install node_modules
 
