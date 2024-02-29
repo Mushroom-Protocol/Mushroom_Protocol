@@ -13,10 +13,9 @@ import Set "mo:map/Set";
 import { ihash; nhash; n32hash; n64hash; thash; phash; bhash; lhash } "mo:map/Map";
 import Random "./libs/RandomClass";
 
-import Interface "ic-management-interface";
-import Startup "Startup";
+import Interface "./interfaces/ic-management-interface";
 
-actor Mushroom {
+shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     type User = Types.User;
@@ -57,6 +56,10 @@ actor Mushroom {
     //////////////////////////////////////////// Definitive records /////////////////////////////////////////////
 
     stable let admins = Set.new<Principal>();
+    ignore Set.put(admins, phash, deployer);
+
+    public func getAdmins(): async [Principal]{Set.toArray(admins)};
+    public func getDeployer(): async Principal{deployer};
     stable let users = HashMap.new<Principal, User>();
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
@@ -192,11 +195,16 @@ actor Mushroom {
     func daoIsDeployed() : Bool {
         DAO != Principal.fromText("aaaaa-aa");
     };
+
+    func isAdmin(p: Principal): Bool{
+        Set.has(admins, phash, p);
+    };
+
     func authorizedCaller(caller : Principal) : Bool {
         if (daoIsDeployed()) {
             caller == DAO;
         } else {
-            Principal.isController(caller);
+            Principal.isController(caller) or isAdmin(caller);
         };
     };
 

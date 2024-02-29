@@ -9,7 +9,7 @@ import Option "mo:base/Option";
 import Bool "mo:base/Bool";
 import Principal "mo:base/Principal";
 import Debug "mo:base/Debug";
-import Types "./types/Typesnftdinamico721";
+import Types "../types/Typesnftdinamico721";
 
 shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibleToken) = Self {
   stable var transactionId: Types.TransactionId = 0;

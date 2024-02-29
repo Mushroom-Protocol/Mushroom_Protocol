@@ -1,4 +1,4 @@
-import Types "./types/Types";
+import Types "../types/Types";
 
 shared ({ caller }) actor class Startup(){
 

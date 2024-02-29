@@ -1,6 +1,6 @@
 import List "mo:base/List";
 import Principal "mo:base/Principal";
-import Types "./types/TypesSoulbound";
+import Types "../types/TypesSoulbound";
 
 shared ({ caller }) actor class SoulboundToken(_name : Text, _symbol : Text, _logo: Types.Logo) {
     //----------- Declaraciones de tipos ------------------

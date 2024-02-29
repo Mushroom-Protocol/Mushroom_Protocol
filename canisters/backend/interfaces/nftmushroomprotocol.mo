@@ -1,4 +1,4 @@
-import Types "./types/TypesProjectNFT";
+import Types "../types/TypesProjectNFT";
 import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import Principal "mo:base/Principal";
