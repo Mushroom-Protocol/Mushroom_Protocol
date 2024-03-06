@@ -21,7 +21,7 @@ import {
 import { Tooltip } from '@chakra-ui/react';
 import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import { backend} from "../../../.dfx/local/canisters/backend";
+import { useCanister } from "@connect2ic/react"
 // import {Industry} from "../../declarations/backend";
 
 
@@ -51,6 +51,7 @@ function blobToBase64(buffer: Uint8Array) {
 
 
 const StartupForms = () => {
+  const [backend] = useCanister("backend")
   const { isOpen, onToggle } = useDisclosure();
   const toast = useToast();
 
@@ -61,7 +62,7 @@ const StartupForms = () => {
     startUpSlogan: "",
     shortDes: "",
     logo:  null, // Asegúrate de proporcionar un array válido aquí
-    status: "",
+    startupStatus: "",
     tlr: 1,
     fullNameTl: "",
     specializationTL: "",
@@ -106,25 +107,12 @@ const StartupForms = () => {
         ...formData,
         website: formData.website || "",
         startUpSlogan: formData.startUpSlogan || "", // Asigna un valor por defecto en caso de que sea null
-        logo: formData.logo || [],
+        logo: [],
+        tlr: parseInt(formData.tlr.toString())
       };
   
       // Intenta realizar la acción de envío
-      const response = await backend.whoami(
-            /* {startUpName : "",
-            email : "",
-            website : "",
-            startUpSlogan : "",
-            shortDes : "",
-            logo :  [1,2,34,5],
-            startupStatus : "",
-            tlr : BigInt(2),
-            fullNameTl : "",
-            specializationTL : "",
-            linkedinTL : "",
-            industry : " ",
-            country : "" }  */
-      );
+      const response = await backend.registerStartUp(formDataToSend);
   
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
@@ -250,7 +238,7 @@ const StartupForms = () => {
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
-                  <Select id="startupStatus" name="status" value={formData.status} onChange={handleSelectChange} placeholder="Select status">
+                  <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status">
                     <option value="ResearchStage" selected>Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>
