@@ -1,3 +1,4 @@
 [dependencies]
 map = "9.0.1"
 base = "0.10.0"
+random-class = "1.0.0"

@@ -11,7 +11,7 @@ import Types "types/Types";
 import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { ihash; nhash; n32hash; n64hash; thash; phash; bhash; lhash } "mo:map/Map";
-import Random "./libs/RandomClass";
+import Random "mo:random-class/Rand";
 
 import Interface "./interfaces/ic-management-interface";
 

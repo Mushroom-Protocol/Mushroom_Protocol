@@ -22,9 +22,8 @@ import StartupForms from "./components/Apply/StartupForms";
 
 function App() {
     const { isConnected, principal } = useConnect();
+
     const [backend] = useCanister("backend");
-
-
 
     // const rightToVote = async () => {
     //     let isDao = await backend.isDaoDeployed();
@@ -56,10 +55,6 @@ function App() {
 
     // let userDaoMember = false;
 
-    const checkUser = async () => {
-        console.log(await backend.whoAmi());
-    };
-
     // useEffect(() => {
     //     const fetchData = async () => {
     //         if (isConnected) {
@@ -68,7 +63,6 @@ function App() {
     //     };
     //     fetchData();
     // }, [isConnected, principal]);
-
 
     return (
         // <>
