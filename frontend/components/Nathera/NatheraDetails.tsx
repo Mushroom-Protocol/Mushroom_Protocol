@@ -20,7 +20,43 @@ import Natheralogo from "../../assets/Natheralogo.png"
 import NatheraTeamAA from "../../assets/NatheraTeamAA.jpg"
 import NatheraTeamPO from "../../assets/NatheraTeamPO.jpg"
 
+import { useEffect, useState } from "react";
+import { useCanister } from "@connect2ic/react";
+
 const NatheraDetails = () => {
+  const [backend] = useCanister("backend");
+  const [startupDetails, setStartupDetails] = useState({
+    startUpName: "",
+    email: "",
+    website: "",
+    startUpSlogan: "",
+    shortDes: "",
+    logo:  null, // Asegúrate de proporcionar un array válido aquí
+    startupStatus: "",
+    tlr: 1,
+    fullNameTl: "",
+    specializationTL: "",
+    linkedinTL: "",
+    industry: { 'MiningTech' : null },
+    country: "",
+  });
+
+  useEffect(() => {
+    callBackend();
+  }, []);
+
+  const callBackend = async () => {
+    const resIncomingStartUps = await backend.getIncomingStartUps();
+    const response = await backend.getIncomingStartupByOwner(resIncomingStartUps[0].owner);
+    const responseOk = response['ok']
+    setStartupDetails(prevState => {
+      console.log("setStartupDetails function");
+      console.log(prevState);
+      console.log(responseOk);
+      return {...prevState, responseOk}
+    });
+  };
+
   return (
     <Center>
     <Grid
@@ -47,9 +83,9 @@ const NatheraDetails = () => {
             height="50px"
           />
           <Box ml="10px">
-            <Text fontSize="18px">NATHERA</Text>
+            <Text fontSize="18px">{startupDetails.startUpName}</Text>
             <Text fontSize="12px" color="#737373" fontStyle="italic">
-              Nanotherapy to Improve Well Being
+              {startupDetails.startUpSlogan}
             </Text>
           </Box>
         </Box>
@@ -58,7 +94,7 @@ const NatheraDetails = () => {
           <br />
         </Text>
         <Text fontSize="15px" color="#737373" textAlign="justify">
-        <br></br>Nathera is a pioneering startup dedicated to the advancement of HealthTech through cutting-edge nanotechnology solutions. Focused on addressing the pressing concerns of musculoskeletal ailments like osteoarthritis, low back pain, and rheumatoid arthritis, the project stands at the forefront of innovative treatments in the health tech industry.
+        <br></br>{startupDetails.shortDes}
         <br></br><br></br>
         Founded  from Chile, Nathera is led by the visionary Aline Alfaro, whose leadership spearheads a team committed to revolutionizing the landscape of musculoskeletal disease management. With an early-stage status and a valuation pre-money of $20,000, the startup navigates the frontier of healthcare innovation, driven by a relentless pursuit of groundbreaking therapeutic advancements.  </Text>
       </GridItem>
