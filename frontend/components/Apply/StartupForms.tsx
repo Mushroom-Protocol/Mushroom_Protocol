@@ -21,7 +21,7 @@ import {
 import { Tooltip } from '@chakra-ui/react';
 import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import { useCanister } from "@connect2ic/react"
+import { useCanister } from "@connect2ic/react";
 // import {Industry} from "../../declarations/backend";
 
 
@@ -31,7 +31,7 @@ function base64ToBlob(dataUrl: String) {
   var byteCharacters = atob(base64Content);   // Convertir el contenido base64 a un array de bytes (Uint8Array)
   var byteArray = new Uint8Array(byteCharacters.length);
   for (var i = 0; i < byteCharacters.length; i++) {
-      byteArray[i] = byteCharacters.charCodeAt(i);
+    byteArray[i] = byteCharacters.charCodeAt(i);
   }
   return byteArray;
 };
@@ -41,9 +41,18 @@ function blobToBase64(buffer: Uint8Array) {
   var bytes = new Uint8Array(buffer);
   var len = bytes.byteLength;
   for (var i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
+    binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
+};
+
+const convertFileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 };
 // -----------------------------------------------------------------------------------------------------------
 
@@ -51,8 +60,8 @@ function blobToBase64(buffer: Uint8Array) {
 
 
 const StartupForms = () => {
-  const [backend] = useCanister("backend")
   const { isOpen, onToggle } = useDisclosure();
+  const [backend] = useCanister("backend");
   const toast = useToast();
 
   const [formData, setFormData] = useState({
@@ -61,22 +70,29 @@ const StartupForms = () => {
     website: "",
     startUpSlogan: "",
     shortDes: "",
-    logo:  null, // Asegúrate de proporcionar un array válido aquí
-    startupStatus: "",
+    logo: null as File | null, // Asegúrate de proporcionar un array válido aquí
+    status: "",
     tlr: 1,
     fullNameTl: "",
     specializationTL: "",
     linkedinTL: "",
-    industry: { 'MiningTech' : null },
+    industry: "",
     country: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, files } = e.target;
+    if (name === 'logo' && files) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: files[0], // Solo toma el primer archivo, puedes ajustar según tus necesidades
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -89,9 +105,9 @@ const StartupForms = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     let loadingToastId: string | number | undefined;
-  
+
     try {
       // Muestra un toast de carga con formato sólido y color azul
       loadingToastId = toast({
@@ -101,7 +117,7 @@ const StartupForms = () => {
         isClosable: false,
         variant: 'solid',
       });
-  
+
       // Filtra los campos opcionales antes de enviar al backend
       const formDataToSend = {
         ...formData,
@@ -110,15 +126,36 @@ const StartupForms = () => {
         logo: [],
         tlr: parseInt(formData.tlr.toString())
       };
-  
+
       // Intenta realizar la acción de envío
-      const response = await backend.registerStartUp(formDataToSend);
-  
+      const response = await backend.registerStartUp(
+        {
+          startUpName: formDataToSend.startUpName,
+          email: formDataToSend.email,
+          website: formDataToSend.website,
+          startUpSlogan: formDataToSend.startUpSlogan,
+          shortDes: formDataToSend.shortDes,
+          logo: formData.logo ? base64ToBlob(await convertFileToBase64(formData.logo)) : null,
+          startupStatus: formDataToSend.status,
+          tlr: Number(formDataToSend.tlr),
+          fullNameTl: formDataToSend.fullNameTl,
+          specializationTL: formDataToSend.specializationTL,
+          linkedinTL: formDataToSend.linkedinTL,
+          industry: formDataToSend.industry,
+          country: formDataToSend.country
+        }
+      );
+
+      /*
+      
+        
+        */
+
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId);
       }
-  
+
       // Muestra un toast de éxito con formato sólido y color verde
       toast({
         title: 'Successful Submission',
@@ -128,14 +165,14 @@ const StartupForms = () => {
         isClosable: true,
         variant: 'solid',
       });
-  
+
       console.log(response);
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId);
       }
-  
+
       // Muestra un toast de error con formato sólido y color rojo
       toast({
         title: 'Submission Error',
@@ -145,11 +182,11 @@ const StartupForms = () => {
         isClosable: true,
         variant: 'solid',
       });
-  
+
       console.error(error);
     }
   };
-  
+
   return (
     <Center>
       <Flex direction="row" align="center" gap={5}>
@@ -225,20 +262,19 @@ const StartupForms = () => {
 
                 <FormControl mt={4}>
                   <FormLabel>Upload Logo</FormLabel>
-                  <InputGroup>
-                    <Input id="uploadLogo" name="logo" value={formData.logo} onChange={handleChange} type="file" placeholder="Upload Logo" />
-                    <InputRightElement width="5rem">
-                      <Button h="1.75rem" size="sm" colorScheme="teal">
-                        Upload
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
+                  <Input
+                    id="uploadLogo"
+                    name="logo"
+                    onChange={handleChange}
+                    type="file"
+                    accept="image/*" // Asegura que solo se puedan seleccionar archivos de imagen
+                  />
                   <FormHelperText>Recommended size 200x200 px</FormHelperText>
                 </FormControl>
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
-                  <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status">
+                  <Select id="startupStatus" name="startupStatus" value={formData.status} onChange={handleSelectChange} placeholder="Select status">
                     <option value="ResearchStage" selected>Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>

@@ -30,6 +30,8 @@ To generate candid files
 
 #### ```dfx generate```
 
+##### Copy and Paste Backend.did.js file from src/declarations folder to .dfx/local/canisters/backend folder
+
 To deploy project
 
 #### ```dfx deploy ```
