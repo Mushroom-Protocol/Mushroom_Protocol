@@ -145,11 +145,6 @@ const StartupForms = () => {
         }
       );
 
-      /*
-      
-        
-        */
-
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId);

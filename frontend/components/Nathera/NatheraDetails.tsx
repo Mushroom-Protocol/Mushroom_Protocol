@@ -20,7 +20,46 @@ import Natheralogo from "../../assets/Natheralogo.png"
 import NatheraTeamAA from "../../assets/NatheraTeamAA.jpg"
 import NatheraTeamPO from "../../assets/NatheraTeamPO.jpg"
 
+import { useEffect, useState } from "react";
+import { useCanister } from "@connect2ic/react";
+
 const NatheraDetails = () => {
+  const [backend] = useCanister("backend");
+
+  const [startupDetails, setStartupDetails] = useState({
+    startUpName: "",
+    email: "",
+    website: "",
+    startUpSlogan: "",
+    shortDes: "",
+    logo:  null, // Asegúrate de proporcionar un array válido aquí
+    startupStatus: "",
+    tlr: 1,
+    fullNameTl: "",
+    specializationTL: "",
+    linkedinTL: "",
+    industry: { 'MiningTech' : null },
+    country: "",
+  });
+
+  useEffect(() => {
+    callBackend();
+  }, []);
+
+  const callBackend = async () => {
+    const resIncomingStartUps = await backend.getIncomingStartUps();
+    const response = await backend.getIncomingStartupByOwner(resIncomingStartUps[0].owner);
+    const responseOk = response['ok']
+    setStartupDetails(prevState => {
+      console.log("setStartupDetails function");
+      console.log(prevState);
+      console.log(responseOk);
+      console.log(startupDetails.startUpName)
+      return {...prevState, responseOk}
+    });
+  };
+
+  
   return (
     <Center>
     <Grid
