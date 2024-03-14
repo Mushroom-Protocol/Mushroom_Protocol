@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -18,9 +18,22 @@ import EONNFTboceto from "../../assets/EONNFTboceto.png"
 import favicon from "../../assets/favicon.ico"
 import MpFavicon  from '../../assets/MpFavicon.png' 
 import DashboardSidebar from "../DashboardSidebar";
+import { useCanister } from "@connect2ic/react";
 
 const LaunchpadNFT = () => {
   const navigate = useNavigate();
+  const [backend] = useCanister("backend");
+  const [incomingStartUps, setIncomingStartUps] = useState([])
+
+  useEffect(() => {
+    const getIncomingStartUps = async () => {
+      const resIncomingStartUps = await backend.getIncomingStartUps();
+      setIncomingStartUps(resIncomingStartUps as any[])
+    }
+
+    getIncomingStartUps()
+  }, []);
+
   return (
   <Center>
     <Box
@@ -50,7 +63,80 @@ const LaunchpadNFT = () => {
         py="20px"
         marginBottom={100}
       >
-       <Box w="320px" h="460px"  borderRadius="25px">
+        {incomingStartUps.map((startUp) => (
+          <Box w="320px" h="460px"  borderRadius="25px">
+            <Center>
+              <Image
+                src={MpFavicon}
+                alt={startUp.startUpName}
+                w="500px"
+                h="290px"
+                mt="0px"
+              />
+            </Center>
+            <Box mt="5px" ml="58px" display="flex" alignItems="center">
+              <Image
+                src={MpFavicon}
+                alt={startUp.startUpName + " logo"}
+                w="40px"
+                h="40px"
+                mr="10px"
+              />
+              <Text fontSize="22px">{startUp.shortDes}</Text>
+            </Box>
+            <Text
+              fontSize="14px"
+              color="#737373"
+              mt="5px"
+              mb="10px"
+              textAlign="center"
+            >
+              Minted: 0 / 600
+              <br />
+              Raised: 0 / 3,000 ICP
+            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Badge
+                ml="50px"
+                bg="#000000"
+                borderColor="#1FAFC8"
+                borderWidth="0.5px"
+                color="#FFFFFF"
+                fontSize="20px"
+                p="5px"
+                borderRadius="0.5rem"
+                textTransform="capitalize"
+                display="flex"
+                alignItems="center"
+              >
+                5
+                <Image
+                  src={favicon}
+                  alt="ICP logo"
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                />
+              </Badge>
+              <Button
+                mr="50px"
+                colorScheme="teal"
+                backgroundColor="#1FAFC8"
+                variant="solid"
+                color="#000000"
+                fontSize="xl"
+                borderRadius="5px"
+                _hover={{
+                  bg: '#01B994',
+                }}
+                onClick= {() => navigate("/Nathera/" + startUp.owner)}
+              >
+                Details
+              </Button>
+            </Flex>
+          </Box>
+        ))}
+        <Box w="320px" h="460px"  borderRadius="25px">
           <Center>
             <Image
               src={NatheraNFTBoceto}
