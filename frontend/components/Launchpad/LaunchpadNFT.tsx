@@ -129,7 +129,7 @@ const LaunchpadNFT = () => {
                 _hover={{
                   bg: '#01B994',
                 }}
-                onClick= {() => navigate("/Nathera/" + startUp.owner)}
+                onClick= {() => navigate("/StartupInfo", { state: { owner: startUp.owner } })}
               >
                 Details
               </Button>

@@ -48,6 +48,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <Navigate to="Home" /> },
       { path: "Home", element: <HomePage /> },
       { path: "LaunchPad", element: <LaunchPadPage /> },
+      { path: "StartupInfo", element: <FoundersPage /> },
       { path: "Nathera", element: <NatheraPage /> },
       { path: "Founders", element: <FoundersPage /> },
       { path: "Apply", element: <ApplyPage /> },
