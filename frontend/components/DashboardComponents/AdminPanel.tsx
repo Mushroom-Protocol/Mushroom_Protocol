@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Link as ChakraLink, List, ListItem } from '@chakra-ui/react';
 import { useCanister } from "@connect2ic/react";
+import { Link as ReactRouterLink } from 'react-router-dom'
 
 const AdminPanel: React.FC = () => {
   const [backend] = useCanister("backend");
@@ -23,7 +24,38 @@ const AdminPanel: React.FC = () => {
   }, []);
 
   return (
-    <div dangerouslySetInnerHTML={{ __html: startupInfo || '' }} />
+    <>
+      <div dangerouslySetInnerHTML={{ __html: startupInfo || '' }} />
+
+      <h1>Panel de administración</h1>
+      <List spacing={3}>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to='/Whitelist'>
+            Ver Whitelist
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to='/StartupsReqs'>
+            Solicitudes de Registro de Startup
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to='/Startups'>
+            Lista de Startups
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to='/FundReqs'>
+            Solicitudes de financiamiento
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to='/Projects'>
+            Lista de Proyectos
+          </ChakraLink>
+        </ListItem>
+      </List>
+    </>
   );
 };
 

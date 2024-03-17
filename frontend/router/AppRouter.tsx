@@ -57,7 +57,17 @@ export const router = createBrowserRouter([
         element: <DashboardSidebar children={undefined} />,
         children: [
           { path: "", element: <Navigate to="Admin" /> }, // Cambié "/" a ""
-          { path: "Admin", element: <AdminPage /> },
+          {
+            path: "Admin",
+            element: <AdminPage />,
+            children: [
+              { path: "Whitelist", element: <Navigate to="Home" />},
+              { path: "StartupsReqs", element: <Navigate to="Home" />},
+              { path: "Startups", element: <Navigate to="Home" />},
+              { path: "FundReqs", element: <Navigate to="Home" />},
+              { path: "Projects", element: <Navigate to="Home" />}
+            ]
+          },
         ],
       },
       { path: "MarketPlace", element: <MarketPlacePage /> },
