@@ -36,10 +36,10 @@ const FoundersDetails = () => {
   })
 
   useEffect(() => {
-    callBackend(location.state.owner)
+    getIncomingStartupByOwner(location.state.owner)
   }, [])
 
-  const callBackend = async (owner) => {
+  const getIncomingStartupByOwner = async (owner) => {
     const response = await backend.getIncomingStartupByOwner(owner)
     setStartupDetails(response['ok'])
   };
