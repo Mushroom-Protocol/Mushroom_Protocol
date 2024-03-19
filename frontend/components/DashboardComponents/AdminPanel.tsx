@@ -13,7 +13,6 @@ const AdminPanel: React.FC = () => {
         const response = await backend.getIncomingStartUps();
         const data = response[0];
         setStartupInfo(`<h1>${data.startUpName}</h1><h2>${data.shortDes}</h2>`);
-        console.log(data);
       } catch (error) {
         console.error('Error al obtener datos de startups:', error);
         // Puedes manejar el error de alguna manera, por ejemplo, mostrando un mensaje al usuario
@@ -30,27 +29,27 @@ const AdminPanel: React.FC = () => {
       <h1>Panel de administración</h1>
       <List spacing={3}>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='/Whitelist'>
+          <ChakraLink as={ReactRouterLink} to='Admin/Whitelist'>
             Ver Whitelist
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='/StartupsReqs'>
+          <ChakraLink as={ReactRouterLink} to='Admin/StartupsReqs'>
             Solicitudes de Registro de Startup
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='/Startups'>
+          <ChakraLink as={ReactRouterLink} to='Admin/Startups'>
             Lista de Startups
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='/FundReqs'>
+          <ChakraLink as={ReactRouterLink} to='Admin/FundReqs'>
             Solicitudes de financiamiento
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='/Projects'>
+          <ChakraLink as={ReactRouterLink} to='Admin/Projects'>
             Lista de Proyectos
           </ChakraLink>
         </ListItem>

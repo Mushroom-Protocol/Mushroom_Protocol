@@ -204,7 +204,7 @@ const { estado, setEstado } = estadoContext;
             <Box ml="4px">
               {
                 user.name === "" ?
-                  <Button id="botonRegisterUser" onClick={onOpen}>Registrar 9 Usuario</Button> :
+                  <Button id="botonRegisterUser" onClick={onOpen}>Registrar Usuario</Button> :
                   <>
                     <Text>{"Registrado como: "}</Text>
                     <Text>{user.name}</Text>

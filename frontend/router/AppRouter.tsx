@@ -16,6 +16,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import AdminPage from "../pages/AdminPage";
 import { EstadoProvider } from '../components/utils/estadoContex';
 import React from "react";
+import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
 
 function Layout() {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ export const router = createBrowserRouter([
             element: <AdminPage />,
             children: [
               { path: "Whitelist", element: <Navigate to="Home" />},
-              { path: "StartupsReqs", element: <Navigate to="Home" />},
+              { path: "StartupsReqs", element: <StartupsReqs />},
               { path: "Startups", element: <Navigate to="Home" />},
               { path: "FundReqs", element: <Navigate to="Home" />},
               { path: "Projects", element: <Navigate to="Home" />}
