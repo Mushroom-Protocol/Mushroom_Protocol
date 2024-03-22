@@ -20,7 +20,7 @@
       ],
       "type": "assets"
     },
-    "assets-v2": {
+    "assets_v2": {
       "dependencies": [
         "backend"
       ],

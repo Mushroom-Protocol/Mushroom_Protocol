@@ -1,5 +1,5 @@
 'use client'
-import { ConnectButton, ConnectDialog, useCanister  } from "@connect2ic/react";
+import { ConnectButton, ConnectDialog, useCanister, useConnect  } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
 
 import {
@@ -27,14 +27,18 @@ import {
   ModalFooter,
   FormControl,
   Input,
-  useToast} from '@chakra-ui/react'
+  useToast,
+  Avatar,
+  VStack} from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
-import { Link as ReactRouterLink } from 'react-router-dom'
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
 import { Link as ChakraLink } from '@chakra-ui/react'
 import MpFavicon  from './../assets/MpFavicon.png' 
 import { useEffect, useState } from 'react';
 import React, { useContext } from 'react';
 import { EstadoContext } from './utils/estadoContex'; 
+import { FiChevronDown } from "react-icons/fi";
+import NatheraTeamAA from '../assets/NatheraTeamAA.jpg';
 interface Props {
   children: React.ReactNode
 }
@@ -59,12 +63,19 @@ const NavLink = (props: Props) => {
   )
 }
 
+interface UserType {
+  name: string, email: string
+}
+
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState({name: "", email: ""});
+  const [user, setUser] = useState({name: "", email: ""} as UserType);
   const [backend] = useCanister("backend");
+  const {isConnected} = useConnect();
   const toast = useToast();
+  const navigate = useNavigate();
+  const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
@@ -73,6 +84,23 @@ export default function WithSubnavigation() {
 if (!estadoContext) {
   throw new Error('El componente debe estar dentro de un estadoContext');
 }
+
+  useEffect(() => {
+    const getMyUser = async () => {
+      const myUser = await backend.getMyUser()
+      return myUser as [UserType]
+    }
+
+    getMyUser().then((responseUser) => {
+      if (responseUser.length > 0) {
+        setUser(responseUser[0] as UserType)
+      }
+    })
+
+    if (!isConnected) {
+      setUser({name: "", email: ""})
+    }
+  }, [isConnected])
 
 const { estado, setEstado } = estadoContext;
 
@@ -135,7 +163,15 @@ const { estado, setEstado } = estadoContext;
         [name]: value,
       }));
     }
-  };
+  }
+
+  const handleItemClick = (to?: string) => {
+    if (to) {
+      setSelectedPage(to);
+      onClose();
+      navigate(to)
+    }
+  }
 
 //const fetchMessage = async () => {
  // try {
@@ -203,12 +239,39 @@ const { estado, setEstado } = estadoContext;
             <div id="botonConexion"><ConnectButton/></div>
             <Box ml="4px">
               {
-                user.name === "" ?
-                  <Button id="botonRegisterUser" onClick={onOpen}>Registrar Usuario</Button> :
-                  <>
-                    <Text>{"Registrado como: "}</Text>
-                    <Text>{user.name}</Text>
-                  </>
+                isConnected ?
+                  user.name === "" ?
+                    <Button id="botonRegisterUser" onClick={onOpen}>Registrar Usuario</Button> :
+                    <div style={{backgroundColor: '#333333'}}>
+                      <Menu>
+                        <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
+                          <HStack>
+                            <Avatar size={'md'} src={NatheraTeamAA} />
+                            <VStack display={{ base: 'none', md: 'flex' }} alignItems="flex-start" spacing="1px" ml="2">
+                              <Text fontSize="md">{user.name}</Text>
+                              <Text fontSize="sm" color="gray.600">
+                                Team Leader
+                              </Text>
+                            </VStack>
+                            <Box display={{ base: 'none', md: 'flex' }}>
+                              <FiChevronDown />
+                            </Box>
+                          </HStack>
+                        </MenuButton>
+                        <MenuList backgroundColor='#000000' borderColor="#000000" textColor="#FFFFFF">
+                          <MenuItem backgroundColor='#FFFFFF' textColor="#000000" onClick={() => handleItemClick('/Dashboard')}>Dashboard</MenuItem>
+                          <MenuItem onClick={() => handleItemClick('/Portfolio')}>Portafolio</MenuItem>
+                          <MenuItem backgroundColor='#FFFFFF' textColor="#000000" onClick={() => handleItemClick('/Edit')}>Edit</MenuItem>
+                          <MenuItem onClick={() => handleItemClick('/')}>Home</MenuItem>
+                          <MenuItem onClick={() => handleItemClick('/LaunchPad')}>LaunchPad</MenuItem>
+                          <MenuDivider />
+                          <MenuItem onClick={() => handleItemClick('/Disconnect')}>Disconnect</MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </div>
+                
+                  :
+                  <></>
               }
             </Box>
             

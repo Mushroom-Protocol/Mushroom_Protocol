@@ -29,12 +29,12 @@ const AdminPanel: React.FC = () => {
       <h1>Panel de administración</h1>
       <List spacing={3}>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='Admin/Whitelist'>
+          <ChakraLink as={ReactRouterLink} to='Whitelist'>
             Ver Whitelist
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='Admin/StartupsReqs'>
+          <ChakraLink as={ReactRouterLink} to='StartupsReqs'>
             Solicitudes de Registro de Startup
           </ChakraLink>
         </ListItem>
