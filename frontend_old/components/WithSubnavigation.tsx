@@ -21,7 +21,7 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Link as ChakraLink } from '@chakra-ui/react'
-// import MpFavicon from '../assets/MpFavicon.png'
+import MpFavicon from '../assets/MpFavicon.png'
 import React, { useState, useContext, useEffect } from 'react';
 import { EstadoContext } from './utils/estadoContex';
 
@@ -116,7 +116,7 @@ export default function WithSubnavigation() {
               <Image
                 boxSize='60px'
                 height='30%'
-                // src={MpFavicon}
+                src={MpFavicon}
                 alt='Logo Mushhroom'
               />
             </Box>

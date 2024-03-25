@@ -55,11 +55,10 @@ function App() {
 
   return (
     <>
-      {/* <EstadoProvider> */}
         <ConnectDialog dark={true} />
         <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
         <RouterProvider router={router} />
-      {/* </EstadoProvider> */}
+
     </>
   )
 };

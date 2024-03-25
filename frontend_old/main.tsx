@@ -9,8 +9,8 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bg: '#001122', // 
-        color: 'white',
+        bg: '#000000', // 
+        color: 'yourFontColor',
       },
     },
   }
@@ -20,7 +20,7 @@ const theme = extendTheme({
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <App />
+    <App/>
     </ChakraProvider>
   </React.StrictMode>,
 );

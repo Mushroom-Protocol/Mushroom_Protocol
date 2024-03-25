@@ -1,87 +1,36 @@
 
-
-
 import React, { useEffect } from "react"
-/*
- * Connect2ic provides essential utilities for IC app development
- */
-import { Actor, HttpAgent } from '@dfinity/agent';
+
 import { createClient } from "@connect2ic/core"
 import { InternetIdentity } from "@connect2ic/core/providers"
 import { Connect2ICProvider, ConnectDialog, useCanister, useConnect } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
 
-import { BrowserRouter as Router, Routes, Route, Navigate, RouterProvider } from "react-router-dom"
-
-// import * as backend from "../.dfx/local/canisters/backend"
-import * as backend from "../src/declarations/backend/"
+import WithSubnavigation from "./components/WithSubnavigation"
+import * as backend from "../src/declarations/backend"
 import { router } from "./router/AppRouter";
-import { EstadoProvider } from "./components/utils/estadoContex";
-import StartupForms from "./components/Apply/StartupForms";
+import { Box, Center, ChakraProvider } from "@chakra-ui/react"
+import { MdMargin } from "react-icons/md"
 
 
 function App() {
-    const { isConnected, principal } = useConnect();
+    // const { isConnected, principal } = useConnect();
 
-    const [backend] = useCanister("backend");
+    // const [backend] = useCanister("backend");
+    console.log("acà")
 
-    // const rightToVote = async () => {
-    //     let isDao = await backend.isDaoDeployed();
-    //     console.log("Dao deployed? ", isDao);
-    //     if (isDao) {
-    //         /*let daoPrincipal = String(await backend.getPrincipalDao());
-    //         console.log("Dao Principal: ", daoPrincipal) //OK
-
-    //         const agent = new HttpAgent({});
-    //         const dao = Actor.createActor(Dao.idlFactory, { agent, canisterId: daoPrincipal });
-
-    //         console.log(await dao.getName()); // OK
-    //         console.log(await dao.whoAmi()); // Error: Fail to verify certificate
-    //         let member = await dao.isAMember(principal);
-    //         return member;
-    //         */
-    //         //----- Modificar al solucionar Front -> DAO ------
-    //         let isMember = await backend.userIsDaoMember();
-    //         console.log("Is Dao member? ", isMember);
-    //         return isMember ? true : false;
-
-    //     }
-    //     else {
-    //         let isAdmin = await backend.iamAdmin();
-    //         console.log("Is admin? ", isAdmin);
-    //         return isAdmin ? true : false;
-    //     };
-    // };
-
-    // let userDaoMember = false;
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         if (isConnected) {
-    //             userDaoMember = await rightToVote();
-    //         }
-    //     };
-    //     fetchData();
-    // }, [isConnected, principal]);
 
     return (
-        // <>
-        //     <EstadoProvider>
-        //         <ConnectDialog dark={true} />
-        //         <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
-        //         <RouterProvider router={router} />
-        //     </EstadoProvider>
-        // </>
-        <>
-        <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
-        <RouterProvider router={router} />
-        <Router>
-            <Routes>
-                <Route path="./components/Apply/StartupForms" element={<StartupForms/>} />
-            </Routes>
-            
-        </Router>
-        </>
+        <ChakraProvider>
+            <h1>Hola mundo</h1>
+            {/* <WithSubnavigation/> */}
+        </ChakraProvider>
+
+
+
+
+
+
 
     )
 
