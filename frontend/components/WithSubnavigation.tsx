@@ -69,6 +69,7 @@ interface UserType {
 
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isRegisterOpen , onOpen: onRegisterOpen, onClose: onRegisterClose } = useDisclosure()
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({name: "", email: ""} as UserType);
   const [backend] = useCanister("backend");
@@ -91,15 +92,14 @@ if (!estadoContext) {
       return myUser as [UserType]
     }
 
-    getMyUser().then((responseUser) => {
-      if (responseUser.length > 0) {
-        setUser(responseUser[0] as UserType)
-      }
-    })
-
-    if (!isConnected) {
+    isConnected ?
+      getMyUser().then((responseUser) => {
+        if (responseUser.length > 0) {
+          setUser(responseUser[0] as UserType)
+        }
+      })
+    :
       setUser({name: "", email: ""})
-    }
   }, [isConnected])
 
 const { estado, setEstado } = estadoContext;
@@ -241,7 +241,7 @@ const { estado, setEstado } = estadoContext;
               {
                 isConnected ?
                   user.name === "" ?
-                    <Button id="botonRegisterUser" onClick={onOpen}>Registrar Usuario</Button> :
+                    <Button id="botonRegisterUser" onClick={onRegisterOpen}>Registrar Usuario</Button> :
                     <div style={{backgroundColor: '#333333'}}>
                       <Menu>
                         <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
@@ -269,13 +269,11 @@ const { estado, setEstado } = estadoContext;
                         </MenuList>
                       </Menu>
                     </div>
-                
-                  :
-                  <></>
+                : <></>
               }
             </Box>
             
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isRegisterOpen} onClose={onRegisterClose}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader><span style={{color: "black"}}>Registrar Usuario</span></ModalHeader>
@@ -297,7 +295,7 @@ const { estado, setEstado } = estadoContext;
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button colorScheme='blue' mr={3} onClick={onClose}>
+                  <Button colorScheme='blue' mr={3} onClick={onRegisterClose}>
                     Cerrar
                   </Button>
                 </ModalFooter>
