@@ -97,8 +97,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Set.add<Text>(mailsToAlertActivity, thash, email);
     };
 
-    func unsuscribeToAlertActivity(email: Text): Bool{
-        Set.remove<Text>(mailsToAlertActivity, thash, email);
+    func unsuscribeToAlertActivity(email: Text): (){
+        ignore Set.remove<Text>(mailsToAlertActivity, thash, email);
     };
 
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
@@ -183,6 +183,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             case (?user){
                 let roles = Array.filter<Role>(user.roles, func x = x != #Admin);
                 ignore HashMap.put<Principal, User>(users, phash, p, {user with roles});
+                unsuscribeToAlertActivity(user.email);
             };
             case null {
                 return #err("The Principal entered does not correspond to a registered user");
