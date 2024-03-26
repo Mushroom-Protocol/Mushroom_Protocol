@@ -28,6 +28,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type ProjectID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
+    type CollectionPreInit = Types.NFT.CollectionPreInit;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -247,12 +248,12 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     func authorizedCaller(caller : Principal) : Bool {
-        return true;
-        if (DAO != null_address) {
-            caller == DAO
+        // return true;
+        caller == Principal.fromActor(Mushroom) or (if (DAO != null_address) {  //ver si funciona la referencia Mushroom
+            caller == DAO 
         } else {
-            Principal.isController(caller) or isAdmin(caller)
-        }
+            Principal.isController(caller) or isAdmin(caller);
+        })
     };
 
     /////////////////////////////////////   Registration functions   /////////////////////////////////////////////
@@ -681,5 +682,31 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     //////////////////////////////////////////// NFT Section  ////////////////////////////////////////////////////
+
+    stable let incommingCollections = HashMap.new<StartupID,CollectionPreInit>();
+
+    public func testAuthMushroom(): async Bool{
+        let principalMR = await whoAmi();
+        authorizedCaller(Principal.fromText(principalMR));
+    };
+
+    public shared ({caller}) func createCollection( data: CollectionPreInit ): async  Result.Result<Text,Text>{
+        let startUp = await getStartUpByID(data.startupID); //
+        switch startUp{
+            case null {
+                return #err("The startupID entered does not correspond to a registered Startup");
+            };
+            case (?startUp){
+                if (caller != startUp.owner){
+                    return #err("The caller's principal does not match the owner of the Startup " #data.startupID);
+                };
+                ignore HashMap.put<StartupID,CollectionPreInit>(incommingCollections, thash, data.startupID, data);
+                return #ok("Your NFT collection creation request was successfully submitted")
+            };
+        };
+        
+    };
+
+
 
 }

@@ -16,6 +16,8 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import AdminPage from "../pages/AdminPage";
 import { EstadoProvider } from '../components/utils/estadoContex';
 import React from "react";
+import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
+import Whitelist from "../components/DashboardComponents/Whitelist";
 
 function Layout() {
   const navigate = useNavigate();

@@ -55,7 +55,6 @@ const NavLink = (props: Props) => {
 
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [loading, setLoading] = useState(false);
   const { isConnected, principal } = useConnect();
 
 
@@ -69,33 +68,25 @@ export default function WithSubnavigation() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        if (isConnected) {
-          setLoading(true);
-          const data = await backend.getMyUser() as User;
-          console.log(data)
-          // console.log("Nombre: ", data[0].verified)
+      console.log("Is conected: ", isConnected);
+      console.log(principal)
 
-          // if (data.) {
-          //   if (!Links.includes("Apply")) {
-          //     Links.push("Apply")
-          //   }
-          // } else {
-          //   while (Links.includes("Apply")) {
-          //     Links.pop();
-          //   }
-          // }
-          // setUserData(data);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      };
-      
+      if (isConnected) {
+        console.log("llamando a getMyUser()")
+        const data = await backend.getDeployer();
+        // console.log(data)
+        // console.log("Nombre: ", data[0].verified)
+
+        if (data) { Links.push("Apply") }
+        // setUserData(data);
+      }
+
     };
 
     fetchUserData();
+    return () => {
+      Links = Links.filter(str => str !== "Apply");
+    };
   }, [isConnected]); // El array vacío significa que este efecto se ejecuta solo en el montaje inicial
 
   return (
@@ -144,7 +135,7 @@ export default function WithSubnavigation() {
           <Flex alignItems={'center'}>
             {!userData && (
               <Button
-                  
+
                 colorScheme="blue" // Esquema de colores del botón
                 bg={"#444"} // Aplicar el color de fondo según el modo de color
                 color={"white"} // Aplicar el color del texto según el modo de color

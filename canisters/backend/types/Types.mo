@@ -142,8 +142,9 @@ module {
 
     };
 
-    module NFT {
+    
 
+    public module NFT {
         public type Tokenomic =  {
 
         };
