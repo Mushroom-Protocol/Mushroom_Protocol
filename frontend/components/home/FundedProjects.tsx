@@ -15,7 +15,7 @@ const FundedProjects = () => {
         flexDirection="column"
         alignItems="center"
         width="1024px"
-        height="700px"
+        // height="700px"
         position="relative"
         marginLeft="0px"
       >
