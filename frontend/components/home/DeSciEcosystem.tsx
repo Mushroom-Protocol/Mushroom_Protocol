@@ -57,7 +57,7 @@ const DeSciEcosystem = () => {
         flexDirection="column"
         alignItems="center"
         width="1024px"
-        height="450px"
+        // height="450px"
         top="50px"
       >
         <Text fontSize="36px" mt="20px">

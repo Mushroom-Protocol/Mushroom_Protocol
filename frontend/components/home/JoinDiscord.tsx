@@ -12,8 +12,9 @@ const JoinDiscord = () => {
   return (
     <Center>
       <Flex
+        display={{ md: "flex" }}
         width="1024px"
-        height="380px"
+        // height="380px"
         color="#FFFFFF"
         paddingX="0px"
         paddingY="20px"

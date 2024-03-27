@@ -18,13 +18,13 @@ const Dappfunctions = () => {
       alignItems="center"
       position="relative"
       width="100vw"
-      height="80vh"
+      // height="80vh"
     >
       <Text fontSize="36px" mt="20px">
         Dapp functions
       </Text>
       <Flex p={4}></Flex>
-      <HStack spacing="100px">
+      <HStack spacing="100px" display={{ md: "flex" }}>
         <VStack maxW="sm" spacing="20px">
           <Box alignItems="left" marginLeft="-20px">
             <Text fontSize="25px">Apply for Sciences</Text>
