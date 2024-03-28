@@ -18,6 +18,7 @@ import * as backend from "../src/declarations/backend/"
 import { router } from "./router/AppRouter";
 import { EstadoProvider } from "./components/utils/estadoContex";
 import StartupForms from "./components/Apply/StartupForms";
+import { Text } from "@chakra-ui/react";
 
 
 function App() {
@@ -73,7 +74,19 @@ function App() {
         //     </EstadoProvider>
         // </>
         <>
-        <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
+        {/* <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1> */}
+        <Text
+            fontSize="16px"
+            fontWeight="bold"
+            backgroundColor={isConnected ? "#64B344" : "#EA332B"}
+            color="#000000"
+            p="8px"
+            borderRadius="8px"
+            m="20px"
+            textAlign="center"
+        >
+            Hello{principal ? " " + principal : ", connect with Internet Identity to continue"}!
+        </Text>
         <RouterProvider router={router} />
         <Router>
             <Routes>

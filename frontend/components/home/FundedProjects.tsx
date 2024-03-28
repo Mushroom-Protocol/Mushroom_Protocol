@@ -37,6 +37,7 @@ const FundedProjects = () => {
             alignItems="center"
             p="20px"
             textAlign="center"
+            m="10px"
           >
             <Image
               src={PathNathera}
@@ -95,6 +96,7 @@ const FundedProjects = () => {
             alignItems="center"
             p="20px"
             textAlign="center"
+            m="10px"
           >
             <Image
               src={biopolimero}
@@ -152,6 +154,7 @@ const FundedProjects = () => {
             alignItems="center"
             p="20px"
             textAlign="center"
+            m="10px"
           >
             <Image
               src={nanocouting}
@@ -183,7 +186,7 @@ const FundedProjects = () => {
             <Text fontSize="16px" color="#737373" textAlign="justify" my="10px">
               Every year, tons of food are wasted during export and
               transportation. EON develops a coating to extend the shelf life of
-              food. <br /> <br />
+              food.
             </Text>
 
             <Text
