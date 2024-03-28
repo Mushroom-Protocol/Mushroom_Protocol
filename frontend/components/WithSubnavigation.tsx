@@ -258,10 +258,10 @@ const { estado, setEstado } = estadoContext;
                             </Box>
                           </HStack>
                         </MenuButton>
-                        <MenuList backgroundColor='#000000' borderColor="#000000" textColor="#FFFFFF">
-                          <MenuItem backgroundColor='#FFFFFF' textColor="#000000" onClick={() => handleItemClick('/Dashboard')}>Dashboard</MenuItem>
+                        <MenuList>
+                          <MenuItem onClick={() => handleItemClick('/Dashboard')}>Dashboard</MenuItem>
                           <MenuItem onClick={() => handleItemClick('/Portfolio')}>Portafolio</MenuItem>
-                          <MenuItem backgroundColor='#FFFFFF' textColor="#000000" onClick={() => handleItemClick('/Edit')}>Edit</MenuItem>
+                          <MenuItem onClick={() => handleItemClick('/Edit')}>Edit</MenuItem>
                           <MenuItem onClick={() => handleItemClick('/')}>Home</MenuItem>
                           <MenuItem onClick={() => handleItemClick('/LaunchPad')}>LaunchPad</MenuItem>
                           <MenuDivider />
