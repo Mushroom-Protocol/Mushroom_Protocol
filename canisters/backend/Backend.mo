@@ -29,13 +29,14 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
     type CollectionPreInit = Types.NFT.CollectionPreInit;
+    type ErrorCode = Types.ErrorCode;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
     let randomStore = Random.Rand();
 
     func generateId(prefix : Text) : async Text {
-        randomStore.setRange(100000, 999999); //This ensures that all UserIDs are 6 digits long.
+        randomStore.setRange(100000, 999999); //This ensures that all IDs are 6 digits long.
         var id : Text = prefix # Nat.toText(await randomStore.next());
         while (not availableId(id)) {
             id := prefix # Nat.toText(await randomStore.next())
@@ -45,8 +46,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    let null_address = Principal.fromText("aaaaa-aa");
-    stable var DAO = null_address;
+    let NULL_ADDRESS = Principal.fromText("aaaaa-aa");
+    stable var DAO = NULL_ADDRESS;
 
     stable let idUsed = Set.new<Text>(); //To speed up the process of random generation and assignment of IDs
 
@@ -60,8 +61,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     stable let admins = Set.new<Principal>();
     ignore Set.put(admins, phash, deployer);
 
-    public func getAdmins() : async [Principal] { Set.toArray(admins) };
-    public func getDeployer() : async Principal { deployer };
+    public func getAdmins() : async [Principal] { Set.toArray(admins) }; //BORRAR
+    public func getDeployer() : async Principal { deployer };   //BORRAR
     stable let users = HashMap.new<Principal, User>();
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
@@ -249,7 +250,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     func authorizedCaller(caller : Principal) : Bool {
         // return true;
-        caller == Principal.fromActor(Mushroom) or (if (DAO != null_address) {  //ver si funciona la referencia Mushroom
+        caller == Principal.fromActor(Mushroom) or (if (DAO != NULL_ADDRESS) {
             caller == DAO 
         } else {
             Principal.isController(caller) or isAdmin(caller);
@@ -685,27 +686,27 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let incommingCollections = HashMap.new<StartupID,CollectionPreInit>();
 
-    public func testAuthMushroom(): async Bool{
-        let principalMR = await whoAmi();
+    public func testAuthMushroom(): async Bool{   //BORRAR 
+        let principalMR = await whoAmi(); 
         authorizedCaller(Principal.fromText(principalMR));
     };
 
-    public shared ({caller}) func createCollection( data: CollectionPreInit ): async  Result.Result<Text,Text>{
-        let startUp = await getStartUpByID(data.startupID); //
+    public shared ({caller}) func createCollection( data: CollectionPreInit ): async  Result.Result<Text,ErrorCode>{
+        let startUp = await getStartUpByID(data.startupID); 
         switch startUp{
             case null {
-                return #err("The startupID entered does not correspond to a registered Startup");
+                return #err(#Err01("The startupID entered does not correspond to a registered Startup"));
             };
             case (?startUp){
                 if (caller != startUp.owner){
-                    return #err("The caller's principal does not match the owner of the Startup " #data.startupID);
+                    return #err(#Err02("The caller's principal does not match the owner of the Startup"));
                 };
                 ignore HashMap.put<StartupID,CollectionPreInit>(incommingCollections, thash, data.startupID, data);
                 return #ok("Your NFT collection creation request was successfully submitted")
             };
         };
-        
     };
+    
 
 
 

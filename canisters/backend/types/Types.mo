@@ -12,7 +12,7 @@ module {
         #Admin;
         #Startup : [Text]; //Startaup ID array
         #Minter : [Text]; //Colections ID array
-        #Reviewer: Concern;
+        #Reviewer : Concern
     };
 
     public type User = {
@@ -22,7 +22,7 @@ module {
         name : Text;
         avatar : ?Blob;
         email : Text;
-        verified : { #Code : Text; #Success: Bool };
+        verified : { #Code : Text; #Success : Bool };
         roles : [Role]
     };
 
@@ -141,11 +141,13 @@ module {
         nftCollections : [Principal];
 
     };
-
-    
+    public type ErrorCode = {
+        #Err01: Text; //The startupID entered does not correspond to a registered Startup
+        #Err02: Text; //The caller's principal does not match the owner of the Startup
+    };
 
     public module NFT {
-        public type Tokenomic =  {
+        public type Tokenomic = {
 
         };
         public type Category = {
@@ -154,56 +156,51 @@ module {
             #InventorTeam;
             #ReserveFund;
             #PublicSale;
-            #AdvisorNCollaborators;
+            #AdvisorNCollaborators
         };
 
         public type Holder = {
-            category: Category;
-            percentage: Float;
+            category : Category;
+            percentage : Float
         };
 
         public type Utilities = {
             #Governance;
             #IpNFT;
             #Membership;
-            #DeFiServices;
+            #DeFiServices
         };
         public type ImageType = {
             #PNG;
             #GIF;
             #JPG;
-            #SVG;
+            #SVG
         };
 
         public type Document = {
-            #PDF: Blob;
-            #MP4: Blob;
-            #MD: Text;
-            #HTML: Text;
-            #Image: Blob;
+            #PDF : Blob;
+            #MP4 : Blob;
+            #MD : Text;
+            #HTML : Text;
+            #Image : Blob
         };
 
         public type CollectionPreInit = {
-            startupID: Text;
-            pojectID: Text;
-            collectionName: Text;
-            shortStorytelling: Text;
-            storytellingCollection: Text;
-            totalSupply: Nat;
-            distribution: [Holder];
-            utilities: [Utilities];
+            startupID : Text;
+            pojectID : Text;
+            collectionName : Text;
+            shortStorytelling : Text;
+            storytellingCollection : Text;
+            totalSupply : Nat;
+            distribution : [Holder];
+            utilities : [Utilities];
             //decimals: Nat;
-            tokenPrice: Nat;
-            documents: [Document];
-            typesImages: ImageType;
-            nftImages: [Blob];
-            creator: Text;
+            tokenPrice : Nat;
+            documents : [Document];
+            typesImages : ImageType;
+            nftImages : [Blob];
+            creator : Text
         };
-
-        
-
-        
-
 
     }
 

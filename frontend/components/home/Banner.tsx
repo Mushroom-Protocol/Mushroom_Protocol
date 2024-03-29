@@ -1,7 +1,7 @@
 import React from "react";
 import { Center, Box, Flex, Heading, Text, Button, Image, flexbox } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
-import MushroomMachine from "../../assets/MushroomMachine.png";
+// import MushroomMachine from "../../assets/MushroomMachine";
 
 const Banner = () => {
   const navigate = useNavigate();
@@ -53,14 +53,14 @@ const Banner = () => {
         >
           View Ip-NFT
         </Button>
-        <Image
+        {/* <Image
           src={MushroomMachine}
           alt="Imagen"
           boxSize="450px"
           position="absolute"
           top="0px"
           right="0px"
-        />
+        /> */}
         <Text
           fontSize="18px"
           position="absolute"
