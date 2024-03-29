@@ -1,8 +1,8 @@
 {
-  "PetChain_backend": {
-    "ic": "yucnr-hyaaa-aaaak-qcjwa-cai"
+  "assets": {
+    "ic": "nys2z-xaaaa-aaaak-qddoq-cai"
   },
-  "PetChain_frontend": {
-    "ic": "ytdlf-kaaaa-aaaak-qcjwq-cai"
+  "backend": {
+    "ic": "nwqxr-mqaaa-aaaak-qddpq-cai"
   }
 }

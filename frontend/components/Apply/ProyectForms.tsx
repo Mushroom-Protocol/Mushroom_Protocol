@@ -22,10 +22,12 @@ import {
 } from '@chakra-ui/react';
 import { MdBiotech } from "react-icons/md";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import { backend} from "../../../.dfx/local/canisters/backend";
+import { useCanister } from "@connect2ic/react"
 
 
 const ProyectForms = () => {
+  const [backend] = useCanister("backend")
+
   const { isOpen, onToggle } = useDisclosure();
   const toast = useToast();
 
@@ -75,8 +77,18 @@ const ProyectForms = () => {
       });
   
   
+      const formDataToSend = {
+        ...formData,
+        fundsRequired: parseInt(formData.fundsRequired),
+        projectDuration: parseInt(formData.projectDuration),
+        milestones: formData.milestones.split(","),
+        budget: [formData.budget],
+        startupID: "",
+        coverImage: [],
+        team: formData.team.split(",")
+      };
       ///////////// CORREGIR LLAMADO AL BACKEND FUNCION DE REGISTRO PROYECTO /////////////////////////
-      //const response = await backend.signUpStartup(formData);
+      const response = await backend.registerProject(formDataToSend);
   
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
@@ -93,7 +105,7 @@ const ProyectForms = () => {
         variant: 'solid',
       });
   
-    /////////////  console.log(response); // ACTIVA TOAST DE MENSAJE DE SUBMIT ////////////////////////
+      console.log(response); // ACTIVA TOAST DE MENSAJE DE SUBMIT ////////////////////////
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {

@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Outlet, Link as RouterLink } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -73,7 +73,8 @@ export default function DashboardSidebar({ children }: { children: ReactNode }) 
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
         {/* Mostrar el contenido de AdminPage dentro del sidebar si está seleccionado */}
-        {selectedPage === '/Dashboard/Admin' && <AdminPage />}
+        {/* {selectedPage === '/Dashboard/Admin' && <AdminPage />} */}
+        <Outlet />
       </Box>
     </Box>
   );

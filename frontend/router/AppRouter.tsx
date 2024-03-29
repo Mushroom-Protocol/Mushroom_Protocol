@@ -16,6 +16,8 @@ import DashboardSidebar from "../components/DashboardSidebar";
 import AdminPage from "../pages/AdminPage";
 import { EstadoProvider } from '../components/utils/estadoContex';
 import React from "react";
+import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
+import Whitelist from "../components/DashboardComponents/Whitelist";
 
 function Layout() {
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <Navigate to="Home" /> },
       { path: "Home", element: <HomePage /> },
       { path: "LaunchPad", element: <LaunchPadPage /> },
+      { path: "StartupInfo", element: <FoundersPage /> },
       { path: "Nathera", element: <NatheraPage /> },
       { path: "Founders", element: <FoundersPage /> },
       { path: "Apply", element: <ApplyPage /> },
@@ -57,6 +60,19 @@ export const router = createBrowserRouter([
         children: [
           { path: "", element: <Navigate to="Admin" /> }, // Cambié "/" a ""
           { path: "Admin", element: <AdminPage /> },
+          { path: "Whitelist", element: <Whitelist /> },
+          { path: "StartupsReqs", element: <StartupsReqs /> },
+          {
+            path: "Admin",
+            element: <AdminPage />,
+            children: [
+              { path: "Whitelist", element: <Whitelist />},
+              { path: "StartupsReqs", element: <StartupsReqs />},
+              { path: "Startups", element: <Navigate to="Home" />},
+              { path: "FundReqs", element: <Navigate to="Home" />},
+              { path: "Projects", element: <Navigate to="Home" />}
+            ]
+          },
         ],
       },
       { path: "MarketPlace", element: <MarketPlacePage /> },
