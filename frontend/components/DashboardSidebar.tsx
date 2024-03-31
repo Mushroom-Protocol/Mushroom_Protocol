@@ -200,7 +200,8 @@ const MobileNav = ({ onOpen, handleItemClick, ...rest }: MobileProps) => {
                 </Box>
               </HStack>
             </MenuButton>
-            <MenuList bg="#000000" borderColor="#000000" textColor="#FFFFFF">
+            {/* <MenuList bg="#000000" borderColor="#000000" textColor="#FFFFFF"> */}
+            <MenuList color="black">
               <MenuItem onClick={() => handleItemClick('/Dashboard')}>Dashboard</MenuItem>
               <MenuItem onClick={() => handleItemClick('/Portfolio')}>Portfolio</MenuItem>
               <MenuItem onClick={() => handleItemClick('/Edit')}>Edit</MenuItem>
