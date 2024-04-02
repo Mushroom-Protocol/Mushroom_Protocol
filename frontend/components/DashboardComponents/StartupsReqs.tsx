@@ -84,7 +84,7 @@ const StartupsReqs: React.FC = () => {
       try {
         const response = await backend.getIncomingStartUps()
         console.log(response)
-        await setStartups(response as [Startup])
+        setStartups(response as [Startup])
       } catch (error) {
         console.error('Error al obtener datos de startups:', error)
       }
@@ -94,10 +94,8 @@ const StartupsReqs: React.FC = () => {
   }, []);
 
   const approveStartUp = async (owner) => {
-    console.log("approveStartUp")
     const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner);
     const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner['ok']
-    console.log(resGetIncomingStartupByOwnerOk)
     const valoration = 4
     const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, valoration, owner)
     console.log(resApproveStartUp)

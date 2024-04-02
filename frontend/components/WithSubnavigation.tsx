@@ -118,6 +118,7 @@ export default function WithSubnavigation() {
   useEffect(() => {
     const getMyUser = async () => {
       const myUser = await backend.getMyUser()
+      console.log(myUser)
       return myUser as [UserType]
     }
 
@@ -401,7 +402,7 @@ export default function WithSubnavigation() {
                           LaunchPad
                         </MenuItem>
                         <MenuDivider />
-                        {user?.verified['Success'] === null || user?.verified['Code'] ?
+                        {user?.verified['Success'] === null ?
                           null
                           : <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
                         }
