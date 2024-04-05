@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { WithSubnavigation, LargeWithNewsletter } from '../components';
+import { WithSubnavigation, LargeWithNewsletter, WithSubnavigation2 } from '../components';
 import { useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { HomePage } from "../pages/HomePage";
@@ -13,11 +13,13 @@ import NatheraPage from "../pages/NatheraPage";
 import FoundersPage from "../pages/FoundersPage";
 import ApplyPage from "../pages/ApplyPage";
 import DashboardSidebar from "../components/DashboardSidebar";
+import DashboardSidebar2 from "../components/DashboardSidebar2";
 import AdminPage from "../pages/AdminPage";
 import { EstadoProvider } from '../components/utils/estadoContex';
 import React from "react";
 import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
 import Whitelist from "../components/DashboardComponents/Whitelist";
+import LaunchpadNFT from "../components/Launchpad/LaunchpadNFT";
 
 function Layout() {
   const navigate = useNavigate();
@@ -33,7 +35,8 @@ function Layout() {
     <>
       <EstadoProvider>
         {/* Renderizar el menú principal solo si no es la ruta del dashboard */}
-        {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation />}
+        {/* {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation />} */}
+        {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation2 />}
         {/* Outlet renderizará las rutas anidadas */}
         <Outlet />
         {!window.location.pathname.startsWith('/Dashboard') && <LargeWithNewsletter />}
@@ -56,12 +59,13 @@ export const router = createBrowserRouter([
       { path: "Apply", element: <ApplyPage /> },
       {
         path: "Dashboard",
-        element: <DashboardSidebar children={undefined} />,
+        // element: <DashboardSidebar children={undefined} />,
+        element: <DashboardSidebar2 children={undefined} />,
         children: [
           { path: "", element: <Navigate to="Admin" /> }, // Cambié "/" a ""
           { path: "Admin", element: <AdminPage /> },
           { path: "Whitelist", element: <Whitelist /> },
-          { path: "StartupsReqs", element: <StartupsReqs /> },
+          { path: "Launchpad", element: <LaunchpadNFT /> },
           {
             path: "Admin",
             element: <AdminPage />,

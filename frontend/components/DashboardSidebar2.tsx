@@ -33,6 +33,7 @@ import { ReactText } from 'react';
 import LogoNegro from '../assets/LogoNegro.png';
 import NatheraTeamAA from '../assets/NatheraTeamAA.jpg';
 import AdminPage from '../pages/AdminPage';
+import MenuUser from './MenuUser';
 
 interface LinkItemProps {
   name: string;
@@ -49,7 +50,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Admin', icon: RiAdminFill, to: '/Dashboard/Admin' },
 ];
 
-export default function DashboardSidebar({ children }: { children: ReactNode }) {
+export default function DashboardSidebar2({ children }: { children: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
  
@@ -185,30 +186,7 @@ const MobileNav = ({ onOpen, handleItemClick, ...rest }: MobileProps) => {
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
         <Flex alignItems={'center'}>
-          <Menu>
-            <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: 'none' }}>
-              <HStack>
-                <Avatar size={'md'} src={NatheraTeamAA} />
-                <VStack display={{ base: 'none', md: 'flex' }} alignItems="flex-start" spacing="1px" ml="2">
-                  <Text fontSize="md">Justina Clark</Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Team Leader
-                  </Text>
-                </VStack>
-                <Box display={{ base: 'none', md: 'flex' }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            {/* <MenuList bg="#000000" borderColor="#000000" textColor="#FFFFFF"> */}
-            <MenuList color="black">
-              <MenuItem onClick={() => handleItemClick('/Dashboard')}>Dashboard</MenuItem>
-              <MenuItem onClick={() => handleItemClick('/Portfolio')}>Portfolio</MenuItem>
-              <MenuItem onClick={() => handleItemClick('/Edit')}>Edit</MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={() => handleItemClick('/Disconnect')}>Disconnect</MenuItem>
-            </MenuList>
-          </Menu>
+          <MenuUser />
         </Flex>
       </HStack>
     </Flex>
