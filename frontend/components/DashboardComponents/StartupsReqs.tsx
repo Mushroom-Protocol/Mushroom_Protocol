@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, List, ListItem, Stack, Text } from '@chakra-ui/react';
-import { useCanister, useConnect } from "@connect2ic/react";
+import { Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Input, List, ListItem, Stack, Text, useToast } from '@chakra-ui/react';
+import { useCanister } from "@connect2ic/react";
 
-interface IncomingStartUp {
-  startUpName : string;
-  email : string;
-  website : string;
-  startUpSlogan : string;
-  shortDes : string;
-  logo : [];
-  startupStatus : string;
-  tlr : number;
-  fullNameTl : string;
-  specializationTL : string;
-  linkedinTL : string;
-  industry : string;
-  country : string;
-};
 
 interface Startup {
   owner: object;
@@ -74,16 +59,20 @@ function blobToBase64(buffer: Uint8Array) {
   return btoa(binary);
 }
 
+
 const StartupsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
-  const {principal} = useConnect()
   const [startups, setStartups] = useState<[Startup] | null>(initialStateStartups)
+  const [formApprove, setFormApprove] = useState({
+    startupValoration: 0,
+  })
+  const [approvedStartupId, setapprovedStartupId] = useState<string | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     const getIncomingStartUps = async () => {
       try {
         const response = await backend.getIncomingStartUps()
-        console.log(response)
         setStartups(response as [Startup])
       } catch (error) {
         console.error('Error al obtener datos de startups:', error)
@@ -91,15 +80,66 @@ const StartupsReqs: React.FC = () => {
     };
 
     getIncomingStartUps();
-  }, []);
+  }, [approvedStartupId]);
 
-  const approveStartUp = async (owner) => {
-    const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner);
-    const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner['ok']
-    const valoration = 4
-    const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, valoration, owner)
-    console.log(resApproveStartUp)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormApprove((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
   }
+
+  const handleApprove = async (owner, valoration) => {
+    let loadingToastId: string | number | undefined
+
+    try {
+      loadingToastId = toast({
+        title: "Submitting Form",
+        status: "loading", // 'loading' es el status para el estilo de carga
+        duration: null,
+        isClosable: false,
+        variant: "solid",
+      })
+
+      const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner);
+      const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner['ok']
+      const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, parseInt(valoration), owner)
+      setapprovedStartupId(resApproveStartUp['ok'])
+
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Successful Submission",
+        // description: `Id de statup aprobada: ${approvedStartupId}`,
+        description: `Id de statup aprobada: ${resApproveStartUp['ok']}`,
+        status: "success", // 'success' es el status para el estilo de éxito
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+
+    } catch (error) {
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Submission Error",
+        description:
+          "There was an error submitting the form. Please try again.",
+        status: "error", // 'error' es el status para el estilo de error
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+
+      console.error("Error al aprobar startup:", error)
+    }
+  }
+
 
   return (
     <>
@@ -126,8 +166,9 @@ const StartupsReqs: React.FC = () => {
               </CardBody>
               <Divider />
               <CardFooter>
+                <Input id="startupValoration" name="startupValoration" value={formApprove.startupValoration} onChange={handleChange} placeholder="Ingresar valoración..." type="number" />
                 <ButtonGroup spacing='2'>
-                  <Button variant='ghost' colorScheme='blue' onClick={() => approveStartUp(startup.owner)}>
+                  <Button colorScheme='blue' onClick={() => handleApprove(startup.owner, formApprove.startupValoration)}>
                     Approve
                   </Button>
                 </ButtonGroup>
