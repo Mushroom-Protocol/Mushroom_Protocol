@@ -66,7 +66,7 @@ const StartupsReqs: React.FC = () => {
   const [formApprove, setFormApprove] = useState({
     startupValoration: 0,
   })
-  const [approvedStartupId, setapprovedStartupId] = useState<string | null>(null)
+  const [responseBackend, setResponseBackend] = useState<string | null>(null)
   const toast = useToast()
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const StartupsReqs: React.FC = () => {
     };
 
     getIncomingStartUps();
-  }, [approvedStartupId]);
+  }, [responseBackend]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -105,7 +105,7 @@ const StartupsReqs: React.FC = () => {
       const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner);
       const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner['ok']
       const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, parseInt(valoration), owner)
-      setapprovedStartupId(resApproveStartUp['ok'])
+      setResponseBackend(resApproveStartUp['ok'])
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -115,6 +115,53 @@ const StartupsReqs: React.FC = () => {
         title: "Successful Submission",
         // description: `Id de statup aprobada: ${approvedStartupId}`,
         description: `Id de statup aprobada: ${resApproveStartUp['ok']}`,
+        status: "success", // 'success' es el status para el estilo de éxito
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+
+    } catch (error) {
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Submission Error",
+        description:
+          "There was an error submitting the form. Please try again.",
+        status: "error", // 'error' es el status para el estilo de error
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+
+      console.error("Error al aprobar startup:", error)
+    }
+  }
+
+  const handleReject = async (owner) => {
+    let loadingToastId: string | number | undefined
+
+    try {
+      loadingToastId = toast({
+        title: "Submitting Form",
+        status: "loading", // 'loading' es el status para el estilo de carga
+        duration: null,
+        isClosable: false,
+        variant: "solid",
+      })
+
+      const resRejectStartUp = await backend.rejectStartUp(owner)
+      setResponseBackend(resRejectStartUp as string)
+
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Successful Submission",
+        description: `Startup rejected successfully.`,
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
@@ -169,7 +216,10 @@ const StartupsReqs: React.FC = () => {
                 <Input id="startupValoration" name="startupValoration" value={formApprove.startupValoration} onChange={handleChange} placeholder="Ingresar valoración..." type="number" />
                 <ButtonGroup spacing='2'>
                   <Button colorScheme='blue' onClick={() => handleApprove(startup.owner, formApprove.startupValoration)}>
-                    Approve
+                    Aprobar
+                  </Button>
+                  <Button variant='ghost' colorScheme='blue' onClick={() => handleReject(startup.owner)}>
+                    Rechazar
                   </Button>
                 </ButtonGroup>
               </CardFooter>
