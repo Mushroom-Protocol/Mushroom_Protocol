@@ -66,6 +66,7 @@ export const router = createBrowserRouter([
           { path: "Admin", element: <AdminPage /> },
           { path: "Whitelist", element: <Whitelist /> },
           { path: "Launchpad", element: <LaunchpadNFT /> },
+          { path: "ForResearcher", element: <ApplyPage /> },
           {
             path: "Admin",
             element: <AdminPage />,

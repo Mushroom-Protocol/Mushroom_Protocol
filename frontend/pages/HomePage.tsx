@@ -23,7 +23,9 @@ export const HomePage = () => {
       <FundedProjects />
       <Flex p={8}></Flex>
       <Dappfunctions />
+      <Flex p={8}></Flex>
       <DeSciEcosystem />
+      <Flex p={8}></Flex>
       <JoinDiscord />
 
       {/*<TableTopUser4iIndustria/>*/}

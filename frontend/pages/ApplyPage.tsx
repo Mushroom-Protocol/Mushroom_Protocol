@@ -56,25 +56,38 @@ export default function ApplyPage() {
 
   return (
     <>
-    <BannerApply/>
-    {
-      user?.verified['Success'] === null ?
-        <StartupForms/>
-      : <Center><Text color="red.500">Se requiere verificación del usuario para registrar Startup.</Text></Center>
-    }
-    <br />
-    {
-      user?.verified['Success'] === null 
-        && user?.roles.length > 0 
-        && isUserRoleStartup(user.roles) 
-      ? <ProyectForms/>
-      : <Center><Text color="red.500">Se requiere aprobación de startup para registrar Proyecto.</Text></Center>
-    }
-    <br />
-    <ColecctionForm/>
-
-    <br />
-    <br />
+      {
+        !window.location.pathname.startsWith('/Dashboard') &&
+        <BannerApply/>
+      }
+      {
+        window.location.pathname.startsWith('/Dashboard') && <br />
+      }
+      {
+        user?.verified['Success'] === null ?
+          <StartupForms/>
+        : <></>
+      }
+      <br />
+      {
+        window.location.pathname.startsWith('/Dashboard') &&
+        <>
+          {
+            user?.verified['Success'] === null 
+              && user?.roles.length > 0 
+              && isUserRoleStartup(user.roles) 
+            ?
+              <>
+                <ProyectForms/>
+                <br />
+                <ColecctionForm/>
+              </>
+            : <></>
+          }
+        </>
+      }
+      <br />
+      <br />
     </>
   )
 }

@@ -46,7 +46,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Portfolio', icon: BsCollection, to: '/Portfolio' },
   { name: 'Launchpad', icon: BsFillRocketTakeoffFill, to: 'Launchpad' },
   { name: 'FungiDAO', icon: MdOutlineHowToVote, to: '/FungiDAO' },
-  { name: 'For Researcher', icon: GiMicroscope, to: '/ForResearcher' },
+  { name: 'For Researcher', icon: GiMicroscope, to: 'ForResearcher' },
   { name: 'Admin', icon: RiAdminFill, to: '/Dashboard/Admin' },
 ];
 
