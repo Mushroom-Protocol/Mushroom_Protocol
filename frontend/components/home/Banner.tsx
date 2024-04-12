@@ -4,22 +4,7 @@ import { Center, Box, Flex, Heading, Text, Button, Image, flexbox } from "@chakr
 import { useNavigate } from 'react-router-dom';
 // import MushroomMachine from "../../assets/MushroomMachine";
 
-function sendMail() {
-  const formData = require('form-data');
-  const Mailgun = require('mailgun.js');
-  const mailgun = new Mailgun(formData);
-  const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'b5f80234c64cd2eaf6764302caabd97c-f68a26c9-2119e0cf' });
 
-  mg.messages.create('sandbox-123.mailgun.org', {
-    from: "Excited User mailgun@sandbox54670183dd5847a6b3fa49c0f1ca31a1.mailgun.org",
-    to: ["arielrobotti@gmail.com"],
-    subject: "Hello",
-    text: "Testing some Mailgun awesomeness!",
-    html: "<h1>Testing some Mailgun awesomeness!</h1>"
-  })
-    .then(msg => console.log(msg)) // logs response data
-    .catch(err => console.log(err)); // logs any error
-};
 
 const Banner = () => {
   const navigate = useNavigate();
@@ -52,25 +37,7 @@ const Banner = () => {
             Supports the science and technology development in LATAM
           </Heading>
         </Box>
-        <Button
-          colorScheme="blue"
-          backgroundColor="#1FAFC8"
-          variant="solid"
-          fontSize="18px"
-          borderRadius="full"
-          ml="16px"
-          position="absolute"
-          top="210px"
-          left="-20px"
-          size='lg'
-          px={10}
-          _hover={{
-            bg: '#01B994',
-          }}
-          onClick={() => sendMail()}
-        >
-          send Email
-        </Button>
+        
         {/* <Image
           src={MushroomMachine}
           alt="Imagen"
