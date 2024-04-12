@@ -60,9 +60,9 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let admins = Set.new<Principal>();
     ignore Set.put(admins, phash, deployer);
-
     public func getAdmins() : async [Principal] { Set.toArray(admins) }; //BORRAR
-    public func getDeployer() : async Principal { deployer };   //BORRAR
+    public func getDeployer() : async Principal { deployer }; //BORRAR
+
     stable let users = HashMap.new<Principal, User>();
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
@@ -70,7 +70,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
     stable let newslettersEmailSubs = Set.new<Text>();
-    stable let mailsToAlertActivity = Set.new<Text>();  //lista de emails para reportar actividad a los admins o solicitar acciones requeridas
+    stable let mailsToAlertActivity = Set.new<Text>(); //lista de emails para reportar actividad a los admins o solicitar acciones requeridas
 
     public shared ({ caller }) func subscribeNewsletter() : async Bool {
         assert userVerified(caller);
@@ -95,12 +95,12 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    func subscribeToAlertActivity(email: Text): (){
-        Set.add<Text>(mailsToAlertActivity, thash, email);
+    func subscribeToAlertActivity(email : Text) : () {
+        Set.add<Text>(mailsToAlertActivity, thash, email)
     };
 
-    func unsuscribeToAlertActivity(email: Text): (){
-        ignore Set.remove<Text>(mailsToAlertActivity, thash, email);
+    func unsuscribeToAlertActivity(email : Text) : () {
+        ignore Set.remove<Text>(mailsToAlertActivity, thash, email)
     };
 
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
@@ -155,48 +155,49 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         await safeUpdateControllers(controllers, #Remove)
     };
 
-    public shared ({ caller }) func addAdmin(p : Principal) : async Result.Result<Bool,Text> {
-        assert isAdmin(caller); 
-        switch (HashMap.get(users, phash, p)){
-            case (?user){
-                if(user.verified != #Success(true)){ 
+    public shared ({ caller }) func addAdmin(p : Principal) : async Result.Result<Bool, Text> {
+        assert isAdmin(caller);
+        switch (HashMap.get(users, phash, p)) {
+            case (?user) {
+                if (user.verified != #Success(true)) {
                     return #err("Administrators must be previously verified users.")
                 };
-                switch (Array.find<Types.Role>(user.roles, func(x) { x == #Admin })){
+                switch (Array.find<Types.Role>(user.roles, func(x) { x == #Admin })) {
                     case null {
                         let bufferRoles = Buffer.fromArray<Types.Role>(user.roles);
                         bufferRoles.add(#Admin);
                         let roles = Buffer.toArray<Types.Role>(bufferRoles);
-                        ignore HashMap.replace<Principal,User>(users, phash, p, {user with roles}); 
+                        ignore HashMap.replace<Principal, User>(users, phash, p, { user with roles })
                     };
-                    case _{};
+                    case _ {}
                 };
                 subscribeToAlertActivity(user.email);
-                #ok(Set.put(admins, phash, p));
+                #ok(Set.put(admins, phash, p))
             };
-            case null {return #err("The Principal you want to add is not a user.")}
-        };
+            case null {
+                return #err("The Principal you want to add is not a user.")
+            }
+        }
     };
 
     public shared ({ caller }) func removeAdmin(p : Principal) : async Result.Result<(), Text> {
         assert caller == deployer and deployer != p;
         let user = HashMap.get(users, phash, p);
-        switch user{
-            case (?user){
+        switch user {
+            case (?user) {
                 let roles = Array.filter<Role>(user.roles, func x = x != #Admin);
-                ignore HashMap.put<Principal, User>(users, phash, p, {user with roles});
-                unsuscribeToAlertActivity(user.email);
+                ignore HashMap.put<Principal, User>(users, phash, p, { user with roles });
+                unsuscribeToAlertActivity(user.email)
             };
             case null {
-                return #err("The Principal entered does not correspond to a registered user");
+                return #err("The Principal entered does not correspond to a registered user")
             }
         };
         ignore Set.remove<Principal>(admins, phash, p);
-        #ok();
+        #ok()
     };
 
     //////////////////////////////////////  private functions  //////////////////////////////////////////////////
-
 
     func availableId(id : Text) : Bool {
         switch (Set.contains<Text>(idUsed, thash, id)) {
@@ -250,11 +251,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     func authorizedCaller(caller : Principal) : Bool {
         // return true;
-        caller == Principal.fromActor(Mushroom) or (if (DAO != NULL_ADDRESS) {
-            caller == DAO 
-        } else {
-            Principal.isController(caller) or isAdmin(caller);
-        })
+        caller == Principal.fromActor(Mushroom) or (
+            if (DAO != NULL_ADDRESS) {
+                caller == DAO
+            } else {
+                Principal.isController(caller) or isAdmin(caller)
+            }
+        )
     };
 
     /////////////////////////////////////   Registration functions   /////////////////////////////////////////////
@@ -427,7 +430,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                 owner;
                 startUpName = st.startUpName;
                 startupId = "";
-                shortDes = st.shortDes;
+                fullNameTl = st.fullNameTl;
+                startUpSlogan = st.startUpSlogan;
                 logo = st.logo
             };
             resultBuffer.add(entrie)
@@ -682,32 +686,59 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    //////////////////////////////////////////// NFT Section  ////////////////////////////////////////////////////
-
-    stable let incommingCollections = HashMap.new<StartupID,CollectionPreInit>();
-
-    public func testAuthMushroom(): async Bool{   //BORRAR 
-        let principalMR = await whoAmi(); 
-        authorizedCaller(Principal.fromText(principalMR));
-    };
-
-    public shared ({caller}) func createCollection( data: CollectionPreInit ): async  Result.Result<Text,ErrorCode>{
-        let startUp = await getStartUpByID(data.startupID); 
-        switch startUp{
-            case null {
-                return #err(#Err01("The startupID entered does not correspond to a registered Startup"));
+    public query func getStartUpsPreview() : async [StartupCard] {
+        let tempBuffer = Buffer.Buffer<StartupCard>(1);
+        for (st in HashMap.vals<StartupID, Startup>(startUps)) {
+            let card : StartupCard = {
+                owner = st.owner;
+                startUpName = st.startUpName;
+                startupId = st.startupId;
+                fullNameTl = st.fullNameTl;
+                startUpSlogan = st.startUpSlogan;
+                logo = st.logo
             };
-            case (?startUp){
-                if (caller != startUp.owner){
-                    return #err(#Err02("The caller's principal does not match the owner of the Startup"));
-                };
-                ignore HashMap.put<StartupID,CollectionPreInit>(incommingCollections, thash, data.startupID, data);
-                return #ok("Your NFT collection creation request was successfully submitted")
-            };
+            tempBuffer.add(card)
         };
+        Buffer.toArray(tempBuffer)
     };
-    
 
+    public query func expandStartUp(id : StartupID) : async ?Startup {
+        var result = HashMap.get(startUps, thash, id);
+        switch result {
+            case null { null };
+            case (?startUp) {
+                ?{
+                    startUp with
+                    documents = [];
+                    email = "";
+                }
+            }
+        }
+    };
 
+    ////////////////////////////////////////    NFT Section    //////////////////////////////////////////////////
+
+    stable let incommingCollections = HashMap.new<StartupID, CollectionPreInit>();
+
+    public func testAuthMushroom() : async Bool {
+        authorizedCaller(Principal.fromText(await whoAmi()))
+    }; //BORRAR
+
+    public shared ({ caller }) func createCollection(data : CollectionPreInit) : async Result.Result<Text, ErrorCode> {
+        let startUp = await getStartUpByID(data.startupID);
+        switch startUp {
+            case null {
+                return #err(#Err01("The startupID entered does not correspond to a registered Startup"))
+            };
+            case (?startUp) {
+                if (caller != startUp.owner) {
+                    return #err(#Err02("The caller's principal does not match the owner of the Startup"))
+                };
+                ignore HashMap.put<StartupID, CollectionPreInit>(incommingCollections, thash, data.startupID, data);
+                return #ok("Your NFT collection creation request was successfully submitted")
+            }
+        }
+    };
+    // public shared ( {caller} ) func deployCollection(data : )
 
 }

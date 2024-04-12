@@ -83,7 +83,8 @@ module {
         owner : Principal;
         startUpName : Text;
         startupId : Text;
-        shortDes : Text;
+        fullNameTl : Text;
+        startUpSlogan: Text;
         logo : Blob
     };
 
@@ -196,11 +197,29 @@ module {
             utilities : [Utilities];
             //decimals: Nat;
             tokenPrice : Nat;
+            documentsFolderUrl : Text;
+            typesImages : ImageType;
+            nftImagesUrl : Text;
+            creator : Text
+        };
+
+        public type CollectionInit =  {
+            startupID : Text;
+            pojectID : Text;
+            collectionName : Text;
+            shortStorytelling : Text;
+            storytellingCollection : Text;
+            totalSupply : Nat;
+            distribution : [Holder];
+            utilities : [Utilities];
+            //decimals: Nat;
+            tokenPrice : Nat;
             documents : [Document];
             typesImages : ImageType;
             nftImages : [Blob];
             creator : Text
-        };
+
+        }
 
     }
 

@@ -1,5 +1,9 @@
 {
   "canisters": {
+    "account": {
+      "type": "motoko",
+      "main": "./canisters/backend/back2.mo"
+    },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
