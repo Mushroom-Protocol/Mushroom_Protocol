@@ -25,6 +25,6 @@
     "baseUrl": "."
   },
   "include": [
-    "./frontend"
+    "frontend_old"
   ]
 }
