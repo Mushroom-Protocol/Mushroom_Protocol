@@ -8,9 +8,8 @@ import {
   Tr,
   Th,
   Td,
-} from "@chakra-ui/react";
-import React from "react";
-
+} from "@chakra-ui/react"
+import React from "react"
 
 const DeSciEcosystem = () => {
   const data = [
@@ -49,7 +48,7 @@ const DeSciEcosystem = () => {
       raised: "$0",
       industry: "Mining",
     },
-  ];
+  ]
 
   return (
     <Center>
@@ -58,9 +57,8 @@ const DeSciEcosystem = () => {
         flexDirection="column"
         alignItems="center"
         width="1024px"
-        height="450px"
+        // height="450px"
         top="50px"
-        
       >
         <Text fontSize="36px" mt="20px">
           DeSci Ecosystem
@@ -116,7 +114,7 @@ const DeSciEcosystem = () => {
         </Table>
       </Flex>
     </Center>
-  );
-};
+  )
+}
 
-export default DeSciEcosystem;
+export default DeSciEcosystem

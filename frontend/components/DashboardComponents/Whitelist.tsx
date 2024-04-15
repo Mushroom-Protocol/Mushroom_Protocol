@@ -4,7 +4,7 @@ import { useCanister } from "@connect2ic/react";
 
 const Whitelist: React.FC = () => {
   const [backend] = useCanister("backend");
-  const [startups, setStartups] = useState<[]>([]);
+  const [startups, setStartups] = useState<[] | null>([]);
 
   useEffect(() => {
     const getIncomingStartUps = async () => {
@@ -17,7 +17,7 @@ const Whitelist: React.FC = () => {
     };
 
     getIncomingStartUps();
-  });
+  }, []);
 
   return (
     <>

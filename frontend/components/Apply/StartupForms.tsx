@@ -71,7 +71,7 @@ const StartupForms = () => {
     startUpSlogan: "",
     shortDes: "",
     logo: null as File | null, // Asegúrate de proporcionar un array válido aquí
-    status: "",
+    startupStatus: "",
     tlr: 1,
     fullNameTl: "",
     specializationTL: "",
@@ -123,7 +123,8 @@ const StartupForms = () => {
         ...formData,
         website: formData.website || "",
         startUpSlogan: formData.startUpSlogan || "", // Asigna un valor por defecto en caso de que sea null
-        logo: formData.logo || [],
+        logo: [],
+        tlr: parseInt(formData.tlr.toString())
       };
 
       // Intenta realizar la acción de envío
@@ -135,7 +136,7 @@ const StartupForms = () => {
           startUpSlogan: formDataToSend.startUpSlogan,
           shortDes: formDataToSend.shortDes,
           logo: formData.logo ? base64ToBlob(await convertFileToBase64(formData.logo)) : null,
-          startupStatus: formDataToSend.status,
+          startupStatus: formDataToSend.startupStatus,
           tlr: Number(formDataToSend.tlr),
           fullNameTl: formDataToSend.fullNameTl,
           specializationTL: formDataToSend.specializationTL,
@@ -268,7 +269,7 @@ const StartupForms = () => {
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
-                  <Select id="startupStatus" name="status" value={formData.status} onChange={handleSelectChange} placeholder="Select status">
+                  <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status">
                     <option value="ResearchStage" selected>Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>
