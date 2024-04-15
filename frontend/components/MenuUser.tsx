@@ -1,9 +1,6 @@
 "use client"
 
-import {
-  useCanister,
-  useConnect,
-} from "@connect2ic/react"
+import { useCanister, useConnect } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
 import {
   Box,
@@ -36,7 +33,6 @@ import { EstadoContext } from "./utils/estadoContex"
 import { FiChevronDown } from "react-icons/fi"
 import { UserType } from "./CommonTypes"
 
-
 interface Props {
   children: React.ReactNode
 }
@@ -47,7 +43,6 @@ const initialStateUser = {
   verified: {},
   roles: [],
 }
-
 
 export default function MenuUser() {
   const { onClose } = useDisclosure()
@@ -104,9 +99,9 @@ export default function MenuUser() {
         isClosable: false,
         variant: "solid",
       })
-      const resEnterVerificationCode = await backend.enterVerificationCode(
+      const resEnterVerificationCode = (await backend.enterVerificationCode(
         formDataVerify.verificationCode,
-      ) as string
+      )) as string
       setUser((prev) => ({ ...prev, verified: { Success: true } }))
 
       if (loadingToastId !== undefined) {
@@ -164,10 +159,10 @@ export default function MenuUser() {
   }
 
   const getCodeVerification = async () => {
-    const resGetCodeVerification = await backend.getCodeVerification() as string
+    const resGetCodeVerification =
+      (await backend.getCodeVerification()) as string
     setResCodeVerificationMessage(resGetCodeVerification["ok"])
   }
-
 
   return (
     <>

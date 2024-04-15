@@ -47,7 +47,6 @@ import { FiChevronDown } from "react-icons/fi"
 import NatheraTeamAA from "../assets/NatheraTeamAA.jpg"
 import { UserType } from "./CommonTypes"
 
-
 interface Props {
   children: React.ReactNode
 }
@@ -77,9 +76,8 @@ const NavLink = (props: Props) => {
 const initialStateUser = {
   name: "",
   email: "",
-  verified: {}
+  verified: {},
 }
-
 
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -100,8 +98,9 @@ export default function WithSubnavigation() {
   const toast = useToast()
   const navigate = useNavigate()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
-  const [resCodeVerificationMessage, setResCodeVerificationMessage] =
-    useState<string | null>(null)
+  const [resCodeVerificationMessage, setResCodeVerificationMessage] = useState<
+    string | null
+  >(null)
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
@@ -144,11 +143,11 @@ export default function WithSubnavigation() {
         isClosable: false,
         variant: "solid",
       })
-      const resUser = await backend.signUp(
+      const resUser = (await backend.signUp(
         formData.userName,
         formData.userEmail,
         [],
-      ) as UserType
+      )) as UserType
       setUser(resUser)
 
       if (loadingToastId !== undefined) {
@@ -197,10 +196,10 @@ export default function WithSubnavigation() {
         isClosable: false,
         variant: "solid",
       })
-      const resEnterVerificationCode = await backend.enterVerificationCode(
+      const resEnterVerificationCode = (await backend.enterVerificationCode(
         formDataVerify.verificationCode,
-      ) as { ok: string }
-      setUser(prev => ({...prev, verified: {Success: null}}))
+      )) as { ok: string }
+      setUser((prev) => ({ ...prev, verified: { Success: true } }))
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -208,7 +207,7 @@ export default function WithSubnavigation() {
 
       toast({
         title: "Successful Submission",
-        description: resEnterVerificationCode['ok'],
+        description: resEnterVerificationCode["ok"],
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
@@ -272,7 +271,9 @@ export default function WithSubnavigation() {
   }
 
   const getCodeVerification = async () => {
-    const resGetCodeVerification = await backend.getCodeVerification() as { ok: string }
+    const resGetCodeVerification = (await backend.getCodeVerification()) as {
+      ok: string
+    }
     setResCodeVerificationMessage(resGetCodeVerification["ok"])
   }
 
@@ -401,10 +402,9 @@ export default function WithSubnavigation() {
                           LaunchPad
                         </MenuItem>
                         <MenuDivider />
-                        {user?.verified['Success'] === true ?
-                          null
-                          : <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
-                        }
+                        {user?.verified["Success"] === true ? null : (
+                          <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
+                        )}
                         <MenuItem onClick={() => resetUser()}>
                           Disconnect
                         </MenuItem>

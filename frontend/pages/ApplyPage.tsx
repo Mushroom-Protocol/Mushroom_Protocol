@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { Flex, Center, Text } from '@chakra-ui/react';
+import React, { useEffect, useState } from "react"
+import { Flex, Center, Text } from "@chakra-ui/react"
 import BannerApply from "../components/Apply/BannerApply"
 import StartupForms from "../components/Apply/StartupForms"
 import ProyectForms from "../components/Apply/ProyectForms"
 import ColecctionForm from "../components/Apply/ColecctionForm"
-import JoinDiscord from '../components/home/JoinDiscord'
-import { useCanister, useConnect } from '@connect2ic/react';
-
+import JoinDiscord from "../components/home/JoinDiscord"
+import { useCanister, useConnect } from "@connect2ic/react"
 
 interface UserType {
   name: string
@@ -19,12 +18,11 @@ const initialStateUser = {
   name: "",
   email: "",
   verified: {},
-  roles: []
+  roles: [],
 }
 
-
 export default function ApplyPage() {
-  const [backend] = useCanister("backend");
+  const [backend] = useCanister("backend")
   const { isConnected } = useConnect()
   const [user, setUser] = useState(initialStateUser)
 
@@ -43,9 +41,9 @@ export default function ApplyPage() {
       : setUser(initialStateUser)
   }, [isConnected])
 
-  const isUserRoleStartup = roles => {
+  const isUserRoleStartup = (roles) => {
     let isUserRoleStartupFlag = false
-    roles.map(elm => {
+    roles.map((elm) => {
       if (elm.Startup && elm.Startup.length > 0) {
         isUserRoleStartupFlag = true
       }
@@ -53,39 +51,31 @@ export default function ApplyPage() {
     return isUserRoleStartupFlag
   }
 
-
   return (
     <>
-      {
-        !window.location.pathname.startsWith('/Dashboard') &&
-        <BannerApply/>
-      }
-      {
-        window.location.pathname.startsWith('/Dashboard') && <br />
-      }
-      {
-        user?.verified['Success'] === true && !isUserRoleStartup(user.roles) ?
-          <StartupForms/>
-        : <></>
-      }
+      {!window.location.pathname.startsWith("/Dashboard") && <BannerApply />}
+      {window.location.pathname.startsWith("/Dashboard") && <br />}
+      {user?.verified["Success"] === true && !isUserRoleStartup(user.roles) ? (
+        <StartupForms />
+      ) : (
+        <></>
+      )}
       <br />
-      {
-        window.location.pathname.startsWith('/Dashboard') &&
+      {window.location.pathname.startsWith("/Dashboard") && (
         <>
-          {
-            user?.verified['Success'] === true 
-              && user?.roles.length > 0 
-              && isUserRoleStartup(user.roles) 
-            ?
-              <>
-                <ProyectForms/>
-                <br />
-                <ColecctionForm/>
-              </>
-            : <></>
-          }
+          {user?.verified["Success"] === true &&
+          user?.roles.length > 0 &&
+          isUserRoleStartup(user.roles) ? (
+            <>
+              <ProyectForms />
+              <br />
+              <ColecctionForm />
+            </>
+          ) : (
+            <></>
+          )}
         </>
-      }
+      )}
       <br />
       <br />
     </>
