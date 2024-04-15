@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { Flex, Image, Spacer, Center, Grid, GridItem, Box, Text, Button, Tag, TagLabel,
-  TagLeftIcon,
-  TagRightIcon,
-  TagCloseButton,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -13,9 +10,10 @@ import { Flex, Image, Spacer, Center, Grid, GridItem, Box, Text, Button, Tag, Ta
   useDisclosure,
   HStack, } from "@chakra-ui/react";
 import { FaClock } from "react-icons/fa6";
-import MpFavicon from "../../assets/MpFavicon.png"
-import Mushroomfounders from "../../assets/Mushroomfounders.gif"
-import favicon from "../../assets/favicon.ico"
+// import MpFavicon from "../../assets/MpFavicon.png"
+// import Mushroomfounders from "../../assets/Mushroomfounders.gif"
+// import favicon from "../../assets/favicon.ico"
+
 
 const FoundersItems = () => {
   const [quantity, setQuantity] = useState(1);
@@ -33,6 +31,7 @@ const FoundersItems = () => {
   };
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
 
   return (
     <Center>
@@ -59,7 +58,7 @@ const FoundersItems = () => {
       >
         <Flex>
         <Box
-          bgImage={MpFavicon}
+          // bgImage={MpFavicon}
           bgSize="60px 60px"
           bgRepeat="no-repeat"
           w="60px"
@@ -121,7 +120,7 @@ const FoundersItems = () => {
         justifyContent="center"
       >
        <Image
-          src={Mushroomfounders}
+          // src={Mushroomfounders}
           alt="Descripción de la imagen"
           objectFit="cover"
           width="300px" // Ajusta el ancho según tus necesidades
@@ -156,7 +155,7 @@ const FoundersItems = () => {
           >
             Price: 5
             <img
-              src={favicon}
+              // src={favicon}
               alt="Icon"
               width="22"
               height="22"

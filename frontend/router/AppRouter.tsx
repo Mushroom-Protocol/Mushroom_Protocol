@@ -20,6 +20,9 @@ import React from "react";
 import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
 import Whitelist from "../components/DashboardComponents/Whitelist";
 import LaunchpadNFT from "../components/Launchpad/LaunchpadNFT";
+import DashboardHome from "../components/DashboardComponents/DashboardHome";
+import Portfolio from "../components/DashboardComponents/Portfolio";
+
 
 function Layout() {
   const navigate = useNavigate();
@@ -45,6 +48,7 @@ function Layout() {
   );
 }
 
+
 export const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -62,9 +66,9 @@ export const router = createBrowserRouter([
         // element: <DashboardSidebar children={undefined} />,
         element: <DashboardSidebar2 children={undefined} />,
         children: [
-          { path: "", element: <Navigate to="Admin" /> }, // Cambié "/" a ""
+          { path: "", element: <DashboardHome /> }, // Cambié "/" a ""
           { path: "Admin", element: <AdminPage /> },
-          { path: "Whitelist", element: <Whitelist /> },
+          { path: "Portfolio", element: <Portfolio /> },
           { path: "Launchpad", element: <LaunchpadNFT /> },
           { path: "ForResearcher", element: <ApplyPage /> },
           {
@@ -87,4 +91,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-

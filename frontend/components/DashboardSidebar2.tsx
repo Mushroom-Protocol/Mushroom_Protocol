@@ -1,7 +1,6 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Outlet, Link as RouterLink } from 'react-router-dom';
 import {
-  Avatar,
   Box,
   CloseButton,
   HStack,
@@ -12,17 +11,11 @@ import {
   Link as ChakraLink,
   Drawer,
   DrawerContent,
-  VStack,
   Icon,
   useColorModeValue,
   useDisclosure,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
 } from '@chakra-ui/react';
-import { FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings, FiMenu, FiBell, FiChevronDown } from 'react-icons/fi';
+import { FiHome, FiMenu, FiBell } from 'react-icons/fi';
 import { BsCollection } from 'react-icons/bs';
 import { BsFillRocketTakeoffFill } from 'react-icons/bs';
 import { MdOutlineHowToVote } from 'react-icons/md';
@@ -31,9 +24,10 @@ import { RiAdminFill } from 'react-icons/ri';
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
 import LogoNegro from '../assets/LogoNegro.png';
-import NatheraTeamAA from '../assets/NatheraTeamAA.jpg';
-import AdminPage from '../pages/AdminPage';
 import MenuUser from './MenuUser';
+import { useCanister, useConnect } from '@connect2ic/react';
+import { UserType } from './CommonTypes';
+
 
 interface LinkItemProps {
   name: string;
@@ -42,13 +36,14 @@ interface LinkItemProps {
 }
 
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Dashboard', icon: FiHome, to: '/Dashboard' },
-  { name: 'Portfolio', icon: BsCollection, to: '/Portfolio' },
+  { name: 'Dashboard', icon: FiHome, to: '' },
+  { name: 'Portfolio', icon: BsCollection, to: 'Portfolio' },
   { name: 'Launchpad', icon: BsFillRocketTakeoffFill, to: 'Launchpad' },
   { name: 'FungiDAO', icon: MdOutlineHowToVote, to: '/FungiDAO' },
   { name: 'For Researcher', icon: GiMicroscope, to: 'ForResearcher' },
   { name: 'Admin', icon: RiAdminFill, to: '/Dashboard/Admin' },
 ];
+
 
 export default function DashboardSidebar2({ children }: { children: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,6 +55,7 @@ export default function DashboardSidebar2({ children }: { children: ReactNode })
       onClose();
     }
   };
+
 
   return (
     <Box minH="100vh" bg="#000000">
@@ -81,13 +77,52 @@ export default function DashboardSidebar2({ children }: { children: ReactNode })
   );
 }
 
+
 interface SidebarProps {
   onClose: () => void;
   display?: { base: string; md: string };
   handleItemClick: (to?: string) => void;
 }
 
+const initialStateUser = {
+  name: "",
+  email: "",
+  verified: {},
+  roles: []
+}
+
+
 const SidebarContent = ({ onClose, handleItemClick, ...rest }: SidebarProps) => {
+  const [backend] = useCanister("backend");
+  const { isConnected } = useConnect()
+  const [user, setUser] = useState(initialStateUser)
+
+  useEffect(() => {
+    const getMyUser = async () => {
+      const myUser = await backend.getMyUser()
+      return myUser as [UserType]
+    }
+
+    isConnected
+      ? getMyUser().then((responseUser) => {
+          if (responseUser.length > 0) {
+            setUser(responseUser[0] as UserType)
+          }
+        })
+      : setUser(initialStateUser)
+  }, [isConnected])
+
+  const isUserRoleAdmin = roles => {
+    let isUserRoleAdminFlag = false
+    roles.map(elm => {
+      if (elm.Admin && elm.Admin.length > 0) {
+        isUserRoleAdminFlag = true
+      }
+    })
+    return isUserRoleAdminFlag
+  }
+
+
   return (
     <Box
       transition="3s ease"
@@ -103,14 +138,22 @@ const SidebarContent = ({ onClose, handleItemClick, ...rest }: SidebarProps) => 
         <Image src={LogoNegro} alt="Profile" />
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon} to={link.to} onClick={() => handleItemClick(link.to)}>
-          {link.name}
-        </NavItem>
-      ))}
+      {LinkItems.map((link) => {
+        if (link.name !== "Admin") {
+          return <NavItem key={link.name} icon={link.icon} to={link.to} onClick={() => handleItemClick(link.to)}>
+            {link.name}
+          </NavItem>
+        } else {
+          isUserRoleAdmin(user.roles) &&
+          <NavItem key={link.name} icon={link.icon} to={link.to} onClick={() => handleItemClick(link.to)}>
+            {link.name}
+          </NavItem>
+        }
+      })}
     </Box>
   );
 };
+
 
 interface NavItemProps {
   icon: IconType;
@@ -152,6 +195,7 @@ const NavItem = ({ icon, children, to, onClick, ...rest }: NavItemProps) => {
     </ChakraLink>
   );
 };
+
 
 interface MobileProps {
   onOpen: () => void;

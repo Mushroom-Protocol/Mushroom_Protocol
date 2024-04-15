@@ -1,29 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Input, List, ListItem, Stack, Text, useToast } from '@chakra-ui/react';
 import { useCanister } from "@connect2ic/react";
+import { Startup } from "../CommonTypes";
 
-
-interface Startup {
-  owner: object;
-  admissionDate: number;
-  startupId: string;
-  startUpName: string;
-  email: string;
-  website: string;
-  startUpSlogan: string;
-  shortDes: string;
-  logo: Uint8Array | null;
-  documents: [[]];
-  startupStatus: string;
-  tlr: number;
-  fullNameTl: string;
-  specializationTL: string;
-  linkedinTL: string;
-  industry: string;
-  country: string;
-  valoration: number;
-  projects: [string];
-}
 
 const initialStateStartups = [
   {
@@ -73,9 +52,11 @@ const StartupsReqs: React.FC = () => {
     const getIncomingStartUps = async () => {
       try {
         const response = await backend.getIncomingStartUps()
+        console.log("backend.getIncomingStartUps")
+        console.log(response)
         setStartups(response as [Startup])
       } catch (error) {
-        console.error('Error al obtener datos de startups:', error)
+        console.error('Error on backend.getIncomingStartUps() call:', error)
       }
     };
 
@@ -102,9 +83,9 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner);
+      const resGetIncomingStartupByOwner = await backend.getIncomingStartupByOwner(owner) as {ok: Startup};
       const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner['ok']
-      const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, parseInt(valoration), owner)
+      const resApproveStartUp = await backend.approveStartUp(resGetIncomingStartupByOwnerOk, parseInt(valoration), owner) as string
       setResponseBackend(resApproveStartUp['ok'])
 
       if (loadingToastId !== undefined) {
@@ -113,8 +94,7 @@ const StartupsReqs: React.FC = () => {
 
       toast({
         title: "Successful Submission",
-        // description: `Id de statup aprobada: ${approvedStartupId}`,
-        description: `Id de statup aprobada: ${resApproveStartUp['ok']}`,
+        description: `Approved startup Id: ${resApproveStartUp['ok']}`,
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
@@ -136,7 +116,7 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      console.error("Error al aprobar startup:", error)
+      console.error("Error approving startup:", error)
     }
   }
 
@@ -183,21 +163,21 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      console.error("Error al aprobar startup:", error)
+      console.error("Error approving startup:", error)
     }
   }
 
 
   return (
     <>
-      <h1>Solicitudes de Registro de Startup</h1>
+      <h1>Startup registration requests</h1>
       <List spacing={3}>
-        {startups.map(startup => {
+        {startups?.map(startup => {
           return (<ListItem>
             <Card maxW='sm'>
               <CardBody>
                 <Image
-                  src={"data:image/png;base64," + blobToBase64(startup.logo)}
+                  // src={"data:image/png;base64," + blobToBase64(startup.logo)}
                   alt='Green double couch with wooden legs'
                   borderRadius='lg'
                 />
@@ -213,13 +193,13 @@ const StartupsReqs: React.FC = () => {
               </CardBody>
               <Divider />
               <CardFooter>
-                <Input id="startupValoration" name="startupValoration" value={formApprove.startupValoration} onChange={handleChange} placeholder="Ingresar valoración..." type="number" />
+                <Input id="startupValoration" name="startupValoration" value={formApprove.startupValoration} onChange={handleChange} placeholder="Enter valoration..." type="number" />
                 <ButtonGroup spacing='2'>
                   <Button colorScheme='blue' onClick={() => handleApprove(startup.owner, formApprove.startupValoration)}>
-                    Aprobar
+                    Approve
                   </Button>
                   <Button variant='ghost' colorScheme='blue' onClick={() => handleReject(startup.owner)}>
-                    Rechazar
+                    Reject
                   </Button>
                 </ButtonGroup>
               </CardFooter>

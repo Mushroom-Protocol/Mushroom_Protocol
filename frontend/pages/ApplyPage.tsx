@@ -64,7 +64,7 @@ export default function ApplyPage() {
         window.location.pathname.startsWith('/Dashboard') && <br />
       }
       {
-        user?.verified['Success'] === null ?
+        user?.verified['Success'] === true && !isUserRoleStartup(user.roles) ?
           <StartupForms/>
         : <></>
       }
@@ -73,7 +73,7 @@ export default function ApplyPage() {
         window.location.pathname.startsWith('/Dashboard') &&
         <>
           {
-            user?.verified['Success'] === null 
+            user?.verified['Success'] === true 
               && user?.roles.length > 0 
               && isUserRoleStartup(user.roles) 
             ?

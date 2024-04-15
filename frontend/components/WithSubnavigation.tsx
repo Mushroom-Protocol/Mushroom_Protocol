@@ -1,4 +1,5 @@
 "use client"
+
 import {
   ConnectButton,
   ConnectDialog,
@@ -6,7 +7,6 @@ import {
   useConnect,
 } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
-
 import {
   Box,
   Flex,
@@ -39,15 +39,19 @@ import {
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom"
 import { Link as ChakraLink } from "@chakra-ui/react"
-import MpFavicon from "./../assets/MpFavicon.png"
+import MpFavicon from "../assets/MpFavicon.png"
 import { useEffect, useState } from "react"
 import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import { FiChevronDown } from "react-icons/fi"
 import NatheraTeamAA from "../assets/NatheraTeamAA.jpg"
+import { UserType } from "./CommonTypes"
+
+
 interface Props {
   children: React.ReactNode
 }
+
 const Links = ["Home", "Launchpad", "Apply"]
 //const { estado, setEstado } = useContext(EstadoContext);
 
@@ -70,17 +74,12 @@ const NavLink = (props: Props) => {
   )
 }
 
-interface UserType {
-  name: string
-  email: string
-  verified: object
-}
-
 const initialStateUser = {
   name: "",
   email: "",
   verified: {}
 }
+
 
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -102,7 +101,7 @@ export default function WithSubnavigation() {
   const navigate = useNavigate()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [resCodeVerificationMessage, setResCodeVerificationMessage] =
-    useState(null)
+    useState<string | null>(null)
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
@@ -149,8 +148,8 @@ export default function WithSubnavigation() {
         formData.userName,
         formData.userEmail,
         [],
-      )
-      setUser(resUser[0] as UserType)
+      ) as UserType
+      setUser(resUser)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -200,7 +199,7 @@ export default function WithSubnavigation() {
       })
       const resEnterVerificationCode = await backend.enterVerificationCode(
         formDataVerify.verificationCode,
-      )
+      ) as { ok: string }
       setUser(prev => ({...prev, verified: {Success: null}}))
 
       if (loadingToastId !== undefined) {
@@ -273,7 +272,7 @@ export default function WithSubnavigation() {
   }
 
   const getCodeVerification = async () => {
-    const resGetCodeVerification = await backend.getCodeVerification()
+    const resGetCodeVerification = await backend.getCodeVerification() as { ok: string }
     setResCodeVerificationMessage(resGetCodeVerification["ok"])
   }
 
@@ -402,7 +401,7 @@ export default function WithSubnavigation() {
                           LaunchPad
                         </MenuItem>
                         <MenuDivider />
-                        {user?.verified['Success'] === null ?
+                        {user?.verified['Success'] === true ?
                           null
                           : <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
                         }

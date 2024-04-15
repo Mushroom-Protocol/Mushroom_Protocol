@@ -1,10 +1,10 @@
 "use client"
+
 import {
   useCanister,
   useConnect,
 } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
-
 import {
   Box,
   HStack,
@@ -16,7 +16,6 @@ import {
   MenuItem,
   MenuDivider,
   useDisclosure,
-  useColorModeValue,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -30,35 +29,28 @@ import {
   Avatar,
   VStack,
 } from "@chakra-ui/react"
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom"
-import { Link as ChakraLink } from "@chakra-ui/react"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import { FiChevronDown } from "react-icons/fi"
-import NatheraTeamAA from "../assets/NatheraTeamAA.jpg"
-import UserIconGeneric from "../assets/user.png"
+import { UserType } from "./CommonTypes"
 
 
 interface Props {
   children: React.ReactNode
 }
 
-interface UserType {
-  name: string
-  email: string
-  verified: object
-}
-
 const initialStateUser = {
   name: "",
   email: "",
   verified: {},
+  roles: [],
 }
 
 
 export default function MenuUser() {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { onClose } = useDisclosure()
   const {
     isOpen: isVerifyOpen,
     onOpen: onVerifyOpen,
@@ -114,8 +106,8 @@ export default function MenuUser() {
       })
       const resEnterVerificationCode = await backend.enterVerificationCode(
         formDataVerify.verificationCode,
-      )
-      setUser((prev) => ({ ...prev, verified: { Success: null } }))
+      ) as string
+      setUser((prev) => ({ ...prev, verified: { Success: true } }))
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -172,7 +164,7 @@ export default function MenuUser() {
   }
 
   const getCodeVerification = async () => {
-    const resGetCodeVerification = await backend.getCodeVerification()
+    const resGetCodeVerification = await backend.getCodeVerification() as string
     setResCodeVerificationMessage(resGetCodeVerification["ok"])
   }
 
@@ -212,7 +204,7 @@ export default function MenuUser() {
             LaunchPad
           </MenuItem>
           <MenuDivider />
-          {user?.verified["Success"] === null ? null : (
+          {user?.verified["Success"] === true ? null : (
             <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
           )}
           <MenuItem onClick={() => resetUser()}>Disconnect</MenuItem>
