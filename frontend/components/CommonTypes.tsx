@@ -39,3 +39,12 @@ export interface StartupCard {
   startUpSlogan: string
   logo: Uint8Array
 }
+
+export interface ProjectCard {
+  owner: object
+  startupName: string
+  projectTitle: string
+  pojectID: string
+  coverImage: Uint8Array
+  problemSolving: string
+}

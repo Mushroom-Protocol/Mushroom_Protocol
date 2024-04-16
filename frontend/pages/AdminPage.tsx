@@ -3,6 +3,7 @@ import AdminPanel from '../components/DashboardComponents/AdminPanel';
 import { useLocation } from 'react-router-dom';
 import StartupsReqs from '../components/DashboardComponents/StartupsReqs';
 import StartupsList from '../components/DashboardComponents/StartupsList';
+import ProjectsList from '../components/DashboardComponents/ProjectsList';
 
 export default function AdminPage() {
     const location = useLocation()
@@ -19,6 +20,10 @@ export default function AdminPage() {
         case "/Dashboard/Admin/StartupsList":
             return (
                 <StartupsList />
+            )
+        case "/Dashboard/Admin/Projects":
+            return (
+                <ProjectsList />
             )
     
         default:

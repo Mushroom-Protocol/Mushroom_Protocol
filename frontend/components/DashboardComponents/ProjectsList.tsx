@@ -17,18 +17,18 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
-import { Startup, StartupCard } from "../CommonTypes"
+import { ProjectCard, Startup, StartupCard } from "../CommonTypes"
 
-const initialStateStartUpsPreview = [
+const initialStateProjectsPreview = [
   {
     owner: {},
-    startUpName: "",
-    startupId: "",
-    fullNameTl: "",
-    startUpSlogan: "",
-    logo: new Uint8Array(),
+    startupName: "",
+    projectTitle: "",
+    pojectID: "",
+    coverImage: new Uint8Array(),
+    problemSolving: "",
   },
-] as [StartupCard]
+] as [ProjectCard]
 
 function blobToBase64(buffer: Uint8Array) {
   var binary = ""
@@ -40,52 +40,49 @@ function blobToBase64(buffer: Uint8Array) {
   return btoa(binary)
 }
 
-const StartupsList: React.FC = () => {
+const ProjectsList: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [startUpsPreview, setStartUpsPreview] = useState<[StartupCard] | null>(
-    initialStateStartUpsPreview,
+  const [projectsPreview, setProjectsPreview] = useState<[ProjectCard]>(
+    initialStateProjectsPreview,
   )
-  const [formApprove, setFormApprove] = useState({
-    startupValoration: 0,
-  })
-  const [responseBackend, setResponseBackend] = useState<string | null>(null)
   const toast = useToast()
 
   useEffect(() => {
-    const getStartUpsPreview = async () => {
+    const getProjectsPreview = async () => {
       try {
-        const resGetStartUpsPreview = (await backend.getStartUpsPreview()) as [
-          StartupCard,
+        const resGetProjectsPreview = (await backend.getProjectsPreview()) as [
+          ProjectCard,
         ]
-        console.log("backend.getIncomingStartUps")
-        console.log(resGetStartUpsPreview)
-        setStartUpsPreview(resGetStartUpsPreview)
+        console.log("backend.getProjectsPreview")
+        console.log(resGetProjectsPreview)
+        setProjectsPreview(resGetProjectsPreview)
       } catch (error) {
-        console.error("Error on backend.getStartUpsPreview() call:", error)
+        console.error("Error on backend.getProjectsPreview() call:", error)
       }
     }
 
-    getStartUpsPreview()
-  }, [responseBackend])
+    getProjectsPreview()
+  }, [])
 
   return (
     <>
-      <Heading fontSize="4xl">Startups list</Heading>
+      <Heading fontSize="4xl">Projects list</Heading>
       <List spacing={3}>
-        {startUpsPreview?.map((startup) => {
+        {projectsPreview?.map((project) => {
           return (
             <ListItem>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">
-                    {startup && startup.startUpName}
+                    {project.projectTitle} ({project.pojectID})
                   </Heading>
                   <Center>
                     <Image
                       src={
-                        "data:image/png;base64," + blobToBase64(startup.logo)
+                        "data:image/png;base64," +
+                        blobToBase64(project.coverImage)
                       }
-                      alt={startup.startUpName}
+                      alt={project.projectTitle}
                       borderRadius="lg"
                       height="150px"
                       width="150px"
@@ -93,10 +90,12 @@ const StartupsList: React.FC = () => {
                     />
                   </Center>
                   <Stack mt="6" spacing="3">
-                    <Text size="md">{startup.startUpSlogan}</Text>
+                    <Text size="md">{project.problemSolving}</Text>
+                    <Text size="md">{project.startupName}</Text>
                   </Stack>
                 </CardBody>
                 <Divider />
+                <CardFooter></CardFooter>
               </Card>
             </ListItem>
           )
@@ -106,4 +105,4 @@ const StartupsList: React.FC = () => {
   )
 }
 
-export default StartupsList
+export default ProjectsList

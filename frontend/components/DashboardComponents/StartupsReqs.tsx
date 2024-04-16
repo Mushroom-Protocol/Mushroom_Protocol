@@ -191,7 +191,7 @@ const StartupsReqs: React.FC = () => {
 
   return (
     <>
-      <h1>Startup registration requests</h1>
+      <Heading fontSize="4xl">Startup registration requests</Heading>
       <List spacing={3}>
         {startups?.map((startup) => {
           return (
