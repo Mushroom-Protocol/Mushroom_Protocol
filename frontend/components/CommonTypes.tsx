@@ -48,3 +48,19 @@ export interface ProjectCard {
   coverImage: Uint8Array
   problemSolving: string
 }
+
+export interface DataProject {
+  startupID: string
+  projectTitle: string
+  coverImage: Uint8Array | null
+  problemSolving: string
+  yoursolution: string
+  impact: string
+  productStatus: string
+  fundsRequired: number
+  projectDuration: number //Número de meses
+  implementation: string
+  milestones: [string]
+  budget: [string]
+  team: [string] //Miembros del equipo
+}

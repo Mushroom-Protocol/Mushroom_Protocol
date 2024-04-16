@@ -36,27 +36,32 @@ const AdminPanel: React.FC = () => {
       <List spacing={3}>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to="Whitelist">
-            <Text fontSize="2xl">See Whitelist</Text>
+            <Text fontSize="xl">See Whitelist</Text>
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to="StartupsReqs">
-            <Text fontSize="2xl">Startup registration requests</Text>
+            <Text fontSize="xl">Startup registration requests</Text>
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to="StartupsList">
-            <Text fontSize="2xl">Startups list</Text>
+            <Text fontSize="xl">Startups list</Text>
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to="Admin/FundReqs">
-            <Text fontSize="2xl">Financing requests</Text>
+          <ChakraLink as={ReactRouterLink} to="ProjectsReqs">
+            <Text fontSize="xl">Project registration requests</Text>
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to="Projects">
-            <Text fontSize="2xl">Projects list</Text>
+            <Text fontSize="xl">Projects list</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="Admin/FundReqs">
+            <Text fontSize="xl">Financing requests</Text>
           </ChakraLink>
         </ListItem>
       </List>

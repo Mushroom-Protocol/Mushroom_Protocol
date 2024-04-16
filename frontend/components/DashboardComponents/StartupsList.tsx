@@ -70,14 +70,14 @@ const StartupsList: React.FC = () => {
 
   return (
     <>
-      <Heading fontSize="4xl">Startups list</Heading>
+      <Heading fontSize="4xl" marginBottom="20px">Startups list</Heading>
       <List spacing={3}>
         {startUpsPreview?.map((startup) => {
           return (
             <ListItem>
               <Card maxW="sm">
                 <CardBody>
-                  <Heading color="blue.600" fontSize="2xl">
+                  <Heading color="blue.600" fontSize="2xl" marginBottom="15px">
                     {startup && startup.startUpName}
                   </Heading>
                   <Center>

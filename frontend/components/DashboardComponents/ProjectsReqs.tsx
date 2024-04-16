@@ -17,31 +17,18 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
-import { Startup } from "../CommonTypes"
+import { DataProject, ProjectCard, Startup } from "../CommonTypes"
 
-const initialStateStartups = [
+const initialStateProjects = [
   {
     owner: {},
-    admissionDate: 0,
-    startupId: "",
-    startUpName: "",
-    email: "",
-    website: "",
-    startUpSlogan: "",
-    shortDes: "",
-    logo: new Uint8Array([]),
-    documents: [[]],
-    startupStatus: "",
-    tlr: 0,
-    fullNameTl: "",
-    specializationTL: "",
-    linkedinTL: "",
-    industry: "",
-    country: "",
-    valoration: 0,
-    projects: [""],
+    startupName: "",
+    projectTitle: "",
+    pojectID: "",
+    coverImage: new Uint8Array(),
+    problemSolving: "",
   },
-] as [Startup]
+] as [ProjectCard]
 
 function blobToBase64(buffer: Uint8Array) {
   var binary = ""
@@ -53,42 +40,34 @@ function blobToBase64(buffer: Uint8Array) {
   return btoa(binary)
 }
 
-const StartupsReqs: React.FC = () => {
+const ProjectsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
-  // const [startups, setStartups] = useState<[Startup] | null>(
-  //   initialStateStartups,
-  // )
-  const [startups, setStartups] = useState<[Startup] | null>()
+  // const [projects, setProjects] = useState<[ProjectCard]>(initialStateProjects)
+  const [projects, setProjects] = useState<[ProjectCard]>()
   const [formApprove, setFormApprove] = useState({
     startupValoration: 0,
   })
-  const [responseBackend, setResponseBackend] = useState<string | null>(null)
+  const [responseBackend, setResponseBackend] = useState<
+    string | null | DataProject
+  >(null)
   const toast = useToast()
 
   useEffect(() => {
-    const getIncomingStartUps = async () => {
+    const getIncomingProjects = async () => {
       try {
-        const response = await backend.getIncomingStartUps()
-        console.log("backend.getIncomingStartUps")
+        const response = (await backend.getIncomingProjects()) as [ProjectCard]
+        console.log("backend.getIncomingProjects")
         console.log(response)
-        setStartups(response as [Startup])
+        setProjects(response)
       } catch (error) {
         console.error("Error on backend.getIncomingStartUps() call:", error)
       }
     }
 
-    getIncomingStartUps()
+    getIncomingProjects()
   }, [responseBackend])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormApprove((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
-  }
-
-  const handleApprove = async (owner, valoration) => {
+  const handleApprove = async (owner) => {
     let loadingToastId: string | number | undefined
 
     try {
@@ -100,18 +79,16 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      const resGetIncomingStartupByOwner =
-        (await backend.getIncomingStartupByOwner(owner)) as { ok: Startup }
-      const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner["ok"]
-      const resApproveStartUp = (await backend.approveStartUp(
-        resGetIncomingStartupByOwnerOk,
-        parseInt(valoration),
-        owner,
-        // )) as {ok: string} | {err: string}
-      )) as object
-      console.log("resApproveStartUp")
-      console.log(resApproveStartUp)
-      setResponseBackend(resApproveStartUp["ok"])
+      // const resGetIncomingStartupByOwner =
+      //   (await backend.getIncomingStartupByOwner(owner)) as { ok: Startup }
+      // const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner["ok"]
+      const resApproveProject = (await backend.approveProject(owner)) as
+        | { ok: string }
+        | { err: string }
+      // )) as object
+      console.log("resApproveProject")
+      console.log(resApproveProject)
+      setResponseBackend(resApproveProject["ok"])
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -119,7 +96,7 @@ const StartupsReqs: React.FC = () => {
 
       toast({
         title: "Successful Submission",
-        description: `Approved startup Id: ${resApproveStartUp["ok"]}`,
+        description: `Approved project Id: ${resApproveProject["ok"]}`,
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
@@ -140,7 +117,7 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      console.error("Error approving startup:", error)
+      console.error("Error approving project:", error)
     }
   }
 
@@ -156,8 +133,12 @@ const StartupsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      const resRejectStartUp = await backend.rejectStartUp(owner)
-      setResponseBackend(resRejectStartUp as string)
+      // const resRejectProject = await backend.rejectProject(owner) as DataProject | null
+      const resRejectProject = (await backend.rejectProject(owner)) as
+        | DataProject
+        | null
+        | string
+      setResponseBackend(resRejectProject)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -165,7 +146,7 @@ const StartupsReqs: React.FC = () => {
 
       toast({
         title: "Successful Submission",
-        description: `Startup rejected successfully.`,
+        description: `Project rejected successfully.`,
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
@@ -192,58 +173,45 @@ const StartupsReqs: React.FC = () => {
 
   return (
     <>
-      <Heading fontSize="4xl">Startup registration requests</Heading>
+      <Heading fontSize="4xl">Project registration requests</Heading>
       <List spacing={3}>
-        {startups?.map((startup) => {
+        {projects?.map((project) => {
           return (
             <ListItem>
               <Card maxW="sm">
                 <CardBody>
+                  <Heading color="blue.600" fontSize="2xl">
+                    {project.projectTitle} ({project.pojectID})
+                  </Heading>
                   <Center>
                     <Image
                       src={
-                        "data:image/png;base64," + blobToBase64(startup.logo)
+                        "data:image/png;base64," +
+                        blobToBase64(project.coverImage)
                       }
-                      alt={startup.startUpName}
+                      alt={project.projectTitle}
                       borderRadius="lg"
                       height="150px"
                       width="150px"
                       textAlign="center"
                     />
                   </Center>
-                  <Stack mt="6" spacing="3">
-                    <Heading color="blue.600" fontSize="2xl">
-                      {startup && startup.startUpName}
-                    </Heading>
-                    <Text size="md">{startup.startUpSlogan}</Text>
-                  </Stack>
+                  <Text size="md">{project.problemSolving}</Text>
+                  <Text size="md">{project.startupName}</Text>
                 </CardBody>
                 <Divider />
                 <CardFooter>
-                  <Input
-                    id="startupValoration"
-                    name="startupValoration"
-                    value={formApprove.startupValoration}
-                    onChange={handleChange}
-                    placeholder="Enter valoration..."
-                    type="number"
-                  />
                   <ButtonGroup spacing="2">
                     <Button
                       colorScheme="blue"
-                      onClick={() =>
-                        handleApprove(
-                          startup.owner,
-                          formApprove.startupValoration,
-                        )
-                      }
+                      onClick={() => handleApprove(project.owner)}
                     >
                       Approve
                     </Button>
                     <Button
                       variant="ghost"
                       colorScheme="blue"
-                      onClick={() => handleReject(startup.owner)}
+                      onClick={() => handleReject(project.owner)}
                     >
                       Reject
                     </Button>
@@ -258,4 +226,4 @@ const StartupsReqs: React.FC = () => {
   )
 }
 
-export default StartupsReqs
+export default ProjectsReqs

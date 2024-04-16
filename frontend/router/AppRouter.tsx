@@ -28,6 +28,7 @@ import DashboardHome from "../components/DashboardComponents/DashboardHome"
 import Portfolio from "../components/DashboardComponents/Portfolio"
 import StartupsList from "../components/DashboardComponents/StartupsList"
 import ProjectsList from "../components/DashboardComponents/ProjectsList"
+import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
 
 function Layout() {
   const navigate = useNavigate()
@@ -86,8 +87,9 @@ export const router = createBrowserRouter([
               { path: "Whitelist", element: <Whitelist /> },
               { path: "StartupsReqs", element: <StartupsReqs /> },
               { path: "StartupsList", element: <StartupsList /> },
-              { path: "FundReqs", element: <Navigate to="Home" /> },
+              { path: "ProjectsReqs", element: <ProjectsReqs /> },
               { path: "Projects", element: <ProjectsList /> },
+              { path: "FundReqs", element: <Navigate to="Home" /> },
             ],
           },
         ],
