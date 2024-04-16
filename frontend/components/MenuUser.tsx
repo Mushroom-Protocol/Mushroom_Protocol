@@ -210,7 +210,7 @@ export default function MenuUser() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            <span style={{ color: "black" }}>Verificar Registro</span>
+            <span style={{ color: "black" }}>Registration Verification</span>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody style={{ color: "black" }}>
@@ -226,7 +226,7 @@ export default function MenuUser() {
               </FormControl>
               <FormControl>
                 <Button type="submit" mt={4} colorScheme="teal">
-                  Verificar
+                  Verify
                 </Button>
               </FormControl>
               <FormControl>
@@ -236,7 +236,7 @@ export default function MenuUser() {
                   variant="ghost"
                   onClick={() => getCodeVerification()}
                 >
-                  Obtener
+                  Get code
                 </Button>
               </FormControl>
               <Text>{resCodeVerificationMessage}</Text>
@@ -245,7 +245,7 @@ export default function MenuUser() {
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onVerifyClose}>
-              Cerrar
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>

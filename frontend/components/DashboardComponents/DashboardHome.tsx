@@ -17,9 +17,7 @@ const currentUserInitialState: UserType = {
 const DashboardHome: React.FC = () => {
   const { principal } = useConnect()
   const [backend] = useCanister("backend")
-  const [currentUser, setCurrentUser] = useState<UserType | null | undefined>(
-    currentUserInitialState,
-  )
+  const [currentUser, setCurrentUser] = useState<UserType>()
   const [startUpsByPrincipal, setStartUpsByPrincipal] = useState<[string]>()
 
   useEffect(() => {
