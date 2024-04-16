@@ -2,7 +2,7 @@ export interface UserType {
   name: string
   email: string
   verified: object
-  roles: []
+  roles: [] | never[]
 }
 
 export interface Startup {
@@ -14,7 +14,7 @@ export interface Startup {
   website: string
   startUpSlogan: string
   shortDes: string
-  logo: Uint8Array | null
+  logo: Uint8Array
   documents: [[]]
   startupStatus: string
   tlr: number
@@ -25,4 +25,13 @@ export interface Startup {
   country: string
   valoration: number
   projects: [string]
+}
+
+export interface StartupCard {
+  owner: object
+  startUpName: string
+  startupId: string
+  fullNameTl: string
+  startUpSlogan: string
+  logo: Uint8Array
 }

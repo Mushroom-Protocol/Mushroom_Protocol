@@ -19,38 +19,38 @@ const AdminPanel: React.FC = () => {
       }
     };
 
-    fetchData();
+    //fetchData();
   }, []);
 
   return (
     <>
       <div dangerouslySetInnerHTML={{ __html: startupInfo || '' }} />
 
-      <h1>Panel de administración</h1>
+      <h1>Administration Panel</h1>
       <List spacing={3}>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to='Whitelist'>
-            Ver Whitelist
+            See Whitelist
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to='StartupsReqs'>
-            Solicitudes de Registro de Startup
+            Startup registration requests
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to='Admin/Startups'>
-            Lista de Startups
+          <ChakraLink as={ReactRouterLink} to='StartupsList'>
+            Startups list
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to='Admin/FundReqs'>
-            Solicitudes de financiamiento
+            Financing requests
           </ChakraLink>
         </ListItem>
         <ListItem>
           <ChakraLink as={ReactRouterLink} to='Admin/Projects'>
-            Lista de Proyectos
+            Projects list
           </ChakraLink>
         </ListItem>
       </List>

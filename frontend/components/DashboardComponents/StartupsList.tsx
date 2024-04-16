@@ -17,31 +17,18 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
-import { Startup } from "../CommonTypes"
+import { Startup, StartupCard } from "../CommonTypes"
 
-const initialStateStartups = [
+const initialStateStartUpsPreview = [
   {
     owner: {},
-    admissionDate: 0,
-    startupId: "",
     startUpName: "",
-    email: "",
-    website: "",
-    startUpSlogan: "",
-    shortDes: "",
-    logo: new Uint8Array([]),
-    documents: [[]],
-    startupStatus: "",
-    tlr: 0,
+    startupId: "",
     fullNameTl: "",
-    specializationTL: "",
-    linkedinTL: "",
-    industry: "",
-    country: "",
-    valoration: 0,
-    projects: [""],
+    startUpSlogan: "",
+    logo: new Uint8Array(),
   },
-] as [Startup]
+] as [StartupCard]
 
 function blobToBase64(buffer: Uint8Array) {
   var binary = ""
@@ -53,10 +40,10 @@ function blobToBase64(buffer: Uint8Array) {
   return btoa(binary)
 }
 
-const StartupsReqs: React.FC = () => {
+const StartupsList: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [startups, setStartups] = useState<[Startup] | null>(
-    initialStateStartups,
+  const [startUpsPreview, setStartUpsPreview] = useState<[StartupCard] | null>(
+    initialStateStartUpsPreview,
   )
   const [formApprove, setFormApprove] = useState({
     startupValoration: 0,
@@ -65,18 +52,20 @@ const StartupsReqs: React.FC = () => {
   const toast = useToast()
 
   useEffect(() => {
-    const getIncomingStartUps = async () => {
+    const getStartUpsPreview = async () => {
       try {
-        const response = await backend.getIncomingStartUps()
+        const resGetStartUpsPreview = (await backend.getStartUpsPreview()) as [
+          StartupCard,
+        ]
         console.log("backend.getIncomingStartUps")
-        console.log(response)
-        setStartups(response as [Startup])
+        console.log(resGetStartUpsPreview)
+        setStartUpsPreview(resGetStartUpsPreview)
       } catch (error) {
-        console.error("Error on backend.getIncomingStartUps() call:", error)
+        console.error("Error on backend.getStartUpsPreview() call:", error)
       }
     }
 
-    getIncomingStartUps()
+    getStartUpsPreview()
   }, [responseBackend])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +95,7 @@ const StartupsReqs: React.FC = () => {
         resGetIncomingStartupByOwnerOk,
         parseInt(valoration),
         owner,
-      // )) as {ok: string} | {err: string}
+        // )) as {ok: string} | {err: string}
       )) as object
       console.log("resApproveStartUp")
       console.log(resApproveStartUp)
@@ -191,9 +180,9 @@ const StartupsReqs: React.FC = () => {
 
   return (
     <>
-      <h1>Startup registration requests</h1>
+      <h1>Startups list</h1>
       <List spacing={3}>
-        {startups?.map((startup) => {
+        {startUpsPreview?.map((startup) => {
           return (
             <ListItem>
               <Card maxW="sm">
@@ -257,4 +246,4 @@ const StartupsReqs: React.FC = () => {
   )
 }
 
-export default StartupsReqs
+export default StartupsList

@@ -26,6 +26,7 @@ import Whitelist from "../components/DashboardComponents/Whitelist"
 import LaunchpadNFT from "../components/Launchpad/LaunchpadNFT"
 import DashboardHome from "../components/DashboardComponents/DashboardHome"
 import Portfolio from "../components/DashboardComponents/Portfolio"
+import StartupsList from "../components/DashboardComponents/StartupsList"
 
 function Layout() {
   const navigate = useNavigate()
@@ -83,7 +84,7 @@ export const router = createBrowserRouter([
             children: [
               { path: "Whitelist", element: <Whitelist /> },
               { path: "StartupsReqs", element: <StartupsReqs /> },
-              { path: "Startups", element: <Navigate to="Home" /> },
+              { path: "StartupsList", element: <StartupsList /> },
               { path: "FundReqs", element: <Navigate to="Home" /> },
               { path: "Projects", element: <Navigate to="Home" /> },
             ],

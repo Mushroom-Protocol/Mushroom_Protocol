@@ -50,6 +50,28 @@ export default function DashboardSidebar2({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
+  // const [backend] = useCanister("backend")
+  // const { isConnected } = useConnect()
+  // const [user, setUser] = useState<UserType>(initialStateUser)
+
+  // useEffect(() => {
+  //   console.log("user")
+  //   console.log(user)
+  //   const getMyUser = async () => {
+  //     const myUser = await backend.getMyUser()
+  //     console.log("myUser")
+  //     console.log(myUser)
+  //     return myUser as [UserType]
+  //   }
+
+  //   isConnected
+  //     ? getMyUser().then((responseUser) => {
+  //         if (responseUser.length > 0) {
+  //           setUser(responseUser[0] as UserType)
+  //         }
+  //       })
+  //     : setUser(initialStateUser)
+  // }, [isConnected])
 
   const handleItemClick = (to?: string) => {
     if (to) {
@@ -165,8 +187,8 @@ const SidebarContent = ({
             </NavItem>
           )
         } else {
-          isUserRoleAdmin(user.roles) && (
-            <NavItem
+          // !isUserRoleAdmin(user.roles) && (
+            return <NavItem
               key={link.name}
               icon={link.icon}
               to={link.to}
@@ -174,7 +196,7 @@ const SidebarContent = ({
             >
               {link.name}
             </NavItem>
-          )
+          // )
         }
       })}
     </Box>

@@ -1,9 +1,8 @@
 import React from 'react'
-import { Flex, Center } from '@chakra-ui/react';
 import AdminPanel from '../components/DashboardComponents/AdminPanel';
-import NatheraDetails from '../components/Nathera/NatheraDetails';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import StartupsReqs from '../components/DashboardComponents/StartupsReqs';
+import StartupsList from '../components/DashboardComponents/StartupsList';
 
 export default function AdminPage() {
     const location = useLocation()
@@ -16,6 +15,10 @@ export default function AdminPage() {
         case "/Dashboard/Admin/StartupsReqs":
             return (
                 <StartupsReqs />
+            )
+        case "/Dashboard/Admin/StartupsList":
+            return (
+                <StartupsList />
             )
     
         default:
