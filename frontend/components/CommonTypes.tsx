@@ -1,8 +1,12 @@
 export interface UserType {
+  principalID: { _arr: Uint8Array; _isPrincipal: boolean }
+  userId: string
+  admissionDate: number
   name: string
+  avatar: Uint8Array | null
   email: string
-  verified: object
-  roles: [] | never[]
+  verified: { Code: string; Success: boolean }
+  roles: [object]
 }
 
 export interface Startup {
