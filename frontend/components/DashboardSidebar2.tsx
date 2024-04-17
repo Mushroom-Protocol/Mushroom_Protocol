@@ -140,8 +140,8 @@ const SidebarContent = ({
 
   useEffect(() => {
     const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
+      const myUser = (await backend.getMyUser()) as [UserType]
+      return myUser
     }
 
     isConnected
@@ -156,7 +156,7 @@ const SidebarContent = ({
   const isUserRoleAdmin = (roles) => {
     let isUserRoleAdminFlag = false
     roles.map((elm) => {
-      if (elm.Admin && elm.Admin.length > 0) {
+      if (elm.Admin === null) {
         isUserRoleAdminFlag = true
       }
     })
@@ -191,16 +191,20 @@ const SidebarContent = ({
             </NavItem>
           )
         } else {
-          isUserRoleAdmin(user.roles) ? 
-            <NavItem
-              key={link.name}
-              icon={link.icon}
-              to={link.to}
-              onClick={() => handleItemClick(link.to)}
-            >
-              {link.name}
-            </NavItem>
-          : null
+          return (
+            <>
+              {isUserRoleAdmin(user.roles) && (
+                <NavItem
+                  key={link.name}
+                  icon={link.icon}
+                  to={link.to}
+                  onClick={() => handleItemClick(link.to)}
+                >
+                  {link.name}
+                </NavItem>
+              )}
+            </>
+          )
         }
       })}
     </Box>

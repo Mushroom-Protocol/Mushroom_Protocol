@@ -67,7 +67,7 @@ const UsersPendingVerification: React.FC = () => {
         {users?.map(user => {
           return (
             <Text>
-              {JSON.stringify(user)}
+              {/* {JSON.stringify(user)} */}
             </Text>
           )
         })}
