@@ -5,6 +5,7 @@ import StartupsReqs from '../components/DashboardComponents/StartupsReqs';
 import StartupsList from '../components/DashboardComponents/StartupsList';
 import ProjectsList from '../components/DashboardComponents/ProjectsList';
 import ProjectsReqs from '../components/DashboardComponents/ProjectsReqs';
+import UsersPendingVerification from '../components/DashboardComponents/UsersPendingVerification';
 
 export default function AdminPage() {
     const location = useLocation()
@@ -29,6 +30,10 @@ export default function AdminPage() {
         case "/Dashboard/Admin/Projects":
             return (
                 <ProjectsList />
+            )
+        case "/Dashboard/Admin/UsersPendingVerification":
+            return (
+                <UsersPendingVerification />
             )
     
         default:

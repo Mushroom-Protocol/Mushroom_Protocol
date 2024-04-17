@@ -118,11 +118,15 @@ interface SidebarProps {
   handleItemClick: (to?: string) => void
 }
 
-const initialStateUser = {
+const initialStateUser: UserType = {
+  principalID: { _arr: new Uint8Array(), _isPrincipal: false },
+  userId: "",
+  admissionDate: 0,
   name: "",
+  avatar: null,
   email: "",
-  verified: {},
-  roles: [],
+  verified: { Code: "", Success: false },
+  roles: [{}],
 }
 
 const SidebarContent = ({
@@ -132,7 +136,7 @@ const SidebarContent = ({
 }: SidebarProps) => {
   const [backend] = useCanister("backend")
   const { isConnected } = useConnect()
-  const [user, setUser] = useState(initialStateUser)
+  const [user, setUser] = useState<UserType>(initialStateUser)
 
   useEffect(() => {
     const getMyUser = async () => {
@@ -187,8 +191,8 @@ const SidebarContent = ({
             </NavItem>
           )
         } else {
-          // !isUserRoleAdmin(user.roles) && (
-            return <NavItem
+          isUserRoleAdmin(user.roles) ? 
+            <NavItem
               key={link.name}
               icon={link.icon}
               to={link.to}
@@ -196,7 +200,7 @@ const SidebarContent = ({
             >
               {link.name}
             </NavItem>
-          // )
+          : null
         }
       })}
     </Box>

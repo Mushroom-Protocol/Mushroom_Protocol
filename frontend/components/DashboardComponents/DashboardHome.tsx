@@ -26,11 +26,7 @@ const DashboardHome: React.FC = () => {
         const resGetMyUser: [UserType] = (await backend.getMyUser()) as [
           UserType,
         ]
-        console.log("resGetMyUser")
-        console.log(resGetMyUser)
-        console.log(resGetMyUser[0].principalID._arr)
         setCurrentUser(resGetMyUser[0])
-        // await getStartUpsByPrincipal(resGetMyUser[0].principalID._arr)
         return currentUser
         // return resGetMyUser[0]
       } catch (error) {
@@ -38,32 +34,39 @@ const DashboardHome: React.FC = () => {
       }
     }
 
-    const getStartUpsByPrincipal = async (userPrincipal) => {
-      console.log("inside getStartUpsByPrincipal, userPrincipal")
-      console.log(userPrincipal)
-      try {
-        const resGetStartUpsByPrincipal: [string] =
-          (await backend.getStartUpsByPrincipal(userPrincipal)) as [string]
-        console.log("resGetStartUpsByPrincipal")
-        console.log(resGetStartUpsByPrincipal)
-        setStartUpsByPrincipal(resGetStartUpsByPrincipal)
-        return startUpsByPrincipal
-        // return resGetStartUpsByPrincipal
-      } catch (error) {
-        console.error("Error on backend.getStartUpsByPrincipal() call.", error)
-      }
-    }
+    // const getStartUpsByPrincipal = async (userPrincipal) => {
+    //   console.log("inside getStartUpsByPrincipal, userPrincipal")
+    //   console.log(userPrincipal)
+    //   try {
+    //     const resGetStartUpsByPrincipal: [string] =
+    //       (await backend.getStartUpsByPrincipal(userPrincipal)) as [string]
+    //     console.log("resGetStartUpsByPrincipal")
+    //     console.log(resGetStartUpsByPrincipal)
+    //     setStartUpsByPrincipal(resGetStartUpsByPrincipal)
+    //     return startUpsByPrincipal
+    //     // return resGetStartUpsByPrincipal
+    //   } catch (error) {
+    //     console.error("Error on backend.getStartUpsByPrincipal() call.", error)
+    //   }
+    // }
 
     getcurrentUser()
-    getStartUpsByPrincipal(currentUser?.principalID._arr)
-    // getStartUpsByPrincipal(principal)
+    // getStartUpsByPrincipal(currentUser?.principalID)
   }, [])
+
+  // const getRoleStartup = (roles: [any] | undefined) => {
+  //   return roles?.map(role => {
+  //     if (role.Startup !== undefined) return role.Startup
+  //   })
+  // }
+
+  const getRoleStartup = (roles: [any] | undefined) => (roles?.find(role => role.Startup !== undefined).Startup)
 
   return (
     <>
       <Heading fontSize="35px">User: {currentUser?.name}</Heading>
       <Text fontSize="2xl">Roles: {JSON.stringify(currentUser?.roles)}</Text>
-      <Text fontSize="2xl">Startups: {startUpsByPrincipal}</Text>
+      <Text fontSize="2xl">Startups: {getRoleStartup(currentUser?.roles)}</Text>
     </>
   )
 }

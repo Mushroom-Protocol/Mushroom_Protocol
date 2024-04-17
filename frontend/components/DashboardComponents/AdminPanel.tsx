@@ -60,6 +60,11 @@ const AdminPanel: React.FC = () => {
           </ChakraLink>
         </ListItem>
         <ListItem>
+          <ChakraLink as={ReactRouterLink} to="UsersPendingVerification">
+            <Text fontSize="xl">Users with pending verification</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
           <ChakraLink as={ReactRouterLink} to="Admin/FundReqs">
             <Text fontSize="xl">Financing requests</Text>
           </ChakraLink>

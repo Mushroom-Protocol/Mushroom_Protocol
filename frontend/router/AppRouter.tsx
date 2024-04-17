@@ -29,6 +29,7 @@ import Portfolio from "../components/DashboardComponents/Portfolio"
 import StartupsList from "../components/DashboardComponents/StartupsList"
 import ProjectsList from "../components/DashboardComponents/ProjectsList"
 import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
+import UsersPendingVerification from "../components/DashboardComponents/UsersPendingVerification"
 
 function Layout() {
   const navigate = useNavigate()
@@ -89,6 +90,7 @@ export const router = createBrowserRouter([
               { path: "StartupsList", element: <StartupsList /> },
               { path: "ProjectsReqs", element: <ProjectsReqs /> },
               { path: "Projects", element: <ProjectsList /> },
+              { path: "UsersPendingVerification", element: <UsersPendingVerification /> },
               { path: "FundReqs", element: <Navigate to="Home" /> },
             ],
           },
