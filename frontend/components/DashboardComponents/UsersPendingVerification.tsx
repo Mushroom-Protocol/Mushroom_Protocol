@@ -60,6 +60,18 @@ const UsersPendingVerification: React.FC = () => {
     getUsers()
   }, [])
 
+  const castFieldsBigInt = (castObject: object) => {
+    console.log("castObject")
+    console.log(castObject)
+    Object.keys(castObject).map(key => {
+      if (typeof(castObject[key]) === "bigint")
+        castObject[key] = Number(castObject[key])
+    })
+    console.log("castObject")
+    console.log(castObject)
+    return castObject
+  }
+
   return (
     <>
       <Heading fontSize="4xl">Users with pending verification</Heading>
@@ -67,7 +79,7 @@ const UsersPendingVerification: React.FC = () => {
         {users?.map(user => {
           return (
             <Text>
-              {/* {JSON.stringify(user)} */}
+              {JSON.stringify(castFieldsBigInt(user[1]))}
             </Text>
           )
         })}

@@ -6,7 +6,8 @@ export interface UserType {
   avatar: Uint8Array | null
   email: string
   verified: { Code: string; Success: boolean }
-  roles: [any]
+  roles: [object]
+  // roles: [any]
 }
 
 export interface Startup {
