@@ -26,6 +26,10 @@ import Whitelist from "../components/DashboardComponents/Whitelist"
 import LaunchpadNFT from "../components/Launchpad/LaunchpadNFT"
 import DashboardHome from "../components/DashboardComponents/DashboardHome"
 import Portfolio from "../components/DashboardComponents/Portfolio"
+import StartupsList from "../components/DashboardComponents/StartupsList"
+import ProjectsList from "../components/DashboardComponents/ProjectsList"
+import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
+import UsersPendingVerification from "../components/DashboardComponents/UsersPendingVerification"
 
 function Layout() {
   const navigate = useNavigate()
@@ -83,9 +87,11 @@ export const router = createBrowserRouter([
             children: [
               { path: "Whitelist", element: <Whitelist /> },
               { path: "StartupsReqs", element: <StartupsReqs /> },
-              { path: "Startups", element: <Navigate to="Home" /> },
+              { path: "StartupsList", element: <StartupsList /> },
+              { path: "ProjectsReqs", element: <ProjectsReqs /> },
+              { path: "Projects", element: <ProjectsList /> },
+              { path: "UsersPendingVerification", element: <UsersPendingVerification /> },
               { path: "FundReqs", element: <Navigate to="Home" /> },
-              { path: "Projects", element: <Navigate to="Home" /> },
             ],
           },
         ],

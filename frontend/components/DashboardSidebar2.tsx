@@ -50,6 +50,28 @@ export default function DashboardSidebar2({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
+  // const [backend] = useCanister("backend")
+  // const { isConnected } = useConnect()
+  // const [user, setUser] = useState<UserType>(initialStateUser)
+
+  // useEffect(() => {
+  //   console.log("user")
+  //   console.log(user)
+  //   const getMyUser = async () => {
+  //     const myUser = await backend.getMyUser()
+  //     console.log("myUser")
+  //     console.log(myUser)
+  //     return myUser as [UserType]
+  //   }
+
+  //   isConnected
+  //     ? getMyUser().then((responseUser) => {
+  //         if (responseUser.length > 0) {
+  //           setUser(responseUser[0] as UserType)
+  //         }
+  //       })
+  //     : setUser(initialStateUser)
+  // }, [isConnected])
 
   const handleItemClick = (to?: string) => {
     if (to) {
@@ -96,11 +118,15 @@ interface SidebarProps {
   handleItemClick: (to?: string) => void
 }
 
-const initialStateUser = {
+const initialStateUser: UserType = {
+  principalID: { _arr: new Uint8Array(), _isPrincipal: false },
+  userId: "",
+  admissionDate: 0,
   name: "",
+  avatar: null,
   email: "",
-  verified: {},
-  roles: [],
+  verified: { Code: "", Success: false },
+  roles: [{}],
 }
 
 const SidebarContent = ({
@@ -110,12 +136,12 @@ const SidebarContent = ({
 }: SidebarProps) => {
   const [backend] = useCanister("backend")
   const { isConnected } = useConnect()
-  const [user, setUser] = useState(initialStateUser)
+  const [user, setUser] = useState<UserType>(initialStateUser)
 
   useEffect(() => {
     const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
+      const myUser = (await backend.getMyUser()) as [UserType]
+      return myUser
     }
 
     isConnected
@@ -130,7 +156,7 @@ const SidebarContent = ({
   const isUserRoleAdmin = (roles) => {
     let isUserRoleAdminFlag = false
     roles.map((elm) => {
-      if (elm.Admin && elm.Admin.length > 0) {
+      if (elm.Admin === null) {
         isUserRoleAdminFlag = true
       }
     })
@@ -165,15 +191,19 @@ const SidebarContent = ({
             </NavItem>
           )
         } else {
-          isUserRoleAdmin(user.roles) && (
-            <NavItem
-              key={link.name}
-              icon={link.icon}
-              to={link.to}
-              onClick={() => handleItemClick(link.to)}
-            >
-              {link.name}
-            </NavItem>
+          return (
+            <>
+              {isUserRoleAdmin(user.roles) && (
+                <NavItem
+                  key={link.name}
+                  icon={link.icon}
+                  to={link.to}
+                  onClick={() => handleItemClick(link.to)}
+                >
+                  {link.name}
+                </NavItem>
+              )}
+            </>
           )
         }
       })}
