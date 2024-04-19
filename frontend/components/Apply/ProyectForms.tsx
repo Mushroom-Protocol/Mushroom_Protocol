@@ -121,7 +121,6 @@ const ProyectForms = () => {
         coverImage: [],
         team: formData.team.split(",")
       };
-      ///////////// CORREGIR LLAMADO AL BACKEND FUNCION DE REGISTRO PROYECTO /////////////////////////
       const response: string = await backend.registerProject(formDataToSend) as string;
   
       // Cierra el toast de carga cuando la acción se completa

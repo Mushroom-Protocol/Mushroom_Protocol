@@ -41,6 +41,28 @@ export interface StartupCard {
   logo: Uint8Array
 }
 
+export interface Project {
+  startupID: string
+  projectTitle: string
+  coverImage: Uint8Array
+  problemSolving: string
+  yoursolution: string
+  impact: string
+  productStatus: string
+  fundsRequired: number
+  projectDuration: number //Número de meses
+  implementation: string
+  milestones: string[]
+  budget: string[]
+  team: string[] //Miembros del equipo
+  approvalDate: number
+  projectId: string
+  documents: Uint8Array[]
+  weeklyReports: object[]
+  tokenAddress: any[]
+  nftCollections: any[]
+}
+
 export interface ProjectCard {
   owner: object
   startupName: string
@@ -61,7 +83,7 @@ export interface DataProject {
   fundsRequired: number
   projectDuration: number //Número de meses
   implementation: string
-  milestones: [string]
-  budget: [string]
-  team: [string] //Miembros del equipo
+  milestones: string[]
+  budget: string[]
+  team: string[] //Miembros del equipo
 }

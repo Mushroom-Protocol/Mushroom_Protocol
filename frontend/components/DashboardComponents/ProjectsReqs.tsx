@@ -181,7 +181,7 @@ const ProjectsReqs: React.FC = () => {
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">
-                    {project.projectTitle} ({project.pojectID})
+                    {project.projectTitle}
                   </Heading>
                   <Center>
                     <Image

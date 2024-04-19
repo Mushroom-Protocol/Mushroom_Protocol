@@ -3,7 +3,7 @@ import { Box, Text, Button, ButtonGroup, VStack, Image, SimpleGrid } from '@chak
 import { Avatar,Card, CardHeader, CardBody, CardFooter,Stack,Heading,Divider } from '@chakra-ui/react'
 import { BiLike,BiChat,BiShare } from 'react-icons/bi'
 import { FaShare } from 'react-icons/fa'
-import { NFT1, Collection1, NFT2 } from './../data/typesgen';
+// import { NFT1, Collection1, NFT2 } from './../data/typesgen';
 
 //{idNFT, costNFT, ownerNFT, nameNFT, shortDescNFT, imageUrlNFT}:NFT1
 //const NFTCard = ( {collection}:Collection1 ) => {
@@ -52,12 +52,13 @@ import { NFT1, Collection1, NFT2 } from './../data/typesgen';
   //);
 //};
 
-const NFTCollection = ({ collection }:Collection1 ) => {
+// const NFTCollection = ({ collection }:Collection1 ) => {
+  const NFTCollection = () => {
   return (
     <Box mb={8}>
-      <Text fontSize="2xl" mb={4}>ID de Colección: {collection.idCollection}</Text>
+      {/* <Text fontSize="2xl" mb={4}>ID de Colección: {collection.idCollection}</Text>
       <Text fontSize="2xl" mb={4}>Nombre: {collection.nameCollection}</Text>
-      <Text fontSize="2xl" mb={4}>Descripción: {collection.shortDescCollect}</Text>
+      <Text fontSize="2xl" mb={4}>Descripción: {collection.shortDescCollect}</Text> */}
          
     </Box>
   );

@@ -28,6 +28,7 @@ import {
 import { useCanister } from "@connect2ic/react"
 import { Startup, StartupCard } from "../CommonTypes"
 import { ExternalLinkIcon } from "@chakra-ui/icons"
+import { blobToBase64 } from "../CommonHelpers"
 
 const initialStateStartUpsPreview = [
   {
@@ -39,16 +40,6 @@ const initialStateStartUpsPreview = [
     logo: new Uint8Array(),
   },
 ] as [StartupCard]
-
-function blobToBase64(buffer: Uint8Array) {
-  var binary = ""
-  var bytes = new Uint8Array(buffer)
-  var len = bytes.byteLength
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
-}
 
 const StartupsList: React.FC = () => {
   const [backend] = useCanister("backend")
@@ -79,9 +70,7 @@ const StartupsList: React.FC = () => {
 
   const openDetails = async (startupId: string) => {
     onOpen()
-    const resExpandStartUp = (await backend.expandStartUp(startupId)) as [
-      Startup,
-    ]
+    const resExpandStartUp: Startup[] = (await backend.expandStartUp(startupId)) as Startup[]
     setStartupDetails(resExpandStartUp[0])
   }
 
@@ -192,7 +181,7 @@ const StartupsList: React.FC = () => {
             <Center>
               <Image
                 src={
-                  "data:image/png;base64," + blobToBase64(startupDetails?.logo)
+                  "data:image/png;base64," + blobToBase64(startupDetails?.logo || new Uint8Array)
                 }
                 alt={startupDetails?.startUpName}
                 borderRadius="lg"
