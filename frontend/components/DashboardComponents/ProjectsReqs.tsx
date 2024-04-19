@@ -49,7 +49,7 @@ const ProjectsReqs: React.FC = () => {
   })
   const [responseBackend, setResponseBackend] = useState<
     string | null | DataProject
-  >(null)
+  >()
   const toast = useToast()
 
   useEffect(() => {
