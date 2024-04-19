@@ -44,6 +44,7 @@ module {
 
     public type Startup = {
         owner : Principal;
+        //startupTeam: [Principal]; TODO
         admissionDate : Int;
         startupId : Text;
         startUpName : Text;

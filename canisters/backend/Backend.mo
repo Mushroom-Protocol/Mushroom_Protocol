@@ -64,6 +64,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     public func getDeployer() : async Principal { deployer }; //BORRAR
 
     stable let users = HashMap.new<Principal, User>();
+
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
 
@@ -330,7 +331,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                 return "Your StartUp registration request was successfully submitted. You will be contacted via email prior to approval of your request."
             };
             case (?request) {
-                return "You have a pending registration application for " # request.startUpName;
+                return "You have a pending registration application for " # request.startUpName # " Startup";
 
             }
         }
@@ -338,18 +339,23 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func registerProject(data : DataProject) : async Text {
         assert isStartUp(caller);
-        let request = HashMap.get(incomingStartUps, phash, caller);
+        let request = HashMap.get(incomingProjects, phash, caller);
         switch request {
             case null {
                 ignore HashMap.add<Principal, DataProject>(incomingProjects, phash, caller, data);
                 return "Your project was successfully submitted. You will be contacted by email to arrange an interview"
             };
             case (?request) {
-                return "You have a pending registration application for " # request.startUpName # " StartUp";
+                return "You have a pending registration application for " # request.projectTitle # " Project";
 
             }
         }
     };
+    ///////////////////////////////////////// StartUps //////////////////////////////////////////////////////////
+
+    //TODO func addTeamStartup assert(userVerificated)
+    //TODO func removeTeamStartup 
+    //
 
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
 
@@ -410,8 +416,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                         ?user
                     };
                     case (#Code(_)) {
-                        // ?({user with verified = #Code("******")})
-                        ?user
+                        ?({user with verified = #Code("******")})
+                        // ?user
                     }
                 }
             }
@@ -498,7 +504,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     public shared ({ caller }) func getStartUpsByPrincipal(p : Principal) : async [StartupID] {
-        assert authorizedCaller(caller);
+        assert (authorizedCaller(caller) or (caller == p));
         switch (getUser(p)) {
             case null { [] };
             case (?user) {
@@ -625,7 +631,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Public Query Functions  ////////////////////////////////////////////////
 
-    public func getUsers() : async [(Principal, User)] {
+    public shared ({ caller }) func getUsers() : async [(Principal, User)] {
+        assert (authorizedCaller(caller));
         HashMap.toArray<Principal, User>(users)
     };
 
@@ -710,7 +717,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                 ?{
                     startUp with
                     documents = [];
-                    email = "";
+                    email = ""
                 }
             }
         }
