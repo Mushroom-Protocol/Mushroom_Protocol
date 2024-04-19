@@ -5,9 +5,8 @@ import {
   Center,
   Heading,
   Image,
-  List,
-  ListItem,
   Text,
+  useToast,
 } from "@chakra-ui/react"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { StartupCard, UserType } from "../CommonTypes"
@@ -30,31 +29,102 @@ const DashboardHome: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserType>()
   const [extractedRolesStartup, setExtractedRolesStartup] = useState<string[]>()
   const [startUpsPreview, setStartUpsPreview] = useState<StartupCard[]>()
+  const toast = useToast()
 
   useEffect(() => {
+    let loadingToastId1: string | number | undefined
+    let loadingToastId2: string | number | undefined
+
     const getcurrentUser = async () => {
       try {
+        loadingToastId1 = toast({
+          title: "Loading data...",
+          status: "loading", // 'loading' es el status para el estilo de carga
+          duration: null,
+          isClosable: false,
+          variant: "solid",
+        })
+
         const resGetMyUser: [UserType] = (await backend.getMyUser()) as [
           UserType,
         ]
         setCurrentUser(resGetMyUser[0])
         // getRoleStartup(currentUser?.roles as any[])
         getRoleStartup(resGetMyUser[0].roles as any[])
+
+        if (loadingToastId1 !== undefined) {
+          toast.close(loadingToastId1)
+        }
+        toast({
+          title: "Data loaded",
+          description: "Initial data successfully retrieved.",
+          status: "success", // 'success' es el status para el estilo de éxito
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+
         return currentUser
         // return resGetMyUser[0]
       } catch (error) {
+        if (loadingToastId1 !== undefined) {
+          toast.close(loadingToastId1)
+        }
+        toast({
+          title: "Error loading data",
+          description:
+            "There was an error retrieving the initial data. Please try again.",
+          status: "error", // 'error' es el status para el estilo de error
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+
         console.error("Error on backend.getMyUser() call.", error)
       }
     }
 
     const getStartUpsPreview = async () => {
       try {
+        loadingToastId2 = toast({
+          title: "Loading data...",
+          status: "loading", // 'loading' es el status para el estilo de carga
+          duration: null,
+          isClosable: false,
+          variant: "solid",
+        })
         const resGetStartUpsPreview: StartupCard[] =
           (await backend.getStartUpsPreview()) as StartupCard[]
         setStartUpsPreview(resGetStartUpsPreview)
         // return startUpsPreview
+
+        if (loadingToastId2 !== undefined) {
+          toast.close(loadingToastId2)
+        }
+        toast({
+          title: "Data loaded",
+          description: "Initial data successfully retrieved.",
+          status: "success", // 'success' es el status para el estilo de éxito
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+
         return resGetStartUpsPreview
       } catch (error) {
+        if (loadingToastId2 !== undefined) {
+          toast.close(loadingToastId2)
+        }
+        toast({
+          title: "Error loading data",
+          description:
+            "There was an error retrieving the initial data. Please try again.",
+          status: "error", // 'error' es el status para el estilo de error
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+
         console.error("Error on backend.getStartUpsPreview() call.", error)
       }
     }
