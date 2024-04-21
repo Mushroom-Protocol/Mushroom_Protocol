@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Center,
@@ -13,21 +13,22 @@ import {
   FormLabel,
   Collapse,
   Input,
-  Select,
-  FormHelperText,
   Checkbox,
-  Textarea,
-  InputGroup,
-  InputRightElement,
   Tooltip,
   useToast,
 } from "@chakra-ui/react"
 import { AiFillPicture } from "react-icons/ai"
 import { IoInformationCircleOutline } from "react-icons/io5"
-import { useCanister } from "@connect2ic/react"
+import { useCanister, useConnect } from "@connect2ic/react"
+import { getRoleStartup } from "../CommonHelpers"
+import { UserType, initialStateUser } from "../CommonTypes"
 
 const ColecctionForm = () => {
   const [backend] = useCanister("backend")
+  const { isConnected } = useConnect()
+  const [user, setUser] = useState<UserType>()
+  const [userRoleStartups, setUserRoleStartups] = useState<string[]>()
+  const [projectsByStartup, setProjectsByStartup] = useState<string[]>()
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
 
@@ -36,14 +37,14 @@ const ColecctionForm = () => {
     shortStorytelling: string
     storytellingCollection: string
     totalSupply: string
-    distribution: string
-    utilities: string[]
-    tokenPrices: string
-    documents: string
+    distribution: any[]
+    utilities: any[]
+    tokenPrice: string
+    documentsFolderUrl: string
     typesImages: string
-    nftImages: string
+    nftImagesUrl: string
     creator: string
-    collectionStatus: string
+    // collectionStatus: string
   }
 
   const initialFormData: FormData = {
@@ -51,14 +52,14 @@ const ColecctionForm = () => {
     shortStorytelling: "",
     storytellingCollection: "",
     totalSupply: "",
-    distribution: "",
+    distribution: [],
     utilities: [],
-    tokenPrices: "",
-    documents: "",
+    tokenPrice: "",
+    documentsFolderUrl: "",
     typesImages: "",
-    nftImages: "",
+    nftImagesUrl: "",
     creator: "",
-    collectionStatus: "",
+    // collectionStatus: "",
   }
 
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -77,6 +78,35 @@ const ColecctionForm = () => {
     creator: "",
     collectionStatus: "",
   });*/
+
+  useEffect(() => {
+    const getMyUser = async () => {
+      const myUser = await backend.getMyUser()
+      return myUser as UserType[]
+    }
+
+    isConnected
+      ? getMyUser().then((responseUser) => {
+          if (responseUser.length > 0) {
+            setUser(responseUser[0] as UserType)
+            const extractedRoleStartups: string[] = getRoleStartup(
+              responseUser[0].roles,
+            )
+            setUserRoleStartups(extractedRoleStartups)
+            getProjectsByStartup(extractedRoleStartups[0])
+          }
+        })
+      : setUser(initialStateUser)
+  }, [isConnected])
+
+  const getProjectsByStartup = async (startupId: string): Promise<string[]> => {
+    const resGetProjectsByStartup: string[] =
+      (await backend.getProjectsByStartup(startupId)) as string[]
+    const resGetProjectsByStartupFlatted: string[] =
+      resGetProjectsByStartup.flat()
+    setProjectsByStartup(resGetProjectsByStartupFlatted)
+    return resGetProjectsByStartupFlatted
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -108,8 +138,17 @@ const ColecctionForm = () => {
         variant: "solid",
       })
 
-      ///////////// CORREGIR LLAMADO AL BACKEND FUNCION DE REGISTRO PROYECTO /////////////////////////
-      const response = await backend.whoAmi()
+      const formDataToSend = {
+        ...formData,
+        startupID: getRoleStartup(user.roles)[0],
+        pojectID: projectsByStartup[0],
+        typesImages: {PNG: null},
+        totalSupply: parseInt(formData.totalSupply),
+        tokenPrice: parseInt(formData.tokenPrice),
+        distribution: [{category: "PublicSale", percentage: 30.25}],
+        utilities: [{Governance: null}],
+      }
+      const resCreateCollection = await backend.createCollection(formDataToSend)
 
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
@@ -125,8 +164,6 @@ const ColecctionForm = () => {
         isClosable: true,
         variant: "solid",
       })
-
-      console.log(response) // ACTIVA TOAST DE MENSAJE DE SUBMIT ////////////////////////
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {
@@ -271,11 +308,11 @@ const ColecctionForm = () => {
 
                 {/* Campo para Nombre del representante o team leader */}
                 <FormControl isRequired mt={4}>
-                  <FormLabel>Token Prices</FormLabel>
+                  <FormLabel>Token Price</FormLabel>
                   <Input
-                    id="tokenPrices"
-                    name="tokenPrices"
-                    value={formData.tokenPrices}
+                    id="tokenPrice"
+                    name="tokenPrice"
+                    value={formData.tokenPrice}
                     onChange={handleChange}
                     placeholder="Amount in $USD"
                   />
@@ -285,11 +322,10 @@ const ColecctionForm = () => {
                 <FormControl isRequired mt={4}>
                   <FormLabel>Documents to be tokenized</FormLabel>
                   <Input
-                    id="documents"
-                    name="documents"
-                    value={formData.documents}
+                    id="documentsFolderUrl"
+                    name="documentsFolderUrl"
+                    value={formData.documentsFolderUrl}
                     onChange={handleChange}
-                    type="file"
                     placeholder="Upload documents"
                   />
                 </FormControl>
@@ -309,11 +345,10 @@ const ColecctionForm = () => {
                 <FormControl isRequired mt={4}>
                   <FormLabel>Upload images</FormLabel>
                   <Input
-                    id="nftImages"
-                    name="nftImages"
-                    value={formData.nftImages}
+                    id="nftImagesUrl"
+                    name="nftImagesUrl"
+                    value={formData.nftImagesUrl}
                     onChange={handleChange}
-                    type="file"
                     placeholder="Load full images or attributes."
                   />
                 </FormControl>

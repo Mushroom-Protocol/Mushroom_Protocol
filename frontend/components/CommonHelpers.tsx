@@ -7,3 +7,12 @@ export function blobToBase64(buffer: Uint8Array) {
   }
   return btoa(binary)
 }
+
+export const getRoleStartup = (roles: any[]) => {
+  let rolesStartup: any[] = []
+  roles?.map((role) => {
+    if (role.Startup) rolesStartup.push(role.Startup)
+  })
+  const rolesStartupFlatted: string[] = rolesStartup.flat()
+  return rolesStartupFlatted
+}

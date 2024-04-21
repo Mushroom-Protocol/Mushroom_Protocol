@@ -6,8 +6,19 @@ export interface UserType {
   avatar: Uint8Array | null
   email: string
   verified: { Code: string; Success: boolean }
-  roles: [object]
+  roles: object[]
   // roles: [any]
+}
+
+export const initialStateUser: UserType = {
+  principalID: { _arr: new Uint8Array, _isPrincipal: false },
+  userId: "",
+  admissionDate: 0,
+  name: "",
+  avatar: null,
+  email: "",
+  verified: { Code: "", Success: false },
+  roles: [],
 }
 
 export interface Startup {

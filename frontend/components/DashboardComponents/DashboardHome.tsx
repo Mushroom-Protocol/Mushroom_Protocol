@@ -134,7 +134,7 @@ const DashboardHome: React.FC = () => {
     getStartUpsPreview()
   }, [])
 
-  const getRolesKeys = (roles: [object] | undefined) => {
+  const getRolesKeys = (roles: object[] | undefined) => {
     return roles
       ?.map((role) => {
         return Object.keys(role)

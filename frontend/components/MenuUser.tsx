@@ -72,7 +72,6 @@ export default function MenuUser() {
   useEffect(() => {
     const getMyUser = async () => {
       const myUser = await backend.getMyUser()
-      console.log(myUser)
       return myUser as [UserType]
     }
 
@@ -156,6 +155,7 @@ export default function MenuUser() {
   const resetUser = () => {
     setUser(initialStateUser)
     disconnect()
+    navigate("/")
   }
 
   const getCodeVerification = async () => {
