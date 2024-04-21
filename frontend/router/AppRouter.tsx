@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import {
   WithSubnavigation,
   LargeWithNewsletter,
-  WithSubnavigation2,
 } from "../components"
 import { useEffect } from "react"
 import { useNavigate, Outlet } from "react-router-dom"
@@ -17,7 +16,6 @@ import NatheraPage from "../pages/NatheraPage"
 import FoundersPage from "../pages/FoundersPage"
 import ApplyPage from "../pages/ApplyPage"
 import DashboardSidebar from "../components/DashboardSidebar"
-import DashboardSidebar2 from "../components/DashboardSidebar2"
 import AdminPage from "../pages/AdminPage"
 import { EstadoProvider } from "../components/utils/estadoContex"
 import React from "react"
@@ -47,7 +45,7 @@ function Layout() {
         {/* Renderizar el menú principal solo si no es la ruta del dashboard */}
         {/* {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation />} */}
         {!window.location.pathname.startsWith("/Dashboard") && (
-          <WithSubnavigation2 />
+          <WithSubnavigation />
         )}
         {/* Outlet renderizará las rutas anidadas */}
         <Outlet />
@@ -74,7 +72,7 @@ export const router = createBrowserRouter([
       {
         path: "Dashboard",
         // element: <DashboardSidebar children={undefined} />,
-        element: <DashboardSidebar2 children={undefined} />,
+        element: <DashboardSidebar children={undefined} />,
         children: [
           { path: "", element: <DashboardHome /> }, // Cambié "/" a ""
           { path: "Admin", element: <AdminPage /> },
