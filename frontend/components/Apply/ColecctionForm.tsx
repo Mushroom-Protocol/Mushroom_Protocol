@@ -37,9 +37,13 @@ const ColecctionForm = () => {
     shortStorytelling: string
     storytellingCollection: string
     totalSupply: string
+    // totalSupply: number
+    // totalSupply: bigint
     distribution: any[]
     utilities: any[]
     tokenPrice: string
+    // tokenPrice: number
+    // tokenPrice: bigint
     documentsFolderUrl: string
     typesImages: string
     nftImagesUrl: string
@@ -52,9 +56,13 @@ const ColecctionForm = () => {
     shortStorytelling: "",
     storytellingCollection: "",
     totalSupply: "",
+    // totalSupply: 0,
+    // totalSupply: BigInt(0),
     distribution: [],
     utilities: [],
     tokenPrice: "",
+    // tokenPrice: 0,
+    // tokenPrice: BigInt(0),
     documentsFolderUrl: "",
     typesImages: "",
     nftImagesUrl: "",
@@ -143,12 +151,18 @@ const ColecctionForm = () => {
         startupID: getRoleStartup(user.roles)[0],
         pojectID: projectsByStartup[0],
         typesImages: {PNG: null},
-        totalSupply: parseInt(formData.totalSupply),
-        tokenPrice: parseInt(formData.tokenPrice),
+        // totalSupply: parseInt(formData.totalSupply),
+        // tokenPrice: parseInt(formData.tokenPrice),
+        totalSupply: BigInt(parseInt(formData.totalSupply)),
+        tokenPrice: BigInt(parseInt(formData.tokenPrice)),
+        // totalSupply: BigInt(formData.totalSupply),
+        // tokenPrice: BigInt(formData.tokenPrice),
         distribution: [{category: "PublicSale", percentage: 30.25}],
         utilities: [{Governance: null}],
       }
       const resCreateCollection = await backend.createCollection(formDataToSend)
+      console.log("resCreateCollection")
+      console.log(resCreateCollection)
 
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
@@ -271,6 +285,7 @@ const ColecctionForm = () => {
                   <Input
                     id="totalSupply"
                     name="totalSupply"
+                    // type="number"
                     value={formData.totalSupply}
                     onChange={handleChange}
                     placeholder="Tokenomics: Total number of tokens issued"
@@ -312,6 +327,7 @@ const ColecctionForm = () => {
                   <Input
                     id="tokenPrice"
                     name="tokenPrice"
+                    // type="number"
                     value={formData.tokenPrice}
                     onChange={handleChange}
                     placeholder="Amount in $USD"
