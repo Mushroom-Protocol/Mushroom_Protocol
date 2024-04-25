@@ -140,7 +140,7 @@ const SidebarContent = ({
 
   useEffect(() => {
     const getMyUser = async () => {
-      const myUser = (await backend.getMyUser()) as [UserType]
+      const myUser = (await backend.getMyUser()) as UserType[]
       return myUser
     }
 
@@ -194,7 +194,7 @@ const SidebarContent = ({
         } else {
           return (
             <>
-              {!isUserRoleAdmin(user.roles) && (
+              {isUserRoleAdmin(user.roles) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}

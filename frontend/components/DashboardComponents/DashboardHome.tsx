@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
   Card,
   CardBody,
@@ -11,78 +11,17 @@ import {
 import { useCanister, useConnect } from "@connect2ic/react"
 import { StartupCard, UserType } from "../CommonTypes"
 import { blobToBase64 } from "../CommonHelpers"
-
-const currentUserInitialState: UserType = {
-  principalID: { _arr: new Uint8Array(), _isPrincipal: false },
-  userId: "",
-  admissionDate: 0,
-  name: "",
-  avatar: null,
-  email: "",
-  verified: { Code: "", Success: false },
-  roles: [{}],
-}
+import { EstadoContext, EstadoProvider } from "../utils/estadoContex"
 
 const DashboardHome: React.FC = () => {
-  const { principal } = useConnect()
   const [backend] = useCanister("backend")
-  const [currentUser, setCurrentUser] = useState<UserType>()
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
   const [extractedRolesStartup, setExtractedRolesStartup] = useState<string[]>()
   const [startUpsPreview, setStartUpsPreview] = useState<StartupCard[]>()
   const toast = useToast()
 
   useEffect(() => {
-    let loadingToastId1: string | number | undefined
     let loadingToastId2: string | number | undefined
-
-    const getcurrentUser = async () => {
-      try {
-        loadingToastId1 = toast({
-          title: "Loading data...",
-          status: "loading", // 'loading' es el status para el estilo de carga
-          duration: null,
-          isClosable: false,
-          variant: "solid",
-        })
-
-        const resGetMyUser: [UserType] = (await backend.getMyUser()) as [
-          UserType,
-        ]
-        setCurrentUser(resGetMyUser[0])
-        // getRoleStartup(currentUser?.roles as any[])
-        getRoleStartup(resGetMyUser[0].roles as any[])
-
-        if (loadingToastId1 !== undefined) {
-          toast.close(loadingToastId1)
-        }
-        toast({
-          title: "Data loaded",
-          description: "Initial data successfully retrieved.",
-          status: "success", // 'success' es el status para el estilo de éxito
-          duration: 5000,
-          isClosable: true,
-          variant: "solid",
-        })
-
-        return currentUser
-        // return resGetMyUser[0]
-      } catch (error) {
-        if (loadingToastId1 !== undefined) {
-          toast.close(loadingToastId1)
-        }
-        toast({
-          title: "Error loading data",
-          description:
-            "There was an error retrieving the initial data. Please try again.",
-          status: "error", // 'error' es el status para el estilo de error
-          duration: 5000,
-          isClosable: true,
-          variant: "solid",
-        })
-
-        console.error("Error on backend.getMyUser() call.", error)
-      }
-    }
 
     const getStartUpsPreview = async () => {
       try {
@@ -129,10 +68,9 @@ const DashboardHome: React.FC = () => {
       }
     }
 
-    getcurrentUser()
-    // getRoleStartup(currentUser?.roles as any[])
+    getRoleStartup(currentUser?.roles as any[])
     getStartUpsPreview()
-  }, [])
+  }, [currentUser])
 
   const getRolesKeys = (roles: object[] | undefined) => {
     return roles
