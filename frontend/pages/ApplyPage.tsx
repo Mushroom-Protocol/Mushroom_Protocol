@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { Flex, Center, Text } from "@chakra-ui/react"
 import BannerApply from "../components/Apply/BannerApply"
 import StartupForms from "../components/Apply/StartupForms"
 import ProyectForms from "../components/Apply/ProyectForms"
 import ColecctionForm from "../components/Apply/ColecctionForm"
-import JoinDiscord from "../components/home/JoinDiscord"
 import { useCanister, useConnect } from "@connect2ic/react"
+import { getRoleStartup } from "frontend/components/CommonHelpers"
 
 interface UserType {
   name: string
@@ -55,29 +54,25 @@ export default function ApplyPage() {
     <>
       {!window.location.pathname.startsWith("/Dashboard") && <BannerApply />}
       {window.location.pathname.startsWith("/Dashboard") && <br />}
-      {user?.verified["Success"] === true && !isUserRoleStartup(user.roles) ? (
+      {user?.verified["Success"] === true && !isUserRoleStartup(user.roles) && (
         <StartupForms />
-      ) : (
-        <></>
       )}
       <br />
       {window.location.pathname.startsWith("/Dashboard") && (
         <>
           {user?.verified["Success"] === true &&
           user?.roles.length > 0 &&
-          isUserRoleStartup(user.roles) ? (
-            <>
+          isUserRoleStartup(user.roles) && (
               <ProyectForms />
-              <br />
+          )}
+          <br />
+          {user?.verified["Success"] === true &&
+          user?.roles.length > 0 &&
+          isUserRoleStartup(user.roles) && (
               <ColecctionForm />
-            </>
-          ) : (
-            <></>
           )}
         </>
       )}
-      <br />
-      <br />
     </>
   )
 }

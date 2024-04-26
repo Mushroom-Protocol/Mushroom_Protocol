@@ -27,6 +27,7 @@ import LogoNegro from "../assets/LogoNegro.png"
 import MenuUser from "./MenuUser"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { UserType } from "./CommonTypes"
+import { getRoleStartup } from "./CommonHelpers"
 
 interface LinkItemProps {
   name: string
@@ -40,7 +41,8 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Launchpad", icon: BsFillRocketTakeoffFill, to: "Launchpad" },
   { name: "FungiDAO", icon: MdOutlineHowToVote, to: "/FungiDAO" },
   { name: "For Researcher", icon: GiMicroscope, to: "ForResearcher" },
-  { name: "Admin", icon: RiAdminFill, to: "/Dashboard/Admin" },
+  // { name: "Admin", icon: RiAdminFill, to: "/Dashboard/Admin" },
+  { name: "Admin", icon: RiAdminFill, to: "Admin" },
 ]
 
 export default function DashboardSidebar({
@@ -180,7 +182,7 @@ const SidebarContent = ({
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => {
-        if (link.name !== "Admin") {
+        if (link.to !== "Admin" && link.to !== "ForResearcher") {
           return (
             <NavItem
               key={link.name}
@@ -194,7 +196,17 @@ const SidebarContent = ({
         } else {
           return (
             <>
-              {isUserRoleAdmin(user.roles) && (
+              {link.to === "Admin" && isUserRoleAdmin(user.roles) && (
+                <NavItem
+                  key={link.name}
+                  icon={link.icon}
+                  to={link.to}
+                  onClick={() => handleItemClick(link.to)}
+                >
+                  {link.name}
+                </NavItem>
+              )}
+              {link.to === "ForResearcher" && (isUserRoleAdmin(user.roles) || getRoleStartup(user.roles).length > 0) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}
