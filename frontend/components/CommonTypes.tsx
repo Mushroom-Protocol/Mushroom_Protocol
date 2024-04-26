@@ -98,3 +98,35 @@ export interface DataProject {
   budget: string[]
   team: string[] //Miembros del equipo
 }
+
+export interface CollectionPreInit {
+  startupID: string
+  pojectID: string
+  collectionName: string
+  shortStorytelling: string
+  storytellingCollection: string
+  totalSupply: number
+  distribution: string[]
+  utilities: string[]
+  tokenPrice: number
+  documentsFolderUrl: string
+  typesImages: string
+  nftImagesUrl: string
+  creator: string
+}
+
+export const initialStateCollectionPreInit: CollectionPreInit = {
+  startupID: "",
+  pojectID: "",
+  collectionName: "",
+  shortStorytelling: "",
+  storytellingCollection: "",
+  totalSupply: 0,
+  distribution: [],
+  utilities: [],
+  tokenPrice: 0,
+  documentsFolderUrl: "",
+  typesImages: "",
+  nftImagesUrl: "",
+  creator: "",
+}

@@ -16,12 +16,18 @@ import {
   Checkbox,
   Tooltip,
   useToast,
+  Select,
 } from "@chakra-ui/react"
 import { AiFillPicture } from "react-icons/ai"
 import { IoInformationCircleOutline } from "react-icons/io5"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { getRoleStartup } from "../CommonHelpers"
-import { UserType, initialStateUser } from "../CommonTypes"
+import {
+  CollectionPreInit,
+  UserType,
+  initialStateCollectionPreInit,
+  initialStateUser,
+} from "../CommonTypes"
 
 const ColecctionForm = () => {
   const [backend] = useCanister("backend")
@@ -31,61 +37,9 @@ const ColecctionForm = () => {
   const [projectsByStartup, setProjectsByStartup] = useState<string[]>()
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
-
-  interface FormData {
-    collectionName: string
-    shortStorytelling: string
-    storytellingCollection: string
-    totalSupply: string
-    // totalSupply: number
-    // totalSupply: bigint
-    distribution: any[]
-    utilities: any[]
-    tokenPrice: string
-    // tokenPrice: number
-    // tokenPrice: bigint
-    documentsFolderUrl: string
-    typesImages: string
-    nftImagesUrl: string
-    creator: string
-    // collectionStatus: string
-  }
-
-  const initialFormData: FormData = {
-    collectionName: "",
-    shortStorytelling: "",
-    storytellingCollection: "",
-    totalSupply: "",
-    // totalSupply: 0,
-    // totalSupply: BigInt(0),
-    distribution: [],
-    utilities: [],
-    tokenPrice: "",
-    // tokenPrice: 0,
-    // tokenPrice: BigInt(0),
-    documentsFolderUrl: "",
-    typesImages: "",
-    nftImagesUrl: "",
-    creator: "",
-    // collectionStatus: "",
-  }
-
-  const [formData, setFormData] = useState<FormData>(initialFormData)
-
-  /*const [formData, setFormData] = useState({
-    collectionName: "",
-    shortStorytelling: "",
-    storytellingCollection: "",
-    totalSupply: "",
-    distribution: "",
-    utilities: [], // 
-    tokenPrices: "",
-    documents: "",
-    typesImages: "",
-    nftImages: "",
-    creator: "",
-    collectionStatus: "",
-  });*/
+  const [formData, setFormData] = useState<CollectionPreInit>(
+    initialStateCollectionPreInit,
+  )
 
   useEffect(() => {
     const getMyUser = async () => {
@@ -131,6 +85,14 @@ const ColecctionForm = () => {
     })
   }
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -150,34 +112,47 @@ const ColecctionForm = () => {
         ...formData,
         startupID: getRoleStartup(user.roles)[0],
         pojectID: projectsByStartup[0],
-        typesImages: {PNG: null},
-        // totalSupply: parseInt(formData.totalSupply),
-        // tokenPrice: parseInt(formData.tokenPrice),
-        totalSupply: BigInt(parseInt(formData.totalSupply)),
-        tokenPrice: BigInt(parseInt(formData.tokenPrice)),
-        // totalSupply: BigInt(formData.totalSupply),
-        // tokenPrice: BigInt(formData.tokenPrice),
-        distribution: [{category: "PublicSale", percentage: 30.25}],
-        utilities: [{Governance: null}],
+        typesImages: { [formData.typesImages]: null },
+        totalSupply: BigInt(formData.totalSupply),
+        tokenPrice: BigInt(formData.tokenPrice),
+        distribution: [{ category: { PublicSale: null }, percentage: 30.25 }],
+        // utilities: [{Governance: null}],
+        utilities: formData.utilities.map((e) => ({ [e]: null })),
       }
-      const resCreateCollection = await backend.createCollection(formDataToSend)
-      console.log("resCreateCollection")
-      console.log(resCreateCollection)
+      const resCreateCollection = (await backend.createCollection(
+        formDataToSend,
+      // )) as { ok: string } | { err: string }
+      )) as any
 
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
       }
 
-      // Muestra un toast de éxito con formato sólido y color verde
-      toast({
-        title: "Successful Submission",
-        description: "Your form was submitted successfully.",
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
+      // Muestra un toast dependiendo del tipo de respuesta del backend
+      if (
+        resCreateCollection.ok &&
+        resCreateCollection.ok.includes("request was successfully")
+      ) {
+        toast({
+          title: "Successful Submission",
+          description: resCreateCollection.ok,
+          status: "success", // 'success' es el status para el estilo de éxito
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      }
+      if (resCreateCollection.err) {
+        toast({
+          title: "Submission Error",
+          description: JSON.stringify(resCreateCollection.err),
+          status: "error", // 'success' es el status para el estilo de éxito
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      }
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {
@@ -285,7 +260,7 @@ const ColecctionForm = () => {
                   <Input
                     id="totalSupply"
                     name="totalSupply"
-                    // type="number"
+                    type="number"
                     value={formData.totalSupply}
                     onChange={handleChange}
                     placeholder="Tokenomics: Total number of tokens issued"
@@ -303,7 +278,7 @@ const ColecctionForm = () => {
                   />
                 </FormControl>
 
-                <FormControl isRequired mt={4}>
+                <FormControl mt={4}>
                   <FormLabel>Utilities</FormLabel>
                   <CheckboxGroup
                     colorScheme="teal" // ajusta según tus preferencias
@@ -312,7 +287,7 @@ const ColecctionForm = () => {
                   >
                     <Checkbox value="Governance">Governance</Checkbox>
                     <br />
-                    <Checkbox value="IPNFT">IP-NFT</Checkbox>
+                    <Checkbox value="IpNFT">IP-NFT</Checkbox>
                     <br />
                     <Checkbox value="Membership">Membership</Checkbox>
                     <br />
@@ -327,7 +302,7 @@ const ColecctionForm = () => {
                   <Input
                     id="tokenPrice"
                     name="tokenPrice"
-                    // type="number"
+                    type="number"
                     value={formData.tokenPrice}
                     onChange={handleChange}
                     placeholder="Amount in $USD"
@@ -346,8 +321,23 @@ const ColecctionForm = () => {
                   />
                 </FormControl>
 
-                {/* Campo para Perfil de Linkedin o similar */}
+                {/* Campo para formato de imágenes */}
                 <FormControl isRequired mt={4}>
+                  <FormLabel>Type of images</FormLabel>
+                  <Select
+                    id="typesImages"
+                    name="typesImages"
+                    value={formData.typesImages}
+                    onChange={handleSelectChange}
+                  >
+                    <option value="PNG">PNG</option>
+                    <option value="GIF">GIF</option>
+                    <option value="JPG">JPG</option>
+                    <option value="SVG">SVG</option>
+                  </Select>
+                </FormControl>
+
+                {/* <FormControl isRequired mt={4}>
                   <FormLabel>Type of images</FormLabel>
                   <Input
                     id="typesImages"
@@ -356,7 +346,7 @@ const ColecctionForm = () => {
                     onChange={handleChange}
                     placeholder="Full images o Generated programmatically"
                   />
-                </FormControl>
+                </FormControl> */}
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Upload images</FormLabel>
