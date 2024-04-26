@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { UserType } from "../CommonTypes"
 
-const currentUserInitialState: UserType = {
-  name: "",
-  email: "",
-  verified: { Success: false },
-  roles: [],
-}
+// const currentUserInitialState: UserType = {
+//   name: "",
+//   email: "",
+//   verified: { Code : "", Success: false },
+//   roles: object[],
+// }
 
 const Portfolio: React.FC = () => {
   const { principal } = useConnect()
   const [backend] = useCanister("backend")
   const [currentUser, setCurrentUser] = useState<UserType | null | undefined>(
-    currentUserInitialState,
+    
   )
 
   useEffect(() => {

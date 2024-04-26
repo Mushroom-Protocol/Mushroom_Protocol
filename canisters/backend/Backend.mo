@@ -67,6 +67,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
+    stable let connectionsRecords = HashMap.new<Principal, [Int]>();
+
 
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
@@ -104,6 +106,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         ignore Set.remove<Text>(mailsToAlertActivity, thash, email)
     };
 
+    public shared ({caller}) func getLogConnections():async  [(Principal, [Int])]{
+        assert authorizedCaller(caller);
+        Iter.toArray(HashMap.entries<Principal, [Int]>(connectionsRecords));
+    };
+    
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
     func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
@@ -199,6 +206,22 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     //////////////////////////////////////  private functions  //////////////////////////////////////////////////
+
+    func recordConnection(caller: Principal): (){
+        let now = Time.now();
+        let visitor = HashMap.get(connectionsRecords, phash, caller);
+        ignore switch visitor {
+            case null {
+                HashMap.put<Principal, [Int]>(connectionsRecords, phash, caller, [now])
+            };
+            case (?visitor) {
+                let datesBuffer = Buffer.fromArray<Int>(visitor);
+                datesBuffer.add(now);
+                HashMap.put<Principal, [Int]>(connectionsRecords, phash, caller, Buffer.toArray(datesBuffer))
+            }
+        }
+    };
+    
 
     func availableId(id : Text) : Bool {
         switch (Set.contains<Text>(idUsed, thash, id)) {
@@ -354,7 +377,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     ///////////////////////////////////////// StartUps //////////////////////////////////////////////////////////
 
     //TODO func addTeamStartup assert(userVerificated)
-    //TODO func removeTeamStartup 
+    //TODO func removeTeamStartup
     //
 
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
@@ -408,6 +431,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     public shared ({ caller }) func getMyUser() : async ?User {
 
         let user = HashMap.get<Principal, User>(users, phash, caller);
+        if (not Principal.isAnonymous(caller)){recordConnection(caller)};
         switch user {
             case null { null };
             case (?user) {
@@ -416,8 +440,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                         ?user
                     };
                     case (#Code(_)) {
-                        ?({user with verified = #Code("******")})
-                        // ?user
+                        ?({ user with verified = #Code("******") })
                     }
                 }
             }

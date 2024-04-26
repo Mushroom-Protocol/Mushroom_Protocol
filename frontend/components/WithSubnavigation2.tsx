@@ -141,6 +141,7 @@ export default function WithSubnavigation2() {
         formData.userEmail,
         [],
       )
+      console.log(resUser)
       setUser(resUser[0] as UserType)
 
       if (loadingToastId !== undefined) {
