@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
   Box,
   Center,
@@ -20,46 +20,47 @@ import {
 } from "@chakra-ui/react"
 import { AiFillPicture } from "react-icons/ai"
 import { IoInformationCircleOutline } from "react-icons/io5"
-import { useCanister, useConnect } from "@connect2ic/react"
+import { useCanister } from "@connect2ic/react"
 import { getRoleStartup } from "../CommonHelpers"
 import {
   CollectionPreInit,
-  UserType,
   initialStateCollectionPreInit,
-  initialStateUser,
 } from "../CommonTypes"
+import { EstadoContext } from "../utils/estadoContex"
+
+interface DistributionType {
+  Airdrop: number
+  Liquidity: number
+  InventorTeam: number
+  ReserveFund: number
+  PublicSale: number
+  AdvisorNCollaborators: number
+}
+
+const formDataDistribution: DistributionType = {
+  Airdrop: 0,
+  Liquidity: 0,
+  InventorTeam: 0,
+  ReserveFund: 0,
+  PublicSale: 0,
+  AdvisorNCollaborators: 0,
+}
 
 const ColecctionForm = () => {
   const [backend] = useCanister("backend")
-  const { isConnected } = useConnect()
-  const [user, setUser] = useState<UserType>()
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
   const [userRoleStartups, setUserRoleStartups] = useState<string[]>()
   const [projectsByStartup, setProjectsByStartup] = useState<string[]>()
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
-  const [formData, setFormData] = useState<CollectionPreInit>(
-    initialStateCollectionPreInit,
-  )
+  const [formData, setFormData] = useState<CollectionPreInit>(initialStateCollectionPreInit)
+  const [formDistribution, setFormDistribution] = useState<DistributionType>(formDataDistribution)
 
   useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as UserType[]
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-            const extractedRoleStartups: string[] = getRoleStartup(
-              responseUser[0].roles,
-            )
-            setUserRoleStartups(extractedRoleStartups)
-            getProjectsByStartup(extractedRoleStartups[0])
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
+    const extractedRoleStartups: string[] = getRoleStartup(currentUser.roles)
+    setUserRoleStartups(extractedRoleStartups)
+    getProjectsByStartup(extractedRoleStartups[0])
+  }, [currentUser])
 
   const getProjectsByStartup = async (startupId: string): Promise<string[]> => {
     const resGetProjectsByStartup: string[] =
@@ -93,8 +94,21 @@ const ColecctionForm = () => {
     }))
   }
 
+  const handleChangeDistribution = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormDistribution((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const distributionSum = Object.keys(formDistribution).reduce(
+      (acc, curr) => (acc + parseFloat(formDistribution[curr])), 0,
+    )
+    if (distributionSum !== 100) return false
 
     let loadingToastId: string | number | undefined
 
@@ -110,18 +124,20 @@ const ColecctionForm = () => {
 
       const formDataToSend = {
         ...formData,
-        startupID: getRoleStartup(user.roles)[0],
+        startupID: getRoleStartup(currentUser.roles)[0],
         pojectID: projectsByStartup[0],
         typesImages: { [formData.typesImages]: null },
         totalSupply: BigInt(formData.totalSupply),
         tokenPrice: BigInt(formData.tokenPrice),
-        distribution: [{ category: { PublicSale: null }, percentage: 30.25 }],
-        // utilities: [{Governance: null}],
+        // distribution: [{ category: { PublicSale: null }, percentage: 30.25 }],
+        distribution: Object.keys(formDataDistribution).map((elm) => ({
+          category: { [elm]: null },
+          percentage: formDataDistribution[elm],
+        })),
         utilities: formData.utilities.map((e) => ({ [e]: null })),
       }
       const resCreateCollection = (await backend.createCollection(
         formDataToSend,
-      // )) as { ok: string } | { err: string }
       )) as any
 
       // Cierra el toast de carga cuando la acción se completa
@@ -269,13 +285,78 @@ const ColecctionForm = () => {
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Distribution</FormLabel>
-                  <Input
-                    id="distribution"
-                    name="distribution"
-                    value={formData.distribution}
-                    onChange={handleChange}
-                    placeholder="Tokenomics: Percentage or amount of tokens assigned to each item"
-                  />
+                  <Flex>
+                    <Text width="30%" justifyContent="right">Airdrop:</Text>
+                    <Input
+                      id="Airdrop"
+                      name="Airdrop"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.Airdrop}
+                      onChange={handleChangeDistribution}
+                      placeholder="Airdrop percentage or amount of tokens"
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" justifyItems="right">Liquidity:</Text>
+                    <Input
+                      id="Liquidity"
+                      name="Liquidity"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.Liquidity}
+                      onChange={handleChangeDistribution}
+                      placeholder="Liquidity percentage or amount of tokens"
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignContent="right">InventorTeam:</Text>
+                    <Input
+                      id="InventorTeam"
+                      name="InventorTeam"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.InventorTeam}
+                      onChange={handleChangeDistribution}
+                      placeholder="Inventor Team percentage or amount of tokens"
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignItems="right">ReserveFund:</Text>
+                    <Input
+                      id="ReserveFund"
+                      name="ReserveFund"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.ReserveFund}
+                      onChange={handleChangeDistribution}
+                      placeholder="Reserve Fund percentage or amount of tokens"
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignItems="right">PublicSale:</Text>
+                    <Input
+                      id="PublicSale"
+                      name="PublicSale"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.PublicSale}
+                      onChange={handleChangeDistribution}
+                      placeholder="Public Sale percentage or amount of tokens"
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignItems="right">AdvisorNCollaborators:</Text>
+                    <Input
+                      id="AdvisorNCollaborators"
+                      name="AdvisorNCollaborators"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.AdvisorNCollaborators}
+                      onChange={handleChangeDistribution}
+                      placeholder="Advisor and Collaborators percentage or amount of tokens"
+                    />
+                  </Flex>
                 </FormControl>
 
                 <FormControl mt={4}>
