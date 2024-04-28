@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { ReactNode, useContext, useEffect, useState } from "react"
 import { Outlet, Link as RouterLink } from "react-router-dom"
 import {
   Box,
@@ -25,9 +25,8 @@ import { IconType } from "react-icons"
 import { ReactText } from "react"
 import LogoNegro from "../assets/LogoNegro.png"
 import MenuUser from "./MenuUser"
-import { useCanister, useConnect } from "@connect2ic/react"
-import { UserType } from "./CommonTypes"
 import { getRoleStartup } from "./CommonHelpers"
+import { EstadoContext } from "./utils/estadoContex"
 
 interface LinkItemProps {
   name: string
@@ -41,7 +40,6 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Launchpad", icon: BsFillRocketTakeoffFill, to: "Launchpad" },
   { name: "FungiDAO", icon: MdOutlineHowToVote, to: "/FungiDAO" },
   { name: "For Researcher", icon: GiMicroscope, to: "ForResearcher" },
-  // { name: "Admin", icon: RiAdminFill, to: "/Dashboard/Admin" },
   { name: "Admin", icon: RiAdminFill, to: "Admin" },
 ]
 
@@ -52,28 +50,6 @@ export default function DashboardSidebar({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
-  // const [backend] = useCanister("backend")
-  // const { isConnected } = useConnect()
-  // const [user, setUser] = useState<UserType>(initialStateUser)
-
-  // useEffect(() => {
-  //   console.log("user")
-  //   console.log(user)
-  //   const getMyUser = async () => {
-  //     const myUser = await backend.getMyUser()
-  //     console.log("myUser")
-  //     console.log(myUser)
-  //     return myUser as [UserType]
-  //   }
-
-  //   isConnected
-  //     ? getMyUser().then((responseUser) => {
-  //         if (responseUser.length > 0) {
-  //           setUser(responseUser[0] as UserType)
-  //         }
-  //       })
-  //     : setUser(initialStateUser)
-  // }, [isConnected])
 
   const handleItemClick = (to?: string) => {
     if (to) {
@@ -120,40 +96,12 @@ interface SidebarProps {
   handleItemClick: (to?: string) => void
 }
 
-const initialStateUser: UserType = {
-  principalID: { _arr: new Uint8Array(), _isPrincipal: false },
-  userId: "",
-  admissionDate: 0,
-  name: "",
-  avatar: null,
-  email: "",
-  verified: { Code: "", Success: false },
-  roles: [{}],
-}
-
 const SidebarContent = ({
   onClose,
   handleItemClick,
   ...rest
 }: SidebarProps) => {
-  const [backend] = useCanister("backend")
-  const { isConnected } = useConnect()
-  const [user, setUser] = useState<UserType>(initialStateUser)
-
-  useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = (await backend.getMyUser()) as UserType[]
-      return myUser
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
 
   const isUserRoleAdmin = (roles) => {
     let isUserRoleAdminFlag = false
@@ -196,7 +144,7 @@ const SidebarContent = ({
         } else {
           return (
             <>
-              {link.to === "Admin" && isUserRoleAdmin(user.roles) && (
+              {link.to === "Admin" && isUserRoleAdmin(currentUser.roles) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}
@@ -206,7 +154,7 @@ const SidebarContent = ({
                   {link.name}
                 </NavItem>
               )}
-              {link.to === "ForResearcher" && (isUserRoleAdmin(user.roles) || getRoleStartup(user.roles).length > 0) && (
+              {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser.roles) || getRoleStartup(currentUser.roles).length > 0) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}

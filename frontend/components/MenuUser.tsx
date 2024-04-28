@@ -27,22 +27,12 @@ import {
   VStack,
 } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import { FiChevronDown } from "react-icons/fi"
-import { UserType } from "./CommonTypes"
-
-interface Props {
-  children: React.ReactNode
-}
-
-const initialStateUser = {
-  name: "",
-  email: "",
-  verified: {},
-  roles: [],
-}
+import { initialStateUser } from "./CommonTypes"
+import { getUserRoles } from "./CommonHelpers"
 
 export default function MenuUser() {
   const { onClose } = useDisclosure()
@@ -51,10 +41,9 @@ export default function MenuUser() {
     onOpen: onVerifyOpen,
     onClose: onVerifyClose,
   } = useDisclosure()
-  const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState(initialStateUser)
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
   const [backend] = useCanister("backend")
-  const { isConnected, disconnect } = useConnect()
+  const { disconnect } = useConnect()
   const toast = useToast()
   const navigate = useNavigate()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
@@ -66,23 +55,9 @@ export default function MenuUser() {
 
   const estadoContext = useContext(EstadoContext)
   if (!estadoContext) {
-    throw new Error("El componente debe estar dentro de un estadoContext")
+    // throw new Error("El componente debe estar dentro de un estadoContext")
+    throw new Error("The component must be inside an estadoContext.")
   }
-
-  useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
 
   const handleSubmitVerify = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -101,7 +76,10 @@ export default function MenuUser() {
       const resEnterVerificationCode = (await backend.enterVerificationCode(
         formDataVerify.verificationCode,
       )) as string
-      setUser((prev) => ({ ...prev, verified: { Success: true } }))
+      setCurrentUser((prev) => ({
+        ...prev,
+        verified: { Success: true, Code: "" },
+      }))
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -153,7 +131,7 @@ export default function MenuUser() {
   }
 
   const resetUser = () => {
-    setUser(initialStateUser)
+    setCurrentUser(initialStateUser)
     disconnect()
     navigate("/")
   }
@@ -176,9 +154,9 @@ export default function MenuUser() {
               spacing="1px"
               ml="2"
             >
-              <Text fontSize="md">{user.name}</Text>
+              <Text fontSize="md">{currentUser?.name}</Text>
               <Text fontSize="sm" color="gray.600">
-                Team Leader
+                {getUserRoles(currentUser?.roles)}
               </Text>
             </VStack>
             <Box display={{ base: "none", md: "flex" }}>
@@ -199,7 +177,7 @@ export default function MenuUser() {
             LaunchPad
           </MenuItem>
           <MenuDivider />
-          {user?.verified["Success"] === true ? null : (
+          {currentUser?.verified["Success"] !== true && (
             <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
           )}
           <MenuItem onClick={() => resetUser()}>Disconnect</MenuItem>
