@@ -16,3 +16,13 @@ export const getRoleStartup = (roles: any[]) => {
   const rolesStartupFlatted: string[] = rolesStartup.flat()
   return rolesStartupFlatted
 }
+
+export const isUserRoleStartup = (roles) => {
+  let isUserRoleStartupFlag = false
+  roles.map((elm) => {
+    if (elm.Startup && elm.Startup.length > 0) {
+      isUserRoleStartupFlag = true
+    }
+  })
+  return isUserRoleStartupFlag
+}

@@ -105,10 +105,17 @@ const ColecctionForm = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const distributionSum = Object.keys(formDistribution).reduce(
-      (acc, curr) => (acc + parseFloat(formDistribution[curr])), 0,
-    )
-    if (distributionSum !== 100) return false
+    if (Object.keys(formDistribution).reduce((acc, curr) => acc + parseFloat(formDistribution[curr]), 0) !== 100) {
+      toast({
+        title: "Submission Error",
+        description: "Tokenomics distribution out of range.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+      return false
+    }
 
     let loadingToastId: string | number | undefined
 

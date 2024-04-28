@@ -170,7 +170,7 @@ export default function WithSubnavigation() {
         isClosable: true,
         variant: "solid",
       })
-      console.error("Error al registrar usuario:", error)
+      console.error("Error on register user:", error)
     }
   }
 
@@ -252,7 +252,7 @@ export default function WithSubnavigation() {
               {isConnected ? (
                 user.name === "" ? (
                   <Button id="botonRegisterUser" onClick={onRegisterOpen}>
-                    Registrar Usuario
+                    Register User
                   </Button>
                 ) : (
                   <div style={{ backgroundColor: "#333333" }}>
