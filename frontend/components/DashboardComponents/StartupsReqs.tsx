@@ -18,46 +18,10 @@ import {
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
 import { Startup } from "../CommonTypes"
-
-const initialStateStartups = [
-  {
-    owner: {},
-    admissionDate: 0,
-    startupId: "",
-    startUpName: "",
-    email: "",
-    website: "",
-    startUpSlogan: "",
-    shortDes: "",
-    logo: new Uint8Array([]),
-    documents: [[]],
-    startupStatus: "",
-    tlr: 0,
-    fullNameTl: "",
-    specializationTL: "",
-    linkedinTL: "",
-    industry: "",
-    country: "",
-    valoration: 0,
-    projects: [""],
-  },
-] as [Startup]
-
-function blobToBase64(buffer: Uint8Array) {
-  var binary = ""
-  var bytes = new Uint8Array(buffer)
-  var len = bytes.byteLength
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
-}
+import { blobToBase64 } from "../CommonHelpers"
 
 const StartupsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
-  // const [startups, setStartups] = useState<[Startup] | null>(
-  //   initialStateStartups,
-  // )
   const [startups, setStartups] = useState<[Startup] | null>()
   const [formApprove, setFormApprove] = useState({
     startupValoration: 0,
@@ -117,14 +81,25 @@ const StartupsReqs: React.FC = () => {
         toast.close(loadingToastId)
       }
 
-      toast({
-        title: "Successful Submission",
-        description: `Approved startup Id: ${resApproveStartUp["ok"]}`,
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
+      if (resApproveStartUp['ok']) {
+        toast({
+          title: "Successful Submission",
+          description: `Approved startup Id: ${resApproveStartUp['ok']}`,
+          status: "success", // 'success' es el status para el estilo de éxito
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      } else {
+        toast({
+          title: "Error approving startup",
+          description: resApproveStartUp['err'],
+          status: "error", // 'error' es el status para el estilo de error
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      }
     } catch (error) {
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)

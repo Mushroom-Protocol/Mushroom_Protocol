@@ -32,3 +32,13 @@ export const isUserRoleStartup = (roles) => {
   })
   return isUserRoleStartupFlag
 }
+
+export const isUserRoleAdmin = (roles) => {
+  let isUserRoleAdminFlag = false
+  roles?.map((elm) => {
+    if (elm.Admin === null) {
+      isUserRoleAdminFlag = true
+    }
+  })
+  return isUserRoleAdminFlag
+}

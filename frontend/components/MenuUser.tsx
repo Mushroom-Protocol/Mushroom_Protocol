@@ -155,7 +155,7 @@ export default function MenuUser() {
               ml="2"
             >
               <Text fontSize="md">{currentUser?.name}</Text>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="gray.300">
                 {getUserRoles(currentUser?.roles)}
               </Text>
             </VStack>

@@ -25,7 +25,7 @@ import { IconType } from "react-icons"
 import { ReactText } from "react"
 import LogoNegro from "../assets/LogoNegro.png"
 import MenuUser from "./MenuUser"
-import { getRoleStartup } from "./CommonHelpers"
+import { getRoleStartup, isUserRoleAdmin } from "./CommonHelpers"
 import { EstadoContext } from "./utils/estadoContex"
 
 interface LinkItemProps {
@@ -103,16 +103,6 @@ const SidebarContent = ({
 }: SidebarProps) => {
   const { currentUser, setCurrentUser } = useContext(EstadoContext)
 
-  const isUserRoleAdmin = (roles) => {
-    let isUserRoleAdminFlag = false
-    roles.map((elm) => {
-      if (elm.Admin === null) {
-        isUserRoleAdminFlag = true
-      }
-    })
-    return isUserRoleAdminFlag
-  }
-
   return (
     <Box
       transition="3s ease"
@@ -144,7 +134,7 @@ const SidebarContent = ({
         } else {
           return (
             <>
-              {link.to === "Admin" && isUserRoleAdmin(currentUser.roles) && (
+              {link.to === "Admin" && isUserRoleAdmin(currentUser?.roles) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}
@@ -154,7 +144,7 @@ const SidebarContent = ({
                   {link.name}
                 </NavItem>
               )}
-              {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser.roles) || getRoleStartup(currentUser.roles).length > 0) && (
+              {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser?.roles) || getRoleStartup(currentUser?.roles).length > 0) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}

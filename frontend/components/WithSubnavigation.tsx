@@ -218,7 +218,7 @@ export default function WithSubnavigation() {
             </div>
             <Box ml="4px">
               {isConnected ? (
-                currentUser.name === "" ? (
+                currentUser?.name === "" ? (
                   <Button id="botonRegisterUser" onClick={onRegisterOpen}>
                     Register User
                   </Button>
