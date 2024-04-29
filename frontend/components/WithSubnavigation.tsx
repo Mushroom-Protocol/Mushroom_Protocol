@@ -35,14 +35,14 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom"
+import { Link as ReactRouterLink } from "react-router-dom"
 import { Link as ChakraLink } from "@chakra-ui/react"
 import MpFavicon from "./../assets/MpFavicon.png"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import MenuUser from "./MenuUser"
-
+import { UserType } from "./CommonTypes"
 
 interface Props {
   children: React.ReactNode
@@ -70,19 +70,6 @@ const NavLink = (props: Props) => {
   )
 }
 
-interface UserType {
-  name: string
-  email: string
-  verified: object
-}
-
-const initialStateUser = {
-  name: "",
-  email: "",
-  verified: {}
-}
-
-
 export default function WithSubnavigation() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -90,12 +77,10 @@ export default function WithSubnavigation() {
     onOpen: onRegisterOpen,
     onClose: onRegisterClose,
   } = useDisclosure()
-  const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState(initialStateUser)
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
   const [backend] = useCanister("backend")
   const { isConnected } = useConnect()
   const toast = useToast()
-  const navigate = useNavigate()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     userName: "",
@@ -106,22 +91,6 @@ export default function WithSubnavigation() {
   if (!estadoContext) {
     throw new Error("El componente debe estar dentro de un estadoContext")
   }
-
-  useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
-
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -140,7 +109,7 @@ export default function WithSubnavigation() {
         formData.userEmail,
         [],
       )
-      setUser(resUser[0] as UserType)
+      setCurrentUser(resUser[0] as UserType)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -188,7 +157,6 @@ export default function WithSubnavigation() {
       }))
     }
   }
-
 
   return (
     <>
@@ -250,7 +218,7 @@ export default function WithSubnavigation() {
             </div>
             <Box ml="4px">
               {isConnected ? (
-                user.name === "" ? (
+                currentUser.name === "" ? (
                   <Button id="botonRegisterUser" onClick={onRegisterOpen}>
                     Register User
                   </Button>
@@ -266,14 +234,14 @@ export default function WithSubnavigation() {
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>
-                  <span style={{ color: "black" }}>Registrar Usuario</span>
+                  <span style={{ color: "black" }}>Register User</span>
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody style={{ color: "black" }}>
                   <form onSubmit={handleSubmit}>
                     <FormControl isRequired>
                       <Input
-                        placeholder="Nombre"
+                        placeholder="Name"
                         id="userName"
                         name="userName"
                         value={formData.userName}
@@ -282,7 +250,7 @@ export default function WithSubnavigation() {
                     </FormControl>
                     <FormControl isRequired>
                       <Input
-                        placeholder="Correo Electrónico"
+                        placeholder="E-Mail"
                         id="userEmail"
                         name="userEmail"
                         value={formData.userEmail}
@@ -291,7 +259,7 @@ export default function WithSubnavigation() {
                     </FormControl>
                     <FormControl>
                       <Button type="submit" mt={4} colorScheme="teal">
-                        Registrar
+                        Register
                       </Button>
                     </FormControl>
                   </form>
@@ -299,7 +267,7 @@ export default function WithSubnavigation() {
 
                 <ModalFooter>
                   <Button colorScheme="blue" mr={3} onClick={onRegisterClose}>
-                    Cerrar
+                    Close
                   </Button>
                 </ModalFooter>
               </ModalContent>
