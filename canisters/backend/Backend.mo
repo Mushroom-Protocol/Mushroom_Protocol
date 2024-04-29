@@ -67,6 +67,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
+    stable let connectionsRecords = HashMap.new<Principal, [Int]>();
+
 
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
@@ -104,6 +106,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         ignore Set.remove<Text>(mailsToAlertActivity, thash, email)
     };
 
+    public shared ({caller}) func getLogConnections():async  [(Principal, [Int])]{
+        assert authorizedCaller(caller);
+        Iter.toArray(HashMap.entries<Principal, [Int]>(connectionsRecords));
+    };
+    
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
     func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
@@ -200,6 +207,21 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     //////////////////////////////////////  private functions  //////////////////////////////////////////////////
 
+    func recordConnection(caller: Principal): (){
+        let now = Time.now();
+        let visitor = HashMap.get(connectionsRecords, phash, caller);
+        ignore switch visitor {
+            case null {
+                HashMap.put<Principal, [Int]>(connectionsRecords, phash, caller, [now])
+            };
+            case (?visitor) {
+                let datesBuffer = Buffer.fromArray<Int>(visitor);
+                datesBuffer.add(now);
+                HashMap.put<Principal, [Int]>(connectionsRecords, phash, caller, Buffer.toArray(datesBuffer))
+            }
+        }
+    };
+    
     func availableId(id : Text) : Bool {
         switch (Set.contains<Text>(idUsed, thash, id)) {
             case (?true) { false };
@@ -352,10 +374,52 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
     ///////////////////////////////////////// StartUps //////////////////////////////////////////////////////////
+    //TODO desarrolllar funcion de migracion de estructura de tipo StartUp antes de desplegar en mainnet para evitar perdidas de datos
+    public func migrateStartUpType(): async (){ 
 
-    //TODO func addTeamStartup assert(userVerificated)
-    //TODO func removeTeamStartup 
-    //
+    };
+
+
+    
+    public shared ({caller}) func addTeamMemberToStartUp(_principal: Text, _stID: Text): async Bool{
+        let startUp = HashMap.get(startUps, thash, _stID);
+        switch startUp{
+            case null{ return false};
+            case (?startUp){
+                assert (startUp.owner == caller);
+                let tempTeamSet = Set.fromIter<Principal>(startUp.startupTeam.vals(), phash);
+                ignore Set.put<Principal>(tempTeamSet, phash, Principal.fromText(_principal));
+                let teamUpdate = Set.toArray(tempTeamSet);
+                ignore HashMap.put(startUps, thash, _stID, {startUp with startupTeam = teamUpdate});
+                true;
+            };
+        };
+    };
+
+    public query func getTeamMemberFromStartUp(_stID: Text): async [Principal]{
+        let startUp = HashMap.get(startUps, thash, _stID);
+        switch startUp{
+            case null { [] };
+            case (?startUp){startUp.startupTeam}
+        };
+    };
+    //TODO func removeTeamStartup
+
+    public shared ({caller}) func removeTeamMemberFromStartUp( _principal: Text, _stID: Text): async Bool{
+        let startUp = HashMap.get(startUps, thash, _stID);
+        switch startUp{
+            case null{ return false};
+            case (?startUp){
+                assert (startUp.owner == caller) and ( _principal != Principal.toText(caller));
+                let tempTeamSet = Set.fromIter<Principal>(startUp.startupTeam.vals(), phash);
+                ignore Set.remove<Principal>(tempTeamSet, phash, Principal.fromText(_principal));
+                let teamUpdate = Set.toArray(tempTeamSet);
+                ignore HashMap.put(startUps, thash, _stID, {startUp with startupTeam = teamUpdate});
+                true;
+            };
+        };
+    };
+    
 
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
 
@@ -408,6 +472,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     public shared ({ caller }) func getMyUser() : async ?User {
 
         let user = HashMap.get<Principal, User>(users, phash, caller);
+        if (not Principal.isAnonymous(caller)){recordConnection(caller)};
         switch user {
             case null { null };
             case (?user) {
@@ -416,8 +481,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                         ?user
                     };
                     case (#Code(_)) {
-                        ?({user with verified = #Code("******")})
-                        // ?user
+                        ?({ user with verified = #Code("******") })
                     }
                 }
             }
@@ -538,6 +602,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let startupId = await generateId("ST"); //  Prefix "ST" subject to change. Example user id "ST123456"
         let startUp : Startup = {
             data with
+            startupTeam = [owner];
             owner;
             startupId;
             valoration;
