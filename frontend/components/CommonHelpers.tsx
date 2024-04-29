@@ -14,7 +14,7 @@ export const getUserRoles = (userRoles: any[]): string[] => {
   return userRoles?.map(userRole => Object.keys(userRole)).flat()
 }
 
-export const getRoleStartup = (roles: any[]) => {
+export const getRoleStartup = (roles: any[]): string[] => {
   let rolesStartup: any[] = []
   roles?.map((role) => {
     if (role.Startup) rolesStartup.push(role.Startup)
@@ -23,9 +23,9 @@ export const getRoleStartup = (roles: any[]) => {
   return rolesStartupFlatted
 }
 
-export const isUserRoleStartup = (roles) => {
+export const isUserRoleStartup = (roles: any[]): boolean => {
   let isUserRoleStartupFlag = false
-  roles.map((elm) => {
+  roles?.map((elm) => {
     if (elm.Startup && elm.Startup.length > 0) {
       isUserRoleStartupFlag = true
     }
@@ -33,7 +33,7 @@ export const isUserRoleStartup = (roles) => {
   return isUserRoleStartupFlag
 }
 
-export const isUserRoleAdmin = (roles) => {
+export const isUserRoleAdmin = (roles: any[]): boolean => {
   let isUserRoleAdminFlag = false
   roles?.map((elm) => {
     if (elm.Admin === null) {

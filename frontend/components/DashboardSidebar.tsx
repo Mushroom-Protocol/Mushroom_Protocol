@@ -25,7 +25,7 @@ import { IconType } from "react-icons"
 import { ReactText } from "react"
 import LogoNegro from "../assets/LogoNegro.png"
 import MenuUser from "./MenuUser"
-import { getRoleStartup, isUserRoleAdmin } from "./CommonHelpers"
+import { isUserRoleAdmin, isUserRoleStartup } from "./CommonHelpers"
 import { EstadoContext } from "./utils/estadoContex"
 
 interface LinkItemProps {
@@ -144,7 +144,7 @@ const SidebarContent = ({
                   {link.name}
                 </NavItem>
               )}
-              {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser?.roles) || getRoleStartup(currentUser?.roles).length > 0) && (
+              {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser?.roles) || isUserRoleStartup(currentUser?.roles)) && (
                 <NavItem
                   key={link.name}
                   icon={link.icon}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Heading } from "@chakra-ui/react"
+import { Box, Heading, Text } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
 
 const ConnectionsRecords: React.FC = () => {
@@ -27,9 +27,24 @@ const ConnectionsRecords: React.FC = () => {
       <Heading fontSize="4xl" marginBottom="20px">
         Connections records
       </Heading>
-      {logConnections?.map((logConnection: any) =>
-        JSON.stringify(logConnection),
-      )}
+      {logConnections?.map((logConnection: any) => {
+        return (
+          <Box>
+            <Text>{JSON.stringify(logConnection[0])}</Text>
+            <Text>Number of connections: {logConnection[1].length}</Text>
+            <Text>
+              {JSON.stringify(
+                logConnection[1].map((logConnectionTimestamp) =>
+                  new Date(
+                    parseInt(logConnectionTimestamp) / 1000000,
+                  ).toLocaleString(),
+                ),
+              )}
+            </Text>
+            <br />
+          </Box>
+        )
+      })}
     </>
   )
 }
