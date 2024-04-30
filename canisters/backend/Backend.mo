@@ -373,13 +373,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    ///////////////////////////////////////// StartUps //////////////////////////////////////////////////////////
-    //TODO desarrolllar funcion de migracion de estructura de tipo StartUp antes de desplegar en mainnet para evitar perdidas de datos
-    public func migrateStartUpType(): async (){ 
-
-    };
-
-
+    ///////////////////////////////////////// Add and remove member team to my StartUp ///////////////////////////////////////////
     
     public shared ({caller}) func addTeamMemberToStartUp(_principal: Text, _stID: Text): async Bool{
         let startUp = HashMap.get(startUps, thash, _stID);
@@ -403,7 +397,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             case (?startUp){startUp.startupTeam}
         };
     };
-    //TODO func removeTeamStartup
 
     public shared ({caller}) func removeTeamMemberFromStartUp( _principal: Text, _stID: Text): async Bool{
         let startUp = HashMap.get(startUps, thash, _stID);
@@ -419,7 +412,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             };
         };
     };
-    
 
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
 
