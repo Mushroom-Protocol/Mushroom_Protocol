@@ -33,6 +33,8 @@ import {
   FormControl,
   Input,
   useToast,
+  FormHelperText,
+  FormLabel,
 } from "@chakra-ui/react"
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
 import { Link as ReactRouterLink } from "react-router-dom"
@@ -43,6 +45,7 @@ import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import MenuUser from "./MenuUser"
 import { UserType } from "./CommonTypes"
+import { base64ToBlob, convertFileToBase64 } from "./CommonHelpers"
 
 interface Props {
   children: React.ReactNode
@@ -85,6 +88,7 @@ export default function WithSubnavigation() {
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
+    userAvatar: null as File | null, // Asegúrate de proporcionar un array válido aquí
   })
 
   const estadoContext = useContext(EstadoContext)
@@ -94,8 +98,8 @@ export default function WithSubnavigation() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    let loadingToastId: string | number | undefined
 
+    let loadingToastId: string | number | undefined
     try {
       loadingToastId = toast({
         title: "Submitting Form",
@@ -104,10 +108,24 @@ export default function WithSubnavigation() {
         isClosable: false,
         variant: "solid",
       })
+      // const userAvatar = formData?.userAvatar ? base64ToBlob(await convertFileToBase64(formData?.userAvatar)) : null
+      // const userAvatar = formData?.userAvatar ? await convertFileToBase64(formData?.userAvatar) : null
+      // console.log("userAvatar")
+      // console.log(userAvatar)
+      // const userAvatarBlob = base64ToBlob(userAvatar)
+      // console.log("userAvatarBlob")
+      // console.log(userAvatarBlob)
+      console.log("formData.userAvatar")
+      console.log(formData.userAvatar)
+      const avatarParsed = formData.userAvatar ? base64ToBlob(await convertFileToBase64(formData.userAvatar)) : null
+      console.log("avatarParsed")
+      console.log(avatarParsed)
       const resUser = await backend.signUp(
         formData.userName,
         formData.userEmail,
         [],
+        // formData.userAvatar,
+        // avatarParsed,
       )
       setCurrentUser(resUser[0] as UserType)
 
@@ -132,8 +150,7 @@ export default function WithSubnavigation() {
 
       toast({
         title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
+        description: JSON.stringify(error),
         status: "error", // 'error' es el status para el estilo de error
         duration: 5000,
         isClosable: true,
@@ -145,7 +162,7 @@ export default function WithSubnavigation() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target
-    if (name === "logo" && files) {
+    if (name === "userAvatar" && files) {
       setFormData((prevData) => ({
         ...prevData,
         [name]: files[0], // Solo toma el primer archivo, puedes ajustar según tus necesidades
@@ -256,6 +273,19 @@ export default function WithSubnavigation() {
                         value={formData.userEmail}
                         onChange={handleChange}
                       />
+                    </FormControl>
+                    <FormControl mt={4}>
+                      <FormLabel>Upload Avatar</FormLabel>
+                      <Input
+                        id="userAvatar"
+                        name="userAvatar"
+                        onChange={handleChange}
+                        type="file"
+                        accept="image/*" // Asegura que solo se puedan seleccionar archivos de imagen
+                      />
+                      <FormHelperText>
+                        Recommended size 200x200 px
+                      </FormHelperText>
                     </FormControl>
                     <FormControl>
                       <Button type="submit" mt={4} colorScheme="teal">

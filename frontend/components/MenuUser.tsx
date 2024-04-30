@@ -25,6 +25,7 @@ import {
   useToast,
   Avatar,
   VStack,
+  Image,
 } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
@@ -32,7 +33,7 @@ import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
 import { FiChevronDown } from "react-icons/fi"
 import { initialStateUser } from "./CommonTypes"
-import { getUserRoles } from "./CommonHelpers"
+import { blobToBase64, getUserRoles } from "./CommonHelpers"
 
 export default function MenuUser() {
   const { onClose } = useDisclosure()
@@ -148,6 +149,11 @@ export default function MenuUser() {
         <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: "none" }}>
           <HStack>
             <Avatar size={"md"} />
+            {/* <Image
+              src={"data:image/png;base64," + blobToBase64(currentUser?.avatar)}
+              alt={currentUser?.userId}
+              borderRadius="lg"
+            /> */}
             <VStack
               display={{ base: "none", md: "flex" }}
               alignItems="flex-start"

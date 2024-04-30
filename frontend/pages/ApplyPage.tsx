@@ -36,9 +36,9 @@ export default function ApplyPage() {
       <br />
       {window.location.pathname.startsWith("/Dashboard") && (
         <>
-          {isUserRoleStartup(currentUser.roles) && !hasStartupProject && <ProyectForms />}
+          {isUserRoleStartup(currentUser?.roles) && !hasStartupProject && <ProyectForms />}
           <br />
-          {isUserRoleStartup(currentUser.roles) && hasStartupProject && <ColecctionForm />}
+          {isUserRoleStartup(currentUser?.roles) && hasStartupProject && <ColecctionForm />}
         </>
       )}
     </>
