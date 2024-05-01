@@ -807,9 +807,9 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    public shared ( {caller} ) func deployCollection(): (){
+    // public shared ( {caller} ) func deployCollection(): (){
 
-    };
+    // };
 
     
 
