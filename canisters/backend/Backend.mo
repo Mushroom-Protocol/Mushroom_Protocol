@@ -106,9 +106,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         ignore Set.remove<Text>(mailsToAlertActivity, thash, email)
     };
 
-    public shared ({caller}) func getLogConnections():async  [(Principal, [Int])]{
+    public shared ({caller}) func getLogConnections():async  [(Text, [Int])]{
         assert authorizedCaller(caller);
-        Iter.toArray(HashMap.entries<Principal, [Int]>(connectionsRecords));
+        let result = Buffer.fromArray<(Text, [Int])>([]);
+        for ((p, t) in HashMap.entries<Principal, [Int]>(connectionsRecords)){
+            result.add((Principal.toText(p), t));
+        };
+        Buffer.toArray<(Text, [Int])>(result);
     };
     
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
@@ -803,6 +807,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    // public shared ( {caller} ) func deployCollection(data : )
+    public shared ( {caller} ) func deployCollection(): (){
+
+    };
+
+    
 
 }
