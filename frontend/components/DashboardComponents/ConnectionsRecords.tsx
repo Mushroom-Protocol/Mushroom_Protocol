@@ -30,7 +30,7 @@ const ConnectionsRecords: React.FC = () => {
       {logConnections?.map((logConnection: any) => {
         return (
           <Box>
-            <Text>{JSON.stringify(logConnection[0])}</Text>
+            <Text>{logConnection[0]}</Text>
             <Text>Number of connections: {logConnection[1].length}</Text>
             <Text>
               {JSON.stringify(

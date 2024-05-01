@@ -74,6 +74,26 @@ const StartupsList: React.FC = () => {
     setStartupDetails(resExpandStartUp[0])
   }
 
+  const getTRL = (idLevel: number): string => {
+    switch (Number(idLevel)) {
+      case 1:
+        return "TRL-1: Basic principles"
+      case 2:
+        return "TRL-2: Technology concept formulated"
+      case 3:
+        return "TRL-3: Experimental proof of concept"
+      case 4:
+        return "TRL-4: Technology validated in lab"
+      case 5:
+        return "TRL-5: Technology validated in relevant environment"
+      case 6:
+        return "TRL-6 or higher"
+    
+      default:
+        return ""
+    }
+  }
+
   return (
     <>
       <Heading fontSize="4xl" marginBottom="20px">
@@ -134,7 +154,7 @@ const StartupsList: React.FC = () => {
             <Text>
               <b>Admission date:</b>{" "}
               {new Date(
-                Number(startupDetails?.admissionDate) / 1000,
+                Number(startupDetails?.admissionDate) / 1000000,
               ).toUTCString()}
             </Text>
             <Text>
@@ -153,7 +173,7 @@ const StartupsList: React.FC = () => {
               <b>Status:</b> {startupDetails?.startupStatus}
             </Text>
             <Text>
-              <b>Technology Readiness Level (TRL):</b> {startupDetails?.tlr}
+              <b>Technology Readiness Level (TRL):</b> {getTRL(startupDetails?.tlr)}
             </Text>
             <Text>
               <b>Legal Representative / Team Leader:</b>{" "}
@@ -176,7 +196,7 @@ const StartupsList: React.FC = () => {
               <b>Country:</b> {startupDetails?.country}
             </Text>
             <Text>
-              <b>Valoration:</b> {startupDetails?.valoration}
+              <b>Valoration:</b> {Number(startupDetails?.valoration)}
             </Text>
             <Center>
               <Image

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { StartupCard, UserType } from "../CommonTypes"
-import { blobToBase64 } from "../CommonHelpers"
+import { blobToBase64, getRoleStartup } from "../CommonHelpers"
 import { EstadoContext, EstadoProvider } from "../utils/estadoContex"
 
 const DashboardHome: React.FC = () => {
@@ -68,7 +68,7 @@ const DashboardHome: React.FC = () => {
       }
     }
 
-    getRoleStartup(currentUser?.roles as any[])
+    setExtractedRolesStartup(getRoleStartup(currentUser?.roles))
     getStartUpsPreview()
   }, [currentUser])
 
@@ -78,16 +78,6 @@ const DashboardHome: React.FC = () => {
         return Object.keys(role)
       })
       .join()
-  }
-
-  const getRoleStartup = (roles: any[]) => {
-    let rolesStartup: any[] = []
-    roles?.map((role) => {
-      if (role.Startup) rolesStartup.push(role.Startup)
-    })
-    const rolesStartupFlatted: string[] = rolesStartup.flat()
-    setExtractedRolesStartup(rolesStartupFlatted)
-    return rolesStartupFlatted
   }
 
   const displayStartupCards = (startupIDs: string[]) => {
