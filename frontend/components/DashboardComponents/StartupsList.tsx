@@ -28,6 +28,7 @@ import {
 import { useCanister } from "@connect2ic/react"
 import { Startup, StartupCard } from "../CommonTypes"
 import { ExternalLinkIcon } from "@chakra-ui/icons"
+import { blobToBase64 } from "../CommonHelpers"
 
 const initialStateStartUpsPreview = [
   {
@@ -39,16 +40,6 @@ const initialStateStartUpsPreview = [
     logo: new Uint8Array(),
   },
 ] as [StartupCard]
-
-function blobToBase64(buffer: Uint8Array) {
-  var binary = ""
-  var bytes = new Uint8Array(buffer)
-  var len = bytes.byteLength
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
-}
 
 const StartupsList: React.FC = () => {
   const [backend] = useCanister("backend")
@@ -79,10 +70,28 @@ const StartupsList: React.FC = () => {
 
   const openDetails = async (startupId: string) => {
     onOpen()
-    const resExpandStartUp = (await backend.expandStartUp(startupId)) as [
-      Startup,
-    ]
+    const resExpandStartUp: Startup[] = (await backend.expandStartUp(startupId)) as Startup[]
     setStartupDetails(resExpandStartUp[0])
+  }
+
+  const getTRL = (idLevel: number): string => {
+    switch (Number(idLevel)) {
+      case 1:
+        return "TRL-1: Basic principles"
+      case 2:
+        return "TRL-2: Technology concept formulated"
+      case 3:
+        return "TRL-3: Experimental proof of concept"
+      case 4:
+        return "TRL-4: Technology validated in lab"
+      case 5:
+        return "TRL-5: Technology validated in relevant environment"
+      case 6:
+        return "TRL-6 or higher"
+    
+      default:
+        return ""
+    }
   }
 
   return (
@@ -145,7 +154,7 @@ const StartupsList: React.FC = () => {
             <Text>
               <b>Admission date:</b>{" "}
               {new Date(
-                Number(startupDetails?.admissionDate) / 1000,
+                Number(startupDetails?.admissionDate) / 1000000,
               ).toUTCString()}
             </Text>
             <Text>
@@ -164,7 +173,7 @@ const StartupsList: React.FC = () => {
               <b>Status:</b> {startupDetails?.startupStatus}
             </Text>
             <Text>
-              <b>Technology Readiness Level (TRL):</b> {startupDetails?.tlr}
+              <b>Technology Readiness Level (TRL):</b> {getTRL(startupDetails?.tlr)}
             </Text>
             <Text>
               <b>Legal Representative / Team Leader:</b>{" "}
@@ -187,12 +196,12 @@ const StartupsList: React.FC = () => {
               <b>Country:</b> {startupDetails?.country}
             </Text>
             <Text>
-              <b>Valoration:</b> {startupDetails?.valoration}
+              <b>Valoration:</b> {Number(startupDetails?.valoration)}
             </Text>
             <Center>
               <Image
                 src={
-                  "data:image/png;base64," + blobToBase64(startupDetails?.logo)
+                  "data:image/png;base64," + blobToBase64(startupDetails?.logo || new Uint8Array)
                 }
                 alt={startupDetails?.startUpName}
                 borderRadius="lg"

@@ -52,12 +52,13 @@ import { NFT1, Collection1, NFT2 } from './../data/typesgen';
   //);
 //};
 
-const NFTCollection = ({ collection }:Collection1 ) => {
+// const NFTCollection = ({ collection }:Collection1 ) => {
+  const NFTCollection = () => {
   return (
     <Box mb={8}>
-      <Text fontSize="2xl" mb={4}>ID de Colección: {collection.idCollection}</Text>
+      {/* <Text fontSize="2xl" mb={4}>ID de Colección: {collection.idCollection}</Text>
       <Text fontSize="2xl" mb={4}>Nombre: {collection.nameCollection}</Text>
-      <Text fontSize="2xl" mb={4}>Descripción: {collection.shortDescCollect}</Text>
+      <Text fontSize="2xl" mb={4}>Descripción: {collection.shortDescCollect}</Text> */}
          
     </Box>
   );

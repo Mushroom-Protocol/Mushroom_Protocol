@@ -1,29 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text } from '@chakra-ui/react';
-import { backend } from "../../../src/declarations/backend";
+import React, { useState } from "react"
+import {
+  Link as ChakraLink,
+  Heading,
+  List,
+  ListItem,
+  Text,
+} from "@chakra-ui/react"
+import { Link as ReactRouterLink } from "react-router-dom"
 
 const AdminPanel: React.FC = () => {
-  const [startupInfo, setStartupInfo] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await backend.getIncomingStartUps();
-        const data = response[0][1];
-        setStartupInfo(`<h1>${data.startUpName}</h1><h2>${data.email}</h2>`);
-        console.log(data);
-      } catch (error) {
-        console.error('Error al obtener datos de startups:', error);
-        // Puedes manejar el error de alguna manera, por ejemplo, mostrando un mensaje al usuario
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [startupInfo, setStartupInfo] = useState<string | null>(null)
 
   return (
-    <div dangerouslySetInnerHTML={{ __html: startupInfo || '' }} />
+    <>
+      <div dangerouslySetInnerHTML={{ __html: startupInfo || '' }} />
+      <Heading fontSize="4xl">Administration Panel</Heading>
+      <List spacing={3}>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="Whitelist">
+            <Text fontSize="xl">See Whitelist</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="UsersPendingVerification">
+            <Text fontSize="xl">Users with pending verification</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="StartupsReqs">
+            <Text fontSize="xl">Startup registration requests</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="StartupsList">
+            <Text fontSize="xl">Startups list</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="ProjectsReqs">
+            <Text fontSize="xl">Project registration requests</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="Projects">
+            <Text fontSize="xl">Projects list</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="CollectionReqs">
+            <Text fontSize="xl">Collection registration requests</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="ConnectionsRecords">
+            <Text fontSize="xl">Connections records</Text>
+          </ChakraLink>
+        </ListItem>
+        <ListItem>
+          <ChakraLink as={ReactRouterLink} to="Admin/FundReqs">
+            <Text fontSize="xl">Financing requests</Text>
+          </ChakraLink>
+        </ListItem>
+      </List>
+    </>
   );
 };
 
-export default AdminPanel;
+export default AdminPanel
