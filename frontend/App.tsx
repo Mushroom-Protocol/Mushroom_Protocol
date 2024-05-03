@@ -18,13 +18,13 @@ import * as backend from "../src/declarations/backend/"
 import { router } from "./router/AppRouter";
 import { EstadoProvider } from "./components/utils/estadoContex";
 import StartupForms from "./components/Apply/StartupForms";
-import { Text } from "@chakra-ui/react";
 
 
 function App() {
     const { isConnected, principal } = useConnect();
-
     const [backend] = useCanister("backend");
+
+
 
     // const rightToVote = async () => {
     //     let isDao = await backend.isDaoDeployed();
@@ -56,6 +56,10 @@ function App() {
 
     // let userDaoMember = false;
 
+    const checkUser = async () => {
+        console.log(await backend.whoAmi());
+    };
+
     // useEffect(() => {
     //     const fetchData = async () => {
     //         if (isConnected) {
@@ -64,6 +68,7 @@ function App() {
     //     };
     //     fetchData();
     // }, [isConnected, principal]);
+
 
     return (
         // <>
@@ -74,19 +79,7 @@ function App() {
         //     </EstadoProvider>
         // </>
         <>
-        {/* <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1> */}
-        <Text
-            fontSize="16px"
-            fontWeight="bold"
-            backgroundColor={isConnected ? "#64B344" : "#EA332B"}
-            color="#000000"
-            p="8px"
-            borderRadius="8px"
-            m="20px"
-            textAlign="center"
-        >
-            Hello{principal ? " " + principal : ", connect with Internet Identity to continue"}!
-        </Text>
+        <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
         <RouterProvider router={router} />
         <Router>
             <Routes>

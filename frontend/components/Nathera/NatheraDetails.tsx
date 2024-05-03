@@ -49,7 +49,12 @@ const NatheraDetails = () => {
     const resIncomingStartUps = await backend.getIncomingStartUps();
     const response = await backend.getIncomingStartupByOwner(resIncomingStartUps[0].owner);
     const responseOk = response['ok']
-    setStartupDetails(responseOk);
+    setStartupDetails(prevState => {
+      console.log("setStartupDetails function");
+      console.log(prevState);
+      console.log(responseOk);
+      return {...prevState, responseOk}
+    });
   };
 
   return (

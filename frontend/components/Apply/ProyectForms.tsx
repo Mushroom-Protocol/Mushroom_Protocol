@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Center,
@@ -13,30 +13,21 @@ import {
   Collapse,
   Input,
   Select,
+  FormHelperText,
+  Textarea,
+  InputGroup,
+  InputRightElement,
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
 import { MdBiotech } from "react-icons/md";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import { useCanister, useConnect } from "@connect2ic/react"
-import { UserType } from "../CommonTypes";
+import { useCanister } from "@connect2ic/react"
 
-const initialStateUser: UserType = {
-  principalID: { _arr: new Uint8Array(), _isPrincipal: false },
-  userId: "",
-  admissionDate: 0,
-  name: "",
-  avatar: null,
-  email: "",
-  verified: { Code: "", Success: false },
-  roles: [{}],
-}
 
 const ProyectForms = () => {
   const [backend] = useCanister("backend")
-  const { isConnected } = useConnect()
-  const [user, setUser] = useState<UserType>(initialStateUser)
-  const [extractedRolesStartup, setExtractedRolesStartup] = useState<string[]>()
+
   const { isOpen, onToggle } = useDisclosure();
   const toast = useToast();
 
@@ -54,21 +45,6 @@ const ProyectForms = () => {
     team: "",
   });
 
-  useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -84,16 +60,6 @@ const ProyectForms = () => {
       [name]: value,
     }));
   };
-
-  const getRoleStartup = (roles: any[]) => {
-    let rolesStartup: any[] = []
-    roles?.map((role) => {
-      if (role.Startup) rolesStartup.push(role.Startup)
-    })
-    const rolesStartupFlatted: string[] = rolesStartup.flat()
-    setExtractedRolesStartup(rolesStartupFlatted)
-    return rolesStartupFlatted
-  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -117,37 +83,29 @@ const ProyectForms = () => {
         projectDuration: parseInt(formData.projectDuration),
         milestones: formData.milestones.split(","),
         budget: [formData.budget],
-        startupID: getRoleStartup(user.roles)[0],
+        startupID: "",
         coverImage: [],
         team: formData.team.split(",")
       };
       ///////////// CORREGIR LLAMADO AL BACKEND FUNCION DE REGISTRO PROYECTO /////////////////////////
-      const response: string = await backend.registerProject(formDataToSend) as string;
+      const response = await backend.registerProject(formDataToSend);
   
       // Cierra el toast de carga cuando la acción se completa
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId);
       }
   
-      if (response?.includes("project was successfully submitted")) {
-        toast({
-          title: 'Successful Submission',
-          description: response,
-          status: 'success', // 'success' es el status para el estilo de éxito
-          duration: 5000,
-          isClosable: true,
-          variant: 'solid',
-        });
-      } else {
-        toast({
-          title: 'Submission Error',
-          description: response,
-          status: 'error', // 'success' es el status para el estilo de éxito
-          duration: 5000,
-          isClosable: true,
-          variant: 'solid',
-        });
-      }
+      // Muestra un toast de éxito con formato sólido y color verde
+      toast({
+        title: 'Successful Submission',
+        description: 'Your form was submitted successfully.',
+        status: 'success', // 'success' es el status para el estilo de éxito
+        duration: 5000,
+        isClosable: true,
+        variant: 'solid',
+      });
+  
+      console.log(response); // ACTIVA TOAST DE MENSAJE DE SUBMIT ////////////////////////
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {

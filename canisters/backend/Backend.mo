@@ -8,10 +8,12 @@ import Array "mo:base/Array";
 import Result "mo:base/Result";
 import Iter "mo:base/Iter";
 import Types "types/Types";
+// import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random-class/Rand";
+import Internal "mo:⛔";
 
 import Interface "./interfaces/ic-management-interface";
 
@@ -788,10 +790,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let incommingCollections = HashMap.new<StartupID, CollectionPreInit>();
 
-    public func testAuthMushroom() : async Bool {
-        authorizedCaller(Principal.fromText(await whoAmi()))
-    }; //BORRAR
-
     public shared ({ caller }) func createCollection(data : CollectionPreInit) : async Result.Result<Text, ErrorCode> {
         let startUp = await getStartUpByID(data.startupID);
         switch startUp {
@@ -807,9 +805,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    // public shared ( {caller} ) func deployCollection(): (){
-
-    // };
+    public shared ( {caller} ) func deployCollection(images: [Blob]): (){
+        assert(authorizedCaller(caller));
+        Internal.cyclesAdd<system>(13_846_199_230 + 6_153_891_538);
+        
+    };
 
     
 

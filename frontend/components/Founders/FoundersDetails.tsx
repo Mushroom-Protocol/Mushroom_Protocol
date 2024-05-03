@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Center,
   Grid,
@@ -13,37 +13,8 @@ import {
 } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { useCanister } from "@connect2ic/react";
-import { useLocation } from "react-router-dom";
 
 const FoundersDetails = () => {
-  const [backend] = useCanister("backend")
-  const location = useLocation()
-  const [startupDetails, setStartupDetails] = useState({
-    startUpName: "",
-    email: "",
-    website: "",
-    startUpSlogan: "",
-    shortDes: "",
-    logo:  null, // Asegúrate de proporcionar un array válido aquí
-    startupStatus: "",
-    tlr: 1,
-    fullNameTl: "",
-    specializationTL: "",
-    linkedinTL: "",
-    industry: { 'MiningTech' : null },
-    country: ""
-  })
-
-  useEffect(() => {
-    getIncomingStartupByOwner(location.state.owner)
-  }, [])
-
-  const getIncomingStartupByOwner = async (owner) => {
-    const response = await backend.getIncomingStartupByOwner(owner)
-    setStartupDetails(response['ok'])
-  };
-
   return (
     <Center>
     <Grid
@@ -70,9 +41,9 @@ const FoundersDetails = () => {
             height="50px"
           />
           <Box ml="10px">
-            <Text fontSize="18px">{startupDetails.startUpName}</Text>
+            <Text fontSize="18px">Mushroom Protocol</Text>
             <Text fontSize="12px" color="#737373" fontStyle="italic">
-              {startupDetails.startUpSlogan}
+            Driving the financial revolution in Biotechnology
             </Text>
           </Box>
         </Box>
@@ -82,7 +53,11 @@ const FoundersDetails = () => {
         </Text>
         <Text fontSize="15px" color="#737373" textAlign="justify">
         <br />
-          {startupDetails.shortDes}
+        Mushroom Protocol is a Web3 platform that allows to bridge the
+          blockchain world with Biotechnology, providing a new form of
+          non-traditional financing. Mushroom Protocol works to decentralize
+          funding in science and provide a free equity funding channel for
+          scientists and biotech startups in Latin America.
           <br />
           <br />
           The protocol allows investors from around the world to fund science
