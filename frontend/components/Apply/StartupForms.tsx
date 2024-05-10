@@ -72,7 +72,7 @@ const StartupForms = () => {
     shortDes: "",
     logo: null as File | null, // Asegúrate de proporcionar un array válido aquí
     startupStatus: "",
-    tlr: 1,
+    tlr: 0,
     fullNameTl: "",
     specializationTL: "",
     linkedinTL: "",
@@ -269,7 +269,7 @@ const StartupForms = () => {
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
-                  <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status">
+                  <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status...">
                     <option value="ResearchStage" selected>Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>
@@ -280,8 +280,8 @@ const StartupForms = () => {
                 {/* Campo para Madurez tecnológica */}
                 <FormControl isRequired mt={4}>
                   <FormLabel>Technology Readiness Level (TRL)</FormLabel>
-                  <Select id="tlr" name="tlr" value={formData.tlr} onChange={handleSelectChange} placeholder="Select TRL">
-                    <option value="1" selected>TRL-1: Basic principles</option>
+                  <Select id="tlr" name="tlr" value={formData.tlr} onChange={handleSelectChange} placeholder="Select TRL...">
+                    <option value="1">TRL-1: Basic principles</option>
                     <option value="2">TRL-2: Technology concept formulated</option>
                     <option value="3">TRL-3: Experimental proof of concept</option>
                     <option value="4">TRL-4: Technology validated in lab</option>
@@ -314,8 +314,8 @@ const StartupForms = () => {
                 {/* Campo para Industria / sector productivo */}
                 <FormControl isRequired mt={4}>
                   <FormLabel>Industry / Productive Sector</FormLabel>
-                  <Select id="industry" name="industry" onChange={handleSelectChange} placeholder="Select Industry">
-                    <option value="HealthTech" selected>HealthTech</option>
+                  <Select id="industry" name="industry" onChange={handleSelectChange} placeholder="Select industry...">
+                    <option value="HealthTech">HealthTech</option>
                     <option value="Agri-FoodTech">Agri-foodTech</option>
                     <option value="GreenTech">GreenTech</option>
                     <option value="SyntheticTech">SyntheticTech</option>
@@ -326,7 +326,7 @@ const StartupForms = () => {
                 {/* Campo para País de origen */}
                 <FormControl isRequired mt={4}>
                   <FormLabel>Country of Origin</FormLabel>
-                  <Select id="country" name="country" value={formData.country} onChange={handleSelectChange}>
+                  <Select id="country" name="country" value={formData.country} onChange={handleSelectChange} placeholder="Select country...">
                     <option value="ar">Argentina</option>
                     <option value="bo">Bolivia</option>
                     <option value="br">Brasil</option>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {
+  Box,
   Button,
   ButtonGroup,
   Card,
@@ -12,29 +13,41 @@ import {
   Input,
   List,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   Text,
+  Link as ChakraLink,
+  useDisclosure,
   useToast,
+  ModalFooter,
+  Flex,
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
 import { Startup } from "../CommonTypes"
-import { blobToBase64 } from "../CommonHelpers"
+import { blobToBase64, getTRL } from "../CommonHelpers"
+import { ExternalLinkIcon } from "@chakra-ui/icons"
 
 const StartupsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
   const [startups, setStartups] = useState<[Startup] | null>()
+  const [incomingStartupDetails, setIncomingStartupDetails] =
+    useState<Startup>()
   const [formApprove, setFormApprove] = useState({
     startupValoration: 0,
   })
   const [responseBackend, setResponseBackend] = useState<string | null>(null)
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
 
   useEffect(() => {
     const getIncomingStartUps = async () => {
       try {
         const response = await backend.getIncomingStartUps()
-        console.log("backend.getIncomingStartUps")
-        console.log(response)
         setStartups(response as [Startup])
       } catch (error) {
         console.error("Error on backend.getIncomingStartUps() call:", error)
@@ -43,6 +56,17 @@ const StartupsReqs: React.FC = () => {
 
     getIncomingStartUps()
   }, [responseBackend])
+
+  const openDetails = async (principal: object) => {
+    const resIncomingStartupByOwner: { ok: Startup[] } | { err: string } =
+      (await backend.getIncomingStartupByOwner(principal)) as
+        | { ok: Startup[] }
+        | { err: string }
+    if (resIncomingStartupByOwner["ok"]) {
+      setIncomingStartupDetails(resIncomingStartupByOwner["ok"])
+      onOpen()
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -81,10 +105,10 @@ const StartupsReqs: React.FC = () => {
         toast.close(loadingToastId)
       }
 
-      if (resApproveStartUp['ok']) {
+      if (resApproveStartUp["ok"]) {
         toast({
           title: "Successful Submission",
-          description: `Approved startup Id: ${resApproveStartUp['ok']}`,
+          description: `Approved startup Id: ${resApproveStartUp["ok"]}`,
           status: "success", // 'success' es el status para el estilo de éxito
           duration: 5000,
           isClosable: true,
@@ -93,7 +117,7 @@ const StartupsReqs: React.FC = () => {
       } else {
         toast({
           title: "Error approving startup",
-          description: resApproveStartUp['err'],
+          description: resApproveStartUp["err"],
           status: "error", // 'error' es el status para el estilo de error
           duration: 5000,
           isClosable: true,
@@ -194,41 +218,125 @@ const StartupsReqs: React.FC = () => {
                   </Stack>
                 </CardBody>
                 <Divider />
-                <CardFooter>
-                  <Input
-                    id="startupValoration"
-                    name="startupValoration"
-                    value={formApprove.startupValoration}
-                    onChange={handleChange}
-                    placeholder="Enter valoration..."
-                    type="number"
-                  />
-                  <ButtonGroup spacing="2">
-                    <Button
-                      colorScheme="blue"
-                      onClick={() =>
-                        handleApprove(
-                          startup.owner,
-                          formApprove.startupValoration,
-                        )
-                      }
-                    >
-                      Approve
-                    </Button>
+                <CardFooter flexDirection="column">
+                  <Flex>
+                    <Input
+                      id="startupValoration"
+                      name="startupValoration"
+                      value={formApprove.startupValoration}
+                      onChange={handleChange}
+                      placeholder="Enter valoration..."
+                      type="number"
+                    />
+                    <ButtonGroup spacing="2">
+                      <Button
+                        colorScheme="blue"
+                        onClick={() =>
+                          handleApprove(
+                            startup.owner,
+                            formApprove.startupValoration,
+                          )
+                        }
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        colorScheme="blue"
+                        onClick={() => handleReject(startup.owner)}
+                      >
+                        Reject
+                      </Button>
+                    </ButtonGroup>
+                  </Flex>
+                  <Box>
                     <Button
                       variant="ghost"
                       colorScheme="blue"
-                      onClick={() => handleReject(startup.owner)}
+                      onClick={() => openDetails(startup.owner)}
                     >
-                      Reject
+                      Details
                     </Button>
-                  </ButtonGroup>
+                  </Box>
                 </CardFooter>
               </Card>
             </ListItem>
           )
         })}
       </List>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Heading color="blue.600" fontSize="2xl">
+              {incomingStartupDetails?.startUpName}
+            </Heading>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody style={{ color: "black" }}>
+            <Text>
+              <b>Slogan:</b> {incomingStartupDetails?.startUpSlogan}
+            </Text>
+            <Text>
+              <b>Short description:</b> {incomingStartupDetails?.shortDes}
+            </Text>
+            <Text>
+              <b>Website:</b>{" "}
+              <ChakraLink href={incomingStartupDetails?.website} isExternal>
+                {incomingStartupDetails?.website} <ExternalLinkIcon mx="2px" />
+              </ChakraLink>
+            </Text>
+            <Text>
+              <b>Status:</b> {incomingStartupDetails?.startupStatus}
+            </Text>
+            <Text>
+              <b>Technology Readiness Level (TRL):</b>{" "}
+              {getTRL(incomingStartupDetails?.tlr)}
+            </Text>
+            <Text>
+              <b>Legal Representative / Team Leader:</b>{" "}
+              {incomingStartupDetails?.fullNameTl}
+            </Text>
+            <Text>
+              <b>Specialization Legal Representative / Team Leader:</b>{" "}
+              {incomingStartupDetails?.specializationTL}
+            </Text>
+            <Text>
+              <b>LinkedIn:</b>{" "}
+              <ChakraLink href={incomingStartupDetails?.linkedinTL} isExternal>
+                {incomingStartupDetails?.linkedinTL}{" "}
+                <ExternalLinkIcon mx="2px" />
+              </ChakraLink>
+            </Text>
+            <Text>
+              <b>Industry:</b> {incomingStartupDetails?.industry}
+            </Text>
+            <Text>
+              <b>Country:</b> {incomingStartupDetails?.country}
+            </Text>
+            <Center>
+              <Image
+                src={
+                  "data:image/png;base64," +
+                  blobToBase64(incomingStartupDetails?.logo || new Uint8Array())
+                }
+                alt={incomingStartupDetails?.startUpName}
+                borderRadius="lg"
+                height="200px"
+                width="200px"
+                textAlign="center"
+              />
+            </Center>
+          </ModalBody>
+          <hr />
+          <ModalFooter>
+            <Button variant="ghost" colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   )
 }

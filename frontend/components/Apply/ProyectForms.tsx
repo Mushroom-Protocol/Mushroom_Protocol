@@ -228,7 +228,7 @@ const ProyectForms = () => {
                     name="productStatus"
                     value={formData.productStatus}
                     onChange={handleSelectChange}
-                    placeholder="Select Status"
+                    placeholder="Select status..."
                   >
                     <option value="ResearchPhase" selected>
                       Research Phase

@@ -28,7 +28,7 @@ import {
 import { useCanister } from "@connect2ic/react"
 import { Startup, StartupCard } from "../CommonTypes"
 import { ExternalLinkIcon } from "@chakra-ui/icons"
-import { blobToBase64 } from "../CommonHelpers"
+import { blobToBase64, getTRL } from "../CommonHelpers"
 
 const initialStateStartUpsPreview = [
   {
@@ -72,26 +72,6 @@ const StartupsList: React.FC = () => {
     onOpen()
     const resExpandStartUp: Startup[] = (await backend.expandStartUp(startupId)) as Startup[]
     setStartupDetails(resExpandStartUp[0])
-  }
-
-  const getTRL = (idLevel: number): string => {
-    switch (Number(idLevel)) {
-      case 1:
-        return "TRL-1: Basic principles"
-      case 2:
-        return "TRL-2: Technology concept formulated"
-      case 3:
-        return "TRL-3: Experimental proof of concept"
-      case 4:
-        return "TRL-4: Technology validated in lab"
-      case 5:
-        return "TRL-5: Technology validated in relevant environment"
-      case 6:
-        return "TRL-6 or higher"
-    
-      default:
-        return ""
-    }
   }
 
   return (
