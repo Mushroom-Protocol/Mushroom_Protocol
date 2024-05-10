@@ -3,7 +3,7 @@ export interface UserType {
   userId: string
   admissionDate: number
   name: string
-  avatar: Uint8Array | null
+  avatar: [Uint8Array] | null
   email: string
   verified: { Code: string; Success: boolean }
   roles: object[]

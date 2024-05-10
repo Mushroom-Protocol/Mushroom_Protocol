@@ -108,24 +108,12 @@ export default function WithSubnavigation() {
         isClosable: false,
         variant: "solid",
       })
-      // const userAvatar = formData?.userAvatar ? base64ToBlob(await convertFileToBase64(formData?.userAvatar)) : null
-      // const userAvatar = formData?.userAvatar ? await convertFileToBase64(formData?.userAvatar) : null
-      // console.log("userAvatar")
-      // console.log(userAvatar)
-      // const userAvatarBlob = base64ToBlob(userAvatar)
-      // console.log("userAvatarBlob")
-      // console.log(userAvatarBlob)
-      console.log("formData.userAvatar")
-      console.log(formData.userAvatar)
+
       const avatarParsed = formData.userAvatar ? base64ToBlob(await convertFileToBase64(formData.userAvatar)) : null
-      console.log("avatarParsed")
-      console.log(avatarParsed)
       const resUser = await backend.signUp(
         formData.userName,
         formData.userEmail,
-        [],
-        // formData.userAvatar,
-        // avatarParsed,
+        avatarParsed ? [avatarParsed] : [],
       )
       setCurrentUser(resUser[0] as UserType)
 

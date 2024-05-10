@@ -148,12 +148,7 @@ export default function MenuUser() {
       <Menu>
         <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: "none" }}>
           <HStack>
-            <Avatar size={"md"} />
-            {/* <Image
-              src={"data:image/png;base64," + blobToBase64(currentUser?.avatar)}
-              alt={currentUser?.userId}
-              borderRadius="lg"
-            /> */}
+            <Avatar size={"md"} src={"data:image/png;base64," + blobToBase64(currentUser?.avatar[0])} />
             <VStack
               display={{ base: "none", md: "flex" }}
               alignItems="flex-start"
