@@ -4,13 +4,13 @@ import { useCanister } from "@connect2ic/react"
 
 const UsersPendingVerification: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [users, setUsers] = useState<[[object, object]]>()
+  const [users, setUsers] = useState<[object, object][]>()
   const toast = useToast()
 
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const resGetUsers = (await backend.getUsers()) as [[object, object]]
+        const resGetUsers = (await backend.getUsers()) as [object, object][]
         setUsers(resGetUsers)
       } catch (error) {
         console.error("Error on backend.getUsers() call:", error)
@@ -25,15 +25,9 @@ const UsersPendingVerification: React.FC = () => {
       <Heading fontSize="4xl" marginBottom="20px">
         Users with pending verification
       </Heading>
-      {users
-        ?.filter(
-          (user: any) => user[1].verified.Code && user[1].verified.Code !== "",
-        )
-        .map((userPending: any) => (
-          <Text fontSize="xl">{`${userPending[1].name} - ${
-            userPending[1].email
-          } - ${JSON.stringify(userPending[1].verified)}`}</Text>
-        ))}
+      {users?.map((userPending: [object, object]) => (
+        <Text fontSize="xl">{`${userPending[0]} - ${userPending[1]}`}</Text>
+      ))}
     </>
   )
 }

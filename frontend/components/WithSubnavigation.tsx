@@ -54,6 +54,12 @@ interface Props {
 const Links = ["Home", "Launchpad", "Apply"]
 //const { estado, setEstado } = useContext(EstadoContext);
 
+const initialStateFormData = {
+  userName: "",
+  userEmail: "",
+  userAvatar: null as File | null, // Asegúrate de proporcionar un array válido aquí
+}
+
 const NavLink = (props: Props) => {
   const { children } = props
   return (
@@ -85,15 +91,10 @@ export default function WithSubnavigation() {
   const { isConnected } = useConnect()
   const toast = useToast()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
-  const [formData, setFormData] = useState({
-    userName: "",
-    userEmail: "",
-    userAvatar: null as File | null, // Asegúrate de proporcionar un array válido aquí
-  })
-
+  const [formData, setFormData] = useState(initialStateFormData)
   const estadoContext = useContext(EstadoContext)
   if (!estadoContext) {
-    throw new Error("El componente debe estar dentro de un estadoContext")
+    throw new Error("The component must be inside an estadoContext.")
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -109,7 +110,9 @@ export default function WithSubnavigation() {
         variant: "solid",
       })
 
-      const avatarParsed = formData.userAvatar ? base64ToBlob(await convertFileToBase64(formData.userAvatar)) : null
+      const avatarParsed = formData.userAvatar
+        ? base64ToBlob(await convertFileToBase64(formData.userAvatar))
+        : null
       const resUser = await backend.signUp(
         formData.userName,
         formData.userEmail,
@@ -130,6 +133,7 @@ export default function WithSubnavigation() {
         variant: "solid",
       })
 
+      setFormData(initialStateFormData)
       onRegisterClose()
     } catch (error) {
       if (loadingToastId !== undefined) {
@@ -222,17 +226,16 @@ export default function WithSubnavigation() {
               <ConnectButton />
             </div>
             <Box ml="4px">
-              {isConnected ? (
-                currentUser?.name === "" ? (
-                  <Button id="botonRegisterUser" onClick={onRegisterOpen}>
-                    Register User
-                  </Button>
-                ) : (
-                  <div style={{ backgroundColor: "#333333" }}>
-                    <MenuUser />
-                  </div>
-                )
-              ) : null}
+              {isConnected && (!currentUser || currentUser?.name === "") && (
+                <Button id="botonRegisterUser" onClick={onRegisterOpen}>
+                  Register User
+                </Button>
+              )}
+              {isConnected && currentUser && currentUser?.name !== "" && (
+                <div style={{ backgroundColor: "#333333" }}>
+                  <MenuUser />
+                </div>
+              )}
             </Box>
 
             <Modal isOpen={isRegisterOpen} onClose={onRegisterClose}>
