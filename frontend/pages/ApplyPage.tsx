@@ -23,7 +23,7 @@ export default function ApplyPage() {
       return resProjectsByStartup.length > 0
     }
 
-    hasRoleStartupProject(getRoleStartup(currentUser.roles)[0]).then(resHasRoleStartupProject => console.log(resHasRoleStartupProject)).catch(error => console.error(error))
+    hasRoleStartupProject(getRoleStartup(currentUser?.roles)[0]).then(resHasRoleStartupProject => console.log(resHasRoleStartupProject)).catch(error => console.error(error))
     // setHasStartupProject(await hasRoleStartupProject(getRoleStartup(currentUser.roles)[0]))
   }, [currentUser])
 

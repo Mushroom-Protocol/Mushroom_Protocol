@@ -48,7 +48,8 @@ import { UserType } from "./CommonTypes"
 import { base64ToBlob, convertFileToBase64 } from "./CommonHelpers"
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactNode,
+  path: string
 }
 
 const Links = ["Home", "Launchpad", "Apply"]
@@ -61,7 +62,7 @@ const initialStateFormData = {
 }
 
 const NavLink = (props: Props) => {
-  const { children } = props
+  const { children, path } = props
   return (
     <Box
       as="a"
@@ -72,7 +73,7 @@ const NavLink = (props: Props) => {
         textDecoration: "none",
         bg: useColorModeValue("gray.200", "gray.700"),
       }}
-      href="/Home"
+      href={path}
     >
       {children}
     </Box>
@@ -316,7 +317,7 @@ export default function WithSubnavigation() {
           <Box pb={40} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink path={link}>{link}</NavLink>
               ))}
             </Stack>
           </Box>
