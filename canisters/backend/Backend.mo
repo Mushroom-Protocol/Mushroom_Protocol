@@ -692,9 +692,18 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Public Query Functions  ////////////////////////////////////////////////
 
-    public shared ({ caller }) func getUsers() : async [(Principal, User)] {
+    public shared ({ caller }) func getUsers() : async [(Text, Text, Text)] {
         assert (authorizedCaller(caller));
-        HashMap.toArray<Principal, User>(users)
+        let tmpBuffer =  Buffer.fromArray<(Text, Text, Text)>([]);
+        for (user in HashMap.vals<Principal, User>(users)){
+            switch (user.verified){
+                case (#Code(code)){
+                    if (code != ""){tmpBuffer.add((user.email, user.name, code))};   
+                };
+                case _ {}
+            };
+        };
+        Buffer.toArray<(Text, Text, Text)>(tmpBuffer);
     };
 
     public query func getProjectsPreview() : async [ProjectCard] {
