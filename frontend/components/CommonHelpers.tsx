@@ -64,6 +64,6 @@ export const convertFileToBase64 = (file?: File): Promise<string> => {
       return resolve(reader.result as string)
     };
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+     
   });
 }
