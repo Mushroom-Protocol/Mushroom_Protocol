@@ -26,6 +26,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type Project = Types.Project;
     type StartupID = Text;
     type ProjectID = Text;
+    type CollectionID = Text;
+    type NftID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
     type CollectionPreInit = Types.NFT.CollectionPreInit;
@@ -68,6 +70,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     stable let startUps = HashMap.new<StartupID, Startup>();
     stable let projects = HashMap.new<ProjectID, Project>();
     stable let connectionsRecords = HashMap.new<Principal, [Int]>();
+
+    ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
+
+    // stable let nftCollections = HashMap.new<CollectionID, Text>();  //Value is the Principal ID of canister Collection in Text format
 
 
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
@@ -692,7 +698,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Public Query Functions  ////////////////////////////////////////////////
 
-    public shared ({ caller }) func getUsers() : async [(Text, Text, Text)] {
+    public shared ({ caller }) func getUsersPendingVerification() : async [(Text, Text, Text)] {
         assert (authorizedCaller(caller));
         let tmpBuffer =  Buffer.fromArray<(Text, Text, Text)>([]);
         for (user in HashMap.vals<Principal, User>(users)){
@@ -818,7 +824,38 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
     // public shared ( {caller} ) func deployCollection(): (){
 
+        //
+
     // };
+
+    // ----------------------- Minteo de NFTs --------------------------------------
+
+    // type MintResult = Result.Result<Text, Text>;
+
+    // func isNFTCollection(id: Text): Bool{
+    //     switch (HashMap.get<Text, Text>(nftCollections, thash, id)){
+    //         case null {false};
+    //         case _ {true};
+    //     }
+    // };
+
+    // func mintNFT(collectionID: Text, to: Principal): async  MintResult{
+    //     let colectionPrincipal = HashMap.get<Text, Text>(nftCollections, thash, collectionID);
+    //     switch colectionPrincipal{
+    //         case null {return #err("Error CollectionID")};
+    //         case (?colectionPrincipal){
+    //             let remoteCollection = actor(colectionPrincipal): actor{
+    //                 mint : shared () -> async (); 
+
+    //             }
+    //         }
+    //     }
+        
+
+        
+    // };
+
+
 
     
 
