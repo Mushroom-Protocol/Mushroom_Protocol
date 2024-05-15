@@ -14,10 +14,10 @@ const PrincipalBanner = () => {
           lineHeight={'110%'}
           color={'#1FAFC8'}
           noOfLines={1}>
-          DECENTRALIZED FINANCING IN BIOTECHNOLOGY
+          ENABLING RESEARCH TALENT TO GET CAPITAL
         </Heading>
         <Text fontSize={{ base: '2xl', sm: '3xl', md: '3xl' }} color={'white'}>
-          Driving the financial revolution in science and technology
+          Driving a financial revolution in biotechnology
         </Text>
         <Stack
           align={'center'}

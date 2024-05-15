@@ -33,29 +33,36 @@ import {
   FormControl,
   Input,
   useToast,
-  Avatar,
-  VStack,
+  FormHelperText,
+  FormLabel,
 } from "@chakra-ui/react"
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom"
+import { Link as ReactRouterLink } from "react-router-dom"
 import { Link as ChakraLink } from "@chakra-ui/react"
-import MpFavicon from "../assets/MpFavicon.png"
-import { useEffect, useState } from "react"
+import MpFavicon from "./../assets/MpFavicon.png"
+import { useState } from "react"
 import React, { useContext } from "react"
 import { EstadoContext } from "./utils/estadoContex"
-import { FiChevronDown } from "react-icons/fi"
-import NatheraTeamAA from "../assets/NatheraTeamAA.jpg"
+import MenuUser from "./MenuUser"
 import { UserType } from "./CommonTypes"
+import { base64ToBlob, convertFileToBase64 } from "./CommonHelpers"
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactNode,
+  path: string
 }
 
 const Links = ["Home", "Launchpad", "Apply"]
 //const { estado, setEstado } = useContext(EstadoContext);
 
+const initialStateFormData = {
+  userName: "",
+  userEmail: "",
+  userAvatar: null as File | null, // Asegúrate de proporcionar un array válido aquí
+}
+
 const NavLink = (props: Props) => {
-  const { children } = props
+  const { children, path } = props
   return (
     <Box
       as="a"
@@ -66,17 +73,11 @@ const NavLink = (props: Props) => {
         textDecoration: "none",
         bg: useColorModeValue("gray.200", "gray.700"),
       }}
-      href="/Home"
+      href={path}
     >
       {children}
     </Box>
   )
-}
-
-const initialStateUser = {
-  name: "",
-  email: "",
-  verified: {},
 }
 
 export default function WithSubnavigation() {
@@ -86,55 +87,21 @@ export default function WithSubnavigation() {
     onOpen: onRegisterOpen,
     onClose: onRegisterClose,
   } = useDisclosure()
-  const {
-    isOpen: isVerifyOpen,
-    onOpen: onVerifyOpen,
-    onClose: onVerifyClose,
-  } = useDisclosure()
-  const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState(initialStateUser)
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
   const [backend] = useCanister("backend")
-  const { isConnected, disconnect } = useConnect()
+  const { isConnected } = useConnect()
   const toast = useToast()
-  const navigate = useNavigate()
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
-  const [resCodeVerificationMessage, setResCodeVerificationMessage] = useState<
-    string | null
-  >(null)
-  const [formData, setFormData] = useState({
-    userName: "",
-    userEmail: "",
-  })
-  const [formDataVerify, setFormDataVerify] = useState({
-    verificationCode: "",
-  })
+  const [formData, setFormData] = useState(initialStateFormData)
   const estadoContext = useContext(EstadoContext)
   if (!estadoContext) {
-    throw new Error("El componente debe estar dentro de un estadoContext")
+    throw new Error("The component must be inside an estadoContext.")
   }
-
-  useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      console.log(myUser)
-      return myUser as [UserType]
-    }
-
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
-
-  const { estado, setEstado } = estadoContext
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    let loadingToastId: string | number | undefined
 
+    let loadingToastId: string | number | undefined
     try {
       loadingToastId = toast({
         title: "Submitting Form",
@@ -143,12 +110,16 @@ export default function WithSubnavigation() {
         isClosable: false,
         variant: "solid",
       })
-      const resUser = (await backend.signUp(
+
+      const avatarParsed = formData.userAvatar
+        ? base64ToBlob(await convertFileToBase64(formData.userAvatar))
+        : null
+      const resUser = await backend.signUp(
         formData.userName,
         formData.userEmail,
-        [],
-      )) as UserType
-      setUser(resUser)
+        avatarParsed ? [avatarParsed] : [],
+      )
+      setCurrentUser(resUser[0] as UserType)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -163,6 +134,7 @@ export default function WithSubnavigation() {
         variant: "solid",
       })
 
+      setFormData(initialStateFormData)
       onRegisterClose()
     } catch (error) {
       if (loadingToastId !== undefined) {
@@ -171,71 +143,19 @@ export default function WithSubnavigation() {
 
       toast({
         title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
+        description: JSON.stringify(error),
         status: "error", // 'error' es el status para el estilo de error
         duration: 5000,
         isClosable: true,
         variant: "solid",
       })
-      console.error("Error al registrar usuario:", error)
-    }
-  }
-
-  const handleSubmitVerify = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
-    event.preventDefault()
-    let loadingToastId: string | number | undefined
-
-    try {
-      loadingToastId = toast({
-        title: "Submitting Form",
-        status: "loading", // 'loading' es el status para el estilo de carga
-        duration: null,
-        isClosable: false,
-        variant: "solid",
-      })
-      const resEnterVerificationCode = (await backend.enterVerificationCode(
-        formDataVerify.verificationCode,
-      )) as { ok: string }
-      setUser((prev) => ({ ...prev, verified: { Success: true } }))
-
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Successful Submission",
-        description: resEnterVerificationCode["ok"],
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-
-      onVerifyClose()
-    } catch (error) {
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
-        status: "error", // 'error' es el status para el estilo de error
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-      console.error("Error al entrar código de verificación:", error)
+      console.error("Error on register user:", error)
     }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target
-    if (name === "logo" && files) {
+    if (name === "userAvatar" && files) {
       setFormData((prevData) => ({
         ...prevData,
         [name]: files[0], // Solo toma el primer archivo, puedes ajustar según tus necesidades
@@ -247,53 +167,6 @@ export default function WithSubnavigation() {
       }))
     }
   }
-
-  const handleChangeVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target
-
-    setFormDataVerify((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
-  }
-
-  const handleItemClick = (to?: string) => {
-    if (to) {
-      setSelectedPage(to)
-      onClose()
-      navigate(to)
-    }
-  }
-
-  const resetUser = () => {
-    setUser(initialStateUser)
-    disconnect()
-  }
-
-  const getCodeVerification = async () => {
-    const resGetCodeVerification = (await backend.getCodeVerification()) as {
-      ok: string
-    }
-    setResCodeVerificationMessage(resGetCodeVerification["ok"])
-  }
-
-  //const fetchMessage = async () => {
-  // try {
-  //  setLoading(true);
-  // const estado1 = await backend.getMessage1();
-  // setEstado(estado1);
-  //} catch (err) {
-  // console.error(err);
-  //} finally {
-  //console.log("El mensaje del backend es" + estado);
-  // setLoading(false);
-  //}
-  //};
-
-  // Fetch the message on page load
-  //useEffect(() => {
-  //fetchMessage();
-  //}, [estado]);
 
   return (
     <>
@@ -354,79 +227,30 @@ export default function WithSubnavigation() {
               <ConnectButton />
             </div>
             <Box ml="4px">
-              {isConnected ? (
-                user.name === "" ? (
-                  <Button id="botonRegisterUser" onClick={onRegisterOpen}>
-                    Registrar Usuario
-                  </Button>
-                ) : (
-                  <div style={{ backgroundColor: "#333333" }}>
-                    <Menu>
-                      <MenuButton
-                        py={2}
-                        transition="all 0.3s"
-                        _focus={{ boxShadow: "none" }}
-                      >
-                        <HStack>
-                          <Avatar size={"md"} src={NatheraTeamAA} />
-                          <VStack
-                            display={{ base: "none", md: "flex" }}
-                            alignItems="flex-start"
-                            spacing="1px"
-                            ml="2"
-                          >
-                            <Text fontSize="md">{user.name}</Text>
-                            <Text fontSize="sm" color="gray.600">
-                              Team Leader
-                            </Text>
-                          </VStack>
-                          <Box display={{ base: "none", md: "flex" }}>
-                            <FiChevronDown />
-                          </Box>
-                        </HStack>
-                      </MenuButton>
-                      <MenuList color="black">
-                        <MenuItem onClick={() => handleItemClick("/Dashboard")}>
-                          Dashboard
-                        </MenuItem>
-                        <MenuItem onClick={() => handleItemClick("/Portfolio")}>
-                          Portafolio
-                        </MenuItem>
-                        <MenuItem onClick={() => handleItemClick("/Edit")}>
-                          Edit
-                        </MenuItem>
-                        <MenuItem onClick={() => handleItemClick("/")}>
-                          Home
-                        </MenuItem>
-                        <MenuItem onClick={() => handleItemClick("/LaunchPad")}>
-                          LaunchPad
-                        </MenuItem>
-                        <MenuDivider />
-                        {user?.verified["Success"] === true ? null : (
-                          <MenuItem onClick={onVerifyOpen}>Verify</MenuItem>
-                        )}
-                        <MenuItem onClick={() => resetUser()}>
-                          Disconnect
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </div>
-                )
-              ) : null}
+              {isConnected && (!currentUser || currentUser?.name === "") && (
+                <Button id="botonRegisterUser" onClick={onRegisterOpen}>
+                  Register User
+                </Button>
+              )}
+              {isConnected && currentUser && currentUser?.name !== "" && (
+                <div style={{ backgroundColor: "#333333" }}>
+                  <MenuUser />
+                </div>
+              )}
             </Box>
 
             <Modal isOpen={isRegisterOpen} onClose={onRegisterClose}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>
-                  <span style={{ color: "black" }}>Registrar Usuario</span>
+                  <span style={{ color: "black" }}>Register User</span>
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody style={{ color: "black" }}>
                   <form onSubmit={handleSubmit}>
                     <FormControl isRequired>
                       <Input
-                        placeholder="Nombre"
+                        placeholder="Name"
                         id="userName"
                         name="userName"
                         value={formData.userName}
@@ -435,16 +259,29 @@ export default function WithSubnavigation() {
                     </FormControl>
                     <FormControl isRequired>
                       <Input
-                        placeholder="Correo Electrónico"
+                        placeholder="E-Mail"
                         id="userEmail"
                         name="userEmail"
                         value={formData.userEmail}
                         onChange={handleChange}
                       />
                     </FormControl>
+                    <FormControl mt={4}>
+                      <FormLabel>Upload Avatar</FormLabel>
+                      <Input
+                        id="userAvatar"
+                        name="userAvatar"
+                        onChange={handleChange}
+                        type="file"
+                        accept="image/*" // Asegura que solo se puedan seleccionar archivos de imagen
+                      />
+                      <FormHelperText>
+                        Recommended size 200x200 px
+                      </FormHelperText>
+                    </FormControl>
                     <FormControl>
                       <Button type="submit" mt={4} colorScheme="teal">
-                        Registrar
+                        Register
                       </Button>
                     </FormControl>
                   </form>
@@ -452,52 +289,7 @@ export default function WithSubnavigation() {
 
                 <ModalFooter>
                   <Button colorScheme="blue" mr={3} onClick={onRegisterClose}>
-                    Cerrar
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <Modal isOpen={isVerifyOpen} onClose={onVerifyClose}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>
-                  <span style={{ color: "black" }}>Verificar Registro</span>
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody style={{ color: "black" }}>
-                  <form onSubmit={handleSubmitVerify}>
-                    <FormControl isRequired>
-                      <Input
-                        placeholder="Código de verificación"
-                        id="verificationCode"
-                        name="verificationCode"
-                        value={formDataVerify.verificationCode}
-                        onChange={handleChangeVerify}
-                      />
-                    </FormControl>
-                    <FormControl>
-                      <Button
-                        type="button"
-                        mt={4}
-                        variant="ghost"
-                        onClick={() => getCodeVerification()}
-                      >
-                        Obtener
-                      </Button>
-                    </FormControl>
-                    <Text>{resCodeVerificationMessage}</Text>
-                    <FormControl>
-                      <Button type="submit" mt={4} colorScheme="teal">
-                        Verificar
-                      </Button>
-                    </FormControl>
-                  </form>
-                </ModalBody>
-
-                <ModalFooter>
-                  <Button colorScheme="blue" mr={3} onClick={onVerifyClose}>
-                    Cerrar
+                    Close
                   </Button>
                 </ModalFooter>
               </ModalContent>
@@ -525,7 +317,7 @@ export default function WithSubnavigation() {
           <Box pb={40} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink path={link}>{link}</NavLink>
               ))}
             </Stack>
           </Box>

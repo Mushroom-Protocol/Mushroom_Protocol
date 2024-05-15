@@ -1,83 +1,46 @@
-import React, { useEffect, useState } from "react"
-import { Flex, Center, Text } from "@chakra-ui/react"
+import React, { useContext, useEffect, useState } from "react"
 import BannerApply from "../components/Apply/BannerApply"
 import StartupForms from "../components/Apply/StartupForms"
 import ProyectForms from "../components/Apply/ProyectForms"
 import ColecctionForm from "../components/Apply/ColecctionForm"
-import JoinDiscord from "../components/home/JoinDiscord"
-import { useCanister, useConnect } from "@connect2ic/react"
-
-interface UserType {
-  name: string
-  email: string
-  verified: object
-  roles: []
-}
-
-const initialStateUser = {
-  name: "",
-  email: "",
-  verified: {},
-  roles: [],
-}
+import { useCanister } from "@connect2ic/react"
+import { EstadoContext } from "../components/utils/estadoContex"
+import { getRoleStartup, isUserRoleStartup } from "../components/CommonHelpers"
 
 export default function ApplyPage() {
   const [backend] = useCanister("backend")
-  const { isConnected } = useConnect()
-  const [user, setUser] = useState(initialStateUser)
+  const [hasStartupProject, setHasStartupProject] = useState<boolean>(false)
+  const { currentUser, setCurrentUser } = useContext(EstadoContext)
 
   useEffect(() => {
-    const getMyUser = async () => {
-      const myUser = await backend.getMyUser()
-      return myUser as [UserType]
+    const hasRoleStartupProject = async (
+      startupId: string,
+    ): Promise<boolean> => {
+      const resProjectsByStartup = (await backend.getProjectsByStartup(
+        startupId,
+      )) as string[][]
+      setHasStartupProject(resProjectsByStartup.flat().length > 0)
+      return resProjectsByStartup.length > 0
     }
 
-    isConnected
-      ? getMyUser().then((responseUser) => {
-          if (responseUser.length > 0) {
-            setUser(responseUser[0] as UserType)
-          }
-        })
-      : setUser(initialStateUser)
-  }, [isConnected])
-
-  const isUserRoleStartup = (roles) => {
-    let isUserRoleStartupFlag = false
-    roles.map((elm) => {
-      if (elm.Startup && elm.Startup.length > 0) {
-        isUserRoleStartupFlag = true
-      }
-    })
-    return isUserRoleStartupFlag
-  }
+    hasRoleStartupProject(getRoleStartup(currentUser?.roles)[0]).then(resHasRoleStartupProject => console.log(resHasRoleStartupProject)).catch(error => console.error(error))
+    // setHasStartupProject(await hasRoleStartupProject(getRoleStartup(currentUser.roles)[0]))
+  }, [currentUser])
 
   return (
     <>
       {!window.location.pathname.startsWith("/Dashboard") && <BannerApply />}
       {window.location.pathname.startsWith("/Dashboard") && <br />}
-      {user?.verified["Success"] === true && !isUserRoleStartup(user.roles) ? (
-        <StartupForms />
-      ) : (
-        <></>
-      )}
+      {currentUser?.verified["Success"] === true &&
+        !isUserRoleStartup(currentUser.roles) && <StartupForms />}
       <br />
       {window.location.pathname.startsWith("/Dashboard") && (
         <>
-          {user?.verified["Success"] === true &&
-          user?.roles.length > 0 &&
-          isUserRoleStartup(user.roles) ? (
-            <>
-              <ProyectForms />
-              <br />
-              <ColecctionForm />
-            </>
-          ) : (
-            <></>
-          )}
+          {isUserRoleStartup(currentUser?.roles) && !hasStartupProject && <ProyectForms />}
+          <br />
+          {isUserRoleStartup(currentUser?.roles) && hasStartupProject && <ColecctionForm />}
         </>
       )}
-      <br />
-      <br />
     </>
   )
 }

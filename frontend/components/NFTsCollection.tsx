@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Box, Text, Button, ButtonGroup, VStack, Image, SimpleGrid } from '@chakra-ui/react';
 import { Avatar,Card, CardHeader, CardBody, CardFooter,Stack,Heading,Divider } from '@chakra-ui/react'
@@ -53,7 +52,8 @@ import { FaShare } from 'react-icons/fa'
   //);
 //};
 
-const NFTCollection = () => {
+// const NFTCollection = ({ collection }:Collection1 ) => {
+  const NFTCollection = () => {
   return (
     <Box mb={8}>
       {/* <Text fontSize="2xl" mb={4}>ID de Colección: {collection.idCollection}</Text>

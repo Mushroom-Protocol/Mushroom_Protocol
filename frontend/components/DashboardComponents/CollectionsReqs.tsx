@@ -9,10 +9,8 @@ import {
   Divider,
   Heading,
   Image,
-  Input,
   List,
   ListItem,
-  Stack,
   Text,
   useToast,
 } from "@chakra-ui/react"
@@ -20,7 +18,7 @@ import { useCanister } from "@connect2ic/react"
 import { DataProject, ProjectCard } from "../CommonTypes"
 import { blobToBase64 } from "../CommonHelpers"
 
-const ProjectsReqs: React.FC = () => {
+const CollectionsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
   const [projects, setProjects] = useState<[ProjectCard]>()
   const [responseBackend, setResponseBackend] = useState<
@@ -153,7 +151,7 @@ const ProjectsReqs: React.FC = () => {
 
   return (
     <>
-      <Heading fontSize="4xl">Project registration requests</Heading>
+      <Heading fontSize="4xl">Collection registration requests</Heading>
       <List spacing={3}>
         {projects?.map((project) => {
           return (
@@ -206,4 +204,4 @@ const ProjectsReqs: React.FC = () => {
   )
 }
 
-export default ProjectsReqs
+export default CollectionsReqs
