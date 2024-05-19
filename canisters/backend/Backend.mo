@@ -2,7 +2,6 @@ import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
-// import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Result "mo:base/Result";
@@ -11,7 +10,14 @@ import Types "types/Types";
 import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
-import Random "mo:random-class/Rand";
+import Random "mo:random/Rand";
+// import Debug "mo:base/Debug";
+
+/////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
+import ExperimentalCycles "mo:base/ExperimentalCycles";
+import Error "mo:base/Error";
+import NFT "NFT/dip721-nft-container";
+import TypesNft "NFT/Types";
 
 import Interface "./interfaces/ic-management-interface";
 
@@ -26,12 +32,14 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type Project = Types.Project;
     type StartupID = Text;
     type ProjectID = Text;
-    type CollectionID = Text;
+    // type CollectionID = Text;
     type NftID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
     type CollectionPreInit = Types.NFT.CollectionPreInit;
     type ErrorCode = Types.ErrorCode;
+    type Dip721NonFungibleToken = TypesNft.Dip721NonFungibleToken;
+    type DeployConfig = Types.NFT.DeployConfig;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -73,8 +81,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
 
-    // stable let nftCollections = HashMap.new<CollectionID, Text>();  //Value is the Principal ID of canister Collection in Text format
-
+    stable let nftCollections = HashMap.new<ProjectID, Text>(); //Value is the Principal ID of canister Collection in Text format
 
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
@@ -112,15 +119,15 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         ignore Set.remove<Text>(mailsToAlertActivity, thash, email)
     };
 
-    public shared ({caller}) func getLogConnections():async  [(Text, [Int])]{
+    public shared ({ caller }) func getLogConnections() : async [(Text, [Int])] {
         assert authorizedCaller(caller);
         let result = Buffer.fromArray<(Text, [Int])>([]);
-        for ((p, t) in HashMap.entries<Principal, [Int]>(connectionsRecords)){
-            result.add((Principal.toText(p), t));
+        for ((p, t) in HashMap.entries<Principal, [Int]>(connectionsRecords)) {
+            result.add((Principal.toText(p), t))
         };
-        Buffer.toArray<(Text, [Int])>(result);
+        Buffer.toArray<(Text, [Int])>(result)
     };
-    
+
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
     func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
@@ -217,7 +224,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     //////////////////////////////////////  private functions  //////////////////////////////////////////////////
 
-    func recordConnection(caller: Principal): (){
+    func recordConnection(caller : Principal) : () {
         let now = Time.now();
         let visitor = HashMap.get(connectionsRecords, phash, caller);
         ignore switch visitor {
@@ -231,7 +238,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    
+
     func availableId(id : Text) : Bool {
         switch (Set.contains<Text>(idUsed, thash, id)) {
             case (?true) { false };
@@ -372,6 +379,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     public shared ({ caller }) func registerProject(data : DataProject) : async Text {
         assert isStartUp(caller);
         let request = HashMap.get(incomingProjects, phash, caller);
+        //Todo Verificar que la startup no tenga un proyecto abierto
         switch request {
             case null {
                 ignore HashMap.add<Principal, DataProject>(incomingProjects, phash, caller, data);
@@ -384,43 +392,43 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
     ///////////////////////////////////////// Add and remove member team to my StartUp ///////////////////////////////////////////
-    
-    public shared ({caller}) func addTeamMemberToStartUp(_principal: Text, _stID: Text): async Bool{
+
+    public shared ({ caller }) func addTeamMemberToStartUp(_principal : Text, _stID : Text) : async Bool {
         let startUp = HashMap.get(startUps, thash, _stID);
-        switch startUp{
-            case null{ return false};
-            case (?startUp){
+        switch startUp {
+            case null { return false };
+            case (?startUp) {
                 assert (startUp.owner == caller);
                 let tempTeamSet = Set.fromIter<Principal>(startUp.startupTeam.vals(), phash);
                 ignore Set.put<Principal>(tempTeamSet, phash, Principal.fromText(_principal));
                 let teamUpdate = Set.toArray(tempTeamSet);
-                ignore HashMap.put(startUps, thash, _stID, {startUp with startupTeam = teamUpdate});
-                true;
-            };
-        };
+                ignore HashMap.put(startUps, thash, _stID, { startUp with startupTeam = teamUpdate });
+                true
+            }
+        }
     };
 
-    public query func getTeamMemberFromStartUp(_stID: Text): async [Principal]{
+    public query func getTeamMemberFromStartUp(_stID : Text) : async [Principal] {
         let startUp = HashMap.get(startUps, thash, _stID);
-        switch startUp{
+        switch startUp {
             case null { [] };
-            case (?startUp){startUp.startupTeam}
-        };
+            case (?startUp) { startUp.startupTeam }
+        }
     };
 
-    public shared ({caller}) func removeTeamMemberFromStartUp( _principal: Text, _stID: Text): async Bool{
+    public shared ({ caller }) func removeTeamMemberFromStartUp(_principal : Text, _stID : Text) : async Bool {
         let startUp = HashMap.get(startUps, thash, _stID);
-        switch startUp{
-            case null{ return false};
-            case (?startUp){
-                assert (startUp.owner == caller) and ( _principal != Principal.toText(caller));
+        switch startUp {
+            case null { return false };
+            case (?startUp) {
+                assert (startUp.owner == caller) and (_principal != Principal.toText(caller));
                 let tempTeamSet = Set.fromIter<Principal>(startUp.startupTeam.vals(), phash);
                 ignore Set.remove<Principal>(tempTeamSet, phash, Principal.fromText(_principal));
                 let teamUpdate = Set.toArray(tempTeamSet);
-                ignore HashMap.put(startUps, thash, _stID, {startUp with startupTeam = teamUpdate});
-                true;
-            };
-        };
+                ignore HashMap.put(startUps, thash, _stID, { startUp with startupTeam = teamUpdate });
+                true
+            }
+        }
     };
 
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
@@ -472,9 +480,9 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     public shared ({ caller }) func getMyUser() : async ?User {
-
+        // Debug.print("getMyUser---> " #Principal.toText(caller));
         let user = HashMap.get<Principal, User>(users, phash, caller);
-        if (not Principal.isAnonymous(caller)){recordConnection(caller)};
+        if (not Principal.isAnonymous(caller)) { recordConnection(caller) };
         switch user {
             case null { null };
             case (?user) {
@@ -518,18 +526,21 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             let startUp = HashMap.get(startUps, thash, pr.startupID);
             var startupName = "";
             switch startUp {
-                case null { return [] };
-                case (?st) { startupName := st.startUpName }
+                case (?st) {
+                    startupName := st.startUpName;
+                    let entrie = {
+                        owner;
+                        startupName;
+                        pojectID = "";
+                        projectTitle = pr.projectTitle;
+                        coverImage = pr.coverImage;
+                        problemSolving = pr.problemSolving
+                    };
+                    resultBuffer.add(entrie)
+                };
+                case null {}
             };
-            let entrie = {
-                owner;
-                startupName;
-                pojectID = "";
-                projectTitle = pr.projectTitle;
-                coverImage = pr.coverImage;
-                problemSolving = pr.problemSolving
-            };
-            resultBuffer.add(entrie)
+
         };
         Buffer.toArray(resultBuffer);
 
@@ -564,8 +575,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         HashMap.get(projects, thash, id)
     };
 
-    public shared ({ caller }) func getStartUpByID(id : Text) : async ?Startup {
-        assert authorizedCaller(caller);
+    public query func getStartUpByID(id : Text) : async ?Startup {
+        // assert authorizedCaller(caller);
         HashMap.get(startUps, thash, id)
     };
 
@@ -700,16 +711,18 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func getUsersPendingVerification() : async [(Text, Text, Text)] {
         assert (authorizedCaller(caller));
-        let tmpBuffer =  Buffer.fromArray<(Text, Text, Text)>([]);
-        for (user in HashMap.vals<Principal, User>(users)){
-            switch (user.verified){
-                case (#Code(code)){
-                    if (code != ""){tmpBuffer.add((user.email, user.name, code))};   
+        let tmpBuffer = Buffer.fromArray<(Text, Text, Text)>([]);
+        for (user in HashMap.vals<Principal, User>(users)) {
+            switch (user.verified) {
+                case (#Code(code)) {
+                    if (code != "") {
+                        tmpBuffer.add((user.email, user.name, code))
+                    }
                 };
                 case _ {}
-            };
+            }
         };
-        Buffer.toArray<(Text, Text, Text)>(tmpBuffer);
+        Buffer.toArray<(Text, Text, Text)>(tmpBuffer)
     };
 
     public query func getProjectsPreview() : async [ProjectCard] {
@@ -803,10 +816,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     stable let incommingCollections = HashMap.new<StartupID, CollectionPreInit>();
 
-    public func testAuthMushroom() : async Bool {
-        authorizedCaller(Principal.fromText(await whoAmi()))
-    }; //BORRAR
-
     public shared ({ caller }) func createCollection(data : CollectionPreInit) : async Result.Result<Text, ErrorCode> {
         let startUp = await getStartUpByID(data.startupID);
         switch startUp {
@@ -822,41 +831,73 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-    // public shared ( {caller} ) func deployCollection(): (){
 
-        //
+    type DeployResult = Result.Result<Principal, Text>;
 
-    // };
+    public shared ({ caller }) func getIncomingCollectionsRequests() : async [StartupID] {
+        assert (authorizedCaller(caller));
+        Iter.toArray(HashMap.keys<StartupID, CollectionPreInit>(incommingCollections))
+    };
 
-    // ----------------------- Minteo de NFTs --------------------------------------
+    public shared ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
+        assert (authorizedCaller(caller));
+        HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
+    };
 
-    // type MintResult = Result.Result<Text, Text>;
+    public query func getNftsAddreses() : async [(ProjectID, Text)] {
+        HashMap.toArray<ProjectID, Text>(nftCollections)
+    };
+    /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
-    // func isNFTCollection(id: Text): Bool{
-    //     switch (HashMap.get<Text, Text>(nftCollections, thash, id)){
-    //         case null {false};
-    //         case _ {true};
-    //     }
-    // };
+    public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
+        assert (authorizedCaller(caller));
+        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.proyectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
+        //verificar que cfg.canisterIdAssets sea un canister de assests válido
+        ExperimentalCycles.add<system>(fee);
+        try {
+            let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.canisterIdAssets, cfg.assetsNames);
+            let canisterId = Principal.fromActor(newCanister);
+            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.proyectId, Principal.toText(canisterId));
+            //Borrar del HashMap la entrada correspondiente a la solicitud de collección
+            return #ok(canisterId)
+        } catch (e) {
+            return #err(Error.message(e))
+        }
+    };
 
-    // func mintNFT(collectionID: Text, to: Principal): async  MintResult{
-    //     let colectionPrincipal = HashMap.get<Text, Text>(nftCollections, thash, collectionID);
-    //     switch colectionPrincipal{
-    //         case null {return #err("Error CollectionID")};
-    //         case (?colectionPrincipal){
-    //             let remoteCollection = actor(colectionPrincipal): actor{
-    //                 mint : shared () -> async (); 
+    ///////////////////////// Comunicacion con canisters de NFTs ///////////////////////////
+    ////////////////////////////////////////////  Mint ////////////////////////////////////
 
-    //             }
-    //         }
-    //     }
-        
+    type MintResult = Result.Result<Text, Text>;
 
-        
-    // };
+    public shared ({ caller }) func mintNFT(project : ProjectID, to : Principal) : async TypesNft.MintReceipt {
+        assert (authorizedCaller(caller));
+        let collectionPrincipal = HashMap.get<Text, Text>(nftCollections, thash, project);
+        switch collectionPrincipal {
+            case null { return #Err(#InvalidTokenId) };
+            case (?principalText) {
+                let remoteCollection = actor (principalText) : actor {
+                    mintDip721 : shared (Principal) -> async TypesNft.MintReceipt
+                };
+                await remoteCollection.mintDip721(to)
+            }
+        }
+    };
 
-
-
-    
+    /////////////////////// getNFT ///////////////////////////////////
+    public shared ({ caller }) func getMyNfts() : async [TypesNft.MetadataResult] {
+        let tempBuffer = Buffer.fromArray<TypesNft.MetadataResult>([]);
+        for (colection in HashMap.vals<ProjectID, Text>(nftCollections)) {
+            let remoteCollection = actor (colection) : actor {
+                getTokenIdsForUserDip721: shared (Principal) -> async [TypesNft.TokenId];
+                getMetadataDip721: shared(TypesNft.TokenId) -> async TypesNft.MetadataResult;
+            };
+            let tokensInCurrentCollection = await remoteCollection.getTokenIdsForUserDip721(caller);
+            for(token in tokensInCurrentCollection.vals()){
+                tempBuffer.add(await remoteCollection.getMetadataDip721(token))
+            };
+        };
+        Buffer.toArray<TypesNft.MetadataResult>(tempBuffer);
+    };
 
 }
