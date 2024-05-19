@@ -220,7 +220,15 @@ module {
             nftImages : [Blob];
             creator : Text
 
-        }
+        };
+
+        public type DeployConfig = {
+            proyectId: Text;
+            canisterIdAssets: Text;
+            assetsNames: [Text];
+            custodian: Text;
+
+        };
 
     }
 
