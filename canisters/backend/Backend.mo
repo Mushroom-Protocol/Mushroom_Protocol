@@ -16,8 +16,8 @@ import Random "mo:random/Rand";
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
-import NFT "NFT/dip721-nft-container";
-import TypesNft "NFT/Types";
+import NFT "../NFT/dip721-nft-container";
+import TypesNft "../NFT/Types";
 
 import Interface "./interfaces/ic-management-interface";
 
