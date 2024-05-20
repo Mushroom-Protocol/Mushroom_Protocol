@@ -886,7 +886,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     /////////////////////// getNFT ///////////////////////////////////
     public shared ({ caller }) func getMyNfts() : async [TypesNft.MetadataResult] {
-        if(not isUser(caller)){return [#Err(#Unauthorized)]};
+        if (not isUser(caller)) { return [#Err(#Unauthorized)] };
         await nftsOwnedBy(caller)
     };
 
@@ -907,7 +907,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                 tempBuffer.add(await remoteCollection.getMetadataDip721(token))
             }
         };
-        Buffer.toArray<TypesNft.MetadataResult>(tempBuffer);
+        Buffer.toArray<TypesNft.MetadataResult>(tempBuffer)
     };
 
 }
