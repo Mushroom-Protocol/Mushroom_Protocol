@@ -2,7 +2,6 @@
 
 Después de que una StartUp haya solicitado la creación de una colección de NFT para su proyecto aprobado, y esta solicitud haya sido revisada por la administración, se procederá de la siguiente manera si se decide el despliegue de dicha colección:
 
-## Requisitos
 
 ### Creación del Proyecto
 
