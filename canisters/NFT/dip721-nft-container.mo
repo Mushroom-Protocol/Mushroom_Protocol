@@ -138,6 +138,11 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return [#TransferNotification, #Burn, #Mint];
     };
 
+    public query func getCustodians(): async [Text]{
+        let arrayCustodians = Set.toArray<Principal>(custodians);
+        Array.tabulate<Text>(custodians.size(), func x = Principal.toText(arrayCustodians[x]));
+    };
+
     public query func logoDip721() : async Types.LogoResult {
         return logo;
     };
