@@ -1,3 +1,4 @@
+import Prim "mo:⛔";
 import Nat16 "mo:base/Nat16";
 import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
@@ -5,11 +6,14 @@ import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Nat "mo:base/Nat";
+import Time "mo:base/Time";
 import Types "Types";
 import Rand "mo:random/Rand";
 import Set "mo:map/Set";
 import Map "mo:map/Map";
-import { n64hash; phash } "mo:map/Map";
+import { nhash; n64hash; phash } "mo:map/Map";
+
+import Utils "./utils";
 
 shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, assets_canister : Text, _fileNames : [Text]) = Self {
 
@@ -19,9 +23,11 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
+    type TransactionId = Types.TransactionId;
+    type Trx = Utils.Trx;
 
-    stable var transactionId : Types.TransactionId = 0; 
-    stable let nfts = Map.new<Nat64, Nft>();
+    stable var transactionId : TransactionId = 0;
+    stable let nfts = Map.new<TokenId, Nft>();
 
     stable var custodians = Set.fromIter<Principal>([Principal.fromText(custodian), caller].vals(), phash);
 
@@ -33,14 +39,29 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     let rand = Rand.Rand(); // get random Nat value with rand.next()
     rand.setRange(10000, 99999); // Establecer un rango para los Nftid
-    stable let tokenIdUsed = Set.new<Nat64>();
+    stable let tokenIdUsed = Set.new<TokenId>();
 
-    func generateRandomID() : async Nat64 {
+    ////////////////////////// Ledger NFT Colection ////////////////////////////////////////
+
+    stable let transactionsLedger = Map.new<TransactionId, Trx>();
+    stable let nftHistory = Map.new<TokenId, [TransactionId]>();
+
+    public query func getNftHistory(id : TokenId) : async ?[TransactionId] {
+        Map.get<TokenId, [TransactionId]>(nftHistory, n64hash, id);
+    };
+
+    public query func getTransaction(id : TransactionId) : async ?Trx {
+        Map.get<TransactionId, Trx>(transactionsLedger, nhash, id);
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+    func generateRandomID() : async TokenId {
         var id = Nat64.fromNat(await rand.next());
         while (Set.has<Nat64>(tokenIdUsed, n64hash, id)) {
             id := Nat64.fromNat(await rand.next());
         };
-        Set.add<Nat64>(tokenIdUsed, n64hash, id);
+        Set.add<TokenId>(tokenIdUsed, n64hash, id);
         id;
     };
 
@@ -91,6 +112,22 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 } else {
                     ignore Map.put<Nat64, Nft>(nfts, n64hash, token_id, { token with owner = to });
                     transactionId += 1;
+                    let trx = {
+                        nftId = token_id;
+                        date = Time.now();
+                        trxType = #Transfer({ from; to });
+                    };
+                    ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
+                    let nftPrevHist = Map.get<TokenId, [TransactionId]>(nftHistory, n64hash, token_id);
+                    let histoyUpdate : [TransactionId] = switch nftPrevHist {
+                        case null { [transactionId] };
+                        case (?prev) {
+                            let s = prev.size();
+                            Prim.Array_tabulate<TransactionId>(s +1, func x = if (x < s) { prev[x] } else { transactionId });
+                        };
+                    };
+                    ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, token_id, histoyUpdate);
+
                     return #Ok(transactionId);
                 };
             };
@@ -99,11 +136,6 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     public query func supportedInterfacesDip721() : async [Types.InterfaceId] {
         return [#TransferNotification, #Burn, #Mint];
-    };
-
-    public query func getCustodians(): async [Text]{
-        let arrayCustodians = Set.toArray<Principal>(custodians);
-        Array.tabulate<Text>(custodians.size(), func x = Principal.toText(arrayCustodians[x]));
     };
 
     public query func logoDip721() : async Types.LogoResult {
@@ -118,7 +150,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return symbol;
     };
 
-    public query func totalSupplyDip721() : async Nat64 { 
+    public query func totalSupplyDip721() : async Nat64 {
         return totalSupply;
     };
 
@@ -134,7 +166,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         };
     };
 
-    public query func getMaxLimitDip721() : async Nat16 { 
+    public query func getMaxLimitDip721() : async Nat16 {
         return maxLimit;
     };
 
@@ -161,7 +193,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return Buffer.toArray<TokenId>(tempBuffer);
     };
 
-    public shared ({ caller }) func mintDip721(to : Principal /* metadata : Types.MetadataDesc */) : async Types.MintReceipt {
+    public shared ({ caller }) func mintDip721(to : Principal, /* metadata : Types.MetadataDesc */) : async Types.MintReceipt {
         if (not Set.has<Principal>(custodians, phash, caller)) {
             return #Err(#Unauthorized);
         };
@@ -191,9 +223,15 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 let nft = { owner = to; id; metadata };
                 ignore Map.put<Nat64, Nft>(nfts, n64hash, id, nft);
                 transactionId += 1;
+                let trx = {
+                    nftId = id;
+                    date = Time.now();
+                    trxType = #Mint;
+                };
+                ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
+                ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, id, [transactionId]);
                 totalSupply += 1;
                 result;
-
             };
         };
     };
