@@ -80,8 +80,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     stable let connectionsRecords = HashMap.new<Principal, [Int]>();
 
     ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
-
-    stable let nftCollections = HashMap.new<ProjectID, Text>(); //Value is the Principal ID of canister Collection in Text format
+    type CollectionAddress = Text; //Canister ID of the collection nft
+    stable let nftCollections = HashMap.new<ProjectID, CollectionAddress>(); //Value is the Principal ID of canister Collection in Text format
 
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
@@ -869,6 +869,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     ////////////////////////////////////////////  Mint ////////////////////////////////////
 
     type MintResult = Result.Result<Text, Text>;
+    type TokenId = TypesNft.TokenId;
 
     public shared ({ caller }) func mintNFT(project : ProjectID) : async TypesNft.MintReceipt {
         assert (isUser(caller));
@@ -899,8 +900,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let tempBuffer = Buffer.fromArray<TypesNft.MetadataResult>([]);
         for (colection in HashMap.vals<ProjectID, Text>(nftCollections)) {
             let remoteCollection = actor (colection) : actor {
-                getTokenIdsForUserDip721 : shared (Principal) -> async [TypesNft.TokenId];
-                getMetadataDip721 : shared (TypesNft.TokenId) -> async TypesNft.MetadataResult
+                getTokenIdsForUserDip721 : shared (Principal) -> async [TokenId];
+                getMetadataDip721 : shared (TokenId) -> async TypesNft.MetadataResult
             };
             let tokensInCurrentCollection = await remoteCollection.getTokenIdsForUserDip721(userPrincipal);
             for (token in tokensInCurrentCollection.vals()) {
@@ -909,5 +910,18 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         };
         Buffer.toArray<TypesNft.MetadataResult>(tempBuffer)
     };
+
+    public func getNftHistory(colId: ProjectID, tokenId: TypesNft.TokenId): async ?[TypesNft.Trx]{
+        let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
+        switch collection {
+            case (?collection){
+                let remoteCollection = actor(collection) : actor {
+                    getNftHistory: shared (TokenId) -> async ?[TypesNft.Trx]
+                };
+                await remoteCollection.getNftHistory(tokenId);
+            };
+            case null {null};
+        }
+    }
 
 }

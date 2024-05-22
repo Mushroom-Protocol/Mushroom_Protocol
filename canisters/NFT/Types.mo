@@ -92,4 +92,15 @@ module {
     token_id: TokenId;
     id: Nat;
   };
+
+  public type Trx = {
+        nftId : Nat64;
+        date : Int;
+        trxType : {
+            #Mint;
+            #Transfer : { from : Principal; to : Principal };
+            #Burn;
+            #Stacking;
+        };
+    };
 };
