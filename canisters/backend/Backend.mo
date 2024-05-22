@@ -870,8 +870,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     type MintResult = Result.Result<Text, Text>;
 
-    public shared ({ caller }) func mintNFT(project : ProjectID, to : Principal) : async TypesNft.MintReceipt {
-        assert (authorizedCaller(caller));
+    public shared ({ caller }) func mintNFT(project : ProjectID) : async TypesNft.MintReceipt {
+        assert (isUser(caller));
         let collectionPrincipal = HashMap.get<Text, Text>(nftCollections, thash, project);
         switch collectionPrincipal {
             case null { return #Err(#InvalidTokenId) };
@@ -879,7 +879,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                 let remoteCollection = actor (principalText) : actor {
                     mintDip721 : shared (Principal) -> async TypesNft.MintReceipt
                 };
-                await remoteCollection.mintDip721(to)
+                await remoteCollection.mintDip721(caller)
             }
         }
     };
