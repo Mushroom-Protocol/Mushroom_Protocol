@@ -270,20 +270,20 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    func isStartUp(p : Principal) : Bool {
-        switch (getUser(p)) {
-            case null { return false };
-            case (?user) {
-                for (r in user.roles.vals()) {
-                    switch r {
-                        case (#Startup(_)) { return true };
-                        case _ {}
-                    }
-                };
-                return false
-            }
-        }
-    };
+    // func isStartUp(p : Principal) : Bool {
+    //     switch (getUser(p)) {
+    //         case null { return false };
+    //         case (?user) {
+    //             for (r in user.roles.vals()) {
+    //                 switch r {
+    //                     case (#Startup(_)) { return true };
+    //                     case _ {}
+    //                 }
+    //             };
+    //             return false
+    //         }
+    //     }
+    // };
 
     func isAdmin(p : Principal) : Bool {
         Set.has(admins, phash, p)
@@ -375,9 +375,30 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-
+    func getStartupListOf(p : Principal) : [StartupID] {
+        let user = getUser(p);
+        switch user {
+            case null { [] };
+            case (?user) {
+                for (role in user.roles.vals()) {
+                    switch role {
+                        case (#Startup(list)) { return list };
+                        case _ {}
+                    };
+                };
+                []
+            }
+        }
+    };
     public shared ({ caller }) func registerProject(data : DataProject) : async Text {
-        assert isStartUp(caller);
+        //////////////// Extra validation of the StartupID field in data /////////////////
+        let startUpsOfCaller = getStartupListOf(caller);
+        let stOK = Array.find<StartupID>(startUpsOfCaller, func x = x == data.startupID);
+        switch stOK {
+            case null { return "The Startup ID entered in the form does not correspond to a Startup associated with the caller"};
+            case _ {}
+        };
+        /////////////////////////////////////////////////////////////////////////////
         let request = HashMap.get(incomingProjects, phash, caller);
         //Todo Verificar que la startup no tenga un proyecto abierto
         switch request {
@@ -911,16 +932,16 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Buffer.toArray<TypesNft.MetadataResult>(tempBuffer)
     };
 
-    public func getNftHistory(colId: ProjectID, tokenId: TypesNft.TokenId): async ?[TypesNft.Trx]{
+    public func getNftHistory(colId : ProjectID, tokenId : TypesNft.TokenId) : async ?[TypesNft.Trx] {
         let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
         switch collection {
-            case (?collection){
-                let remoteCollection = actor(collection) : actor {
-                    getNftHistory: shared (TokenId) -> async ?[TypesNft.Trx]
+            case (?collection) {
+                let remoteCollection = actor (collection) : actor {
+                    getNftHistory : shared (TokenId) -> async ?[TypesNft.Trx]
                 };
-                await remoteCollection.getNftHistory(tokenId);
+                await remoteCollection.getNftHistory(tokenId)
             };
-            case null {null};
+            case null { null }
         }
     }
 
