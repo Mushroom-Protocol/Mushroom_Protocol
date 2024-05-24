@@ -4,8 +4,6 @@ import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
 import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
-import Debug "mo:base/Debug";
-import Nat "mo:base/Nat";
 import Time "mo:base/Time";
 import Types "Types";
 import Rand "mo:random/Rand";
@@ -13,24 +11,22 @@ import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 
-import Utils "./utils";
-
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, assets_canister : Text, _fileNames : [Text]) = Self {
-
-    let baseUrl = "https://" # assets_canister # ".raw.icp0.io/";
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, _baseUrl : Text, _fileNames : [Text]) = Self {
 
     stable var fileNames = _fileNames;
 
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
-    type Trx = Utils.Trx;
+    type Trx = Types.Trx;
 
     stable var transactionId : TransactionId = 0;
     stable let nfts = Map.new<TokenId, Nft>();
+    stable let baseUrl = _baseUrl;
 
-    stable var custodians = Set.fromIter<Principal>([Principal.fromText(custodian), caller].vals(), phash);
-
+    stable var custodians = Set.new<Principal>();
+    ignore Set.put<Principal>(custodians, phash, caller);
+    ignore Set.put<Principal>(custodians, phash, Principal.fromText(custodian));
     stable let logo : Types.LogoResult = init.logo;
     stable let name : Text = init.name;
     stable let symbol : Text = init.symbol;
@@ -49,14 +45,18 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     public query func getNftHistory(id : TokenId) : async [?Trx] {
         let transactions = Map.get<TokenId, [TransactionId]>(nftHistory, n64hash, id);
         switch transactions {
-            case null {[]};
+            case null { [] };
             case (?transactions) {
-                Prim.Array_tabulate<?Trx>(transactions.size(), func x =  getTransaction(transactions[x]))
-            };
-        };
+                Prim.Array_tabulate<?Trx>(transactions.size(), func x = _getTransaction(transactions[x]))
+            }
+        }
     };
 
-    func getTransaction(id : TransactionId) : ?Trx {
+    public query func getTransaction(id : TransactionId) : async ?Trx {
+        _getTransaction(id)
+    };
+
+    func _getTransaction(id : TransactionId) : ?Trx {
         Map.get<TransactionId, Trx>(transactionsLedger, nhash, id)
     };
 
@@ -114,17 +114,17 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                     //TODO Agregar validacion de no Staking
                     return #Err(#Unauthorized)
                 } else if (from != token.owner) {
-                    return #Err(#Other)
+                    return #Err(#SenderIsNotOwner)
                 } else {
                     ignore Map.put<Nat64, Nft>(nfts, n64hash, token_id, { token with owner = to });
-                    transactionId += 1;
+
                     ///////////////// transactionsLedger and nftHistory update /////////////////////////
                     let trx = {
                         nftId = token_id;
                         date = Time.now();
                         trxType = #Transfer({ from; to })
                     };
-                    ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId - 1, trx);
+                    ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
                     let nftPrevHist = Map.get<TokenId, [TransactionId]>(nftHistory, n64hash, token_id);
                     let histoyUpdate : [TransactionId] = switch nftPrevHist {
                         case null { [transactionId] };
@@ -135,7 +135,8 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                     };
                     ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, token_id, histoyUpdate);
                     ////////////////////////////////////////////////////////////////////////////////////
-                    return #Ok(transactionId)
+                    transactionId += 1;
+                    return #Ok(transactionId -1)
                 }
             }
         }
@@ -210,16 +211,14 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
             return #Err(#Unauthorized)
         };
         let available = fileNames.size();
-        Debug.print(Nat.toText(available));
 
         switch available {
             case 0 {
                 return #Err(#Other)
             };
             case _ {
-                let id = await generateRandomID();
-                let indexImgsArray = Nat64.toNat(id) % available;
-                Debug.print(Nat.toText(indexImgsArray));
+                let tokenId = await generateRandomID();
+                let indexImgsArray = Nat64.toNat(tokenId) % available;
                 let metadata : Types.MetadataDesc = [{
                     purpose = #Rendered;
                     key_val_data = [{
@@ -231,21 +230,21 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
                 fileNames := Array.filter<Text>(fileNames, func x = x != fileNames[indexImgsArray]);
 
-                let result = #Ok({ token_id = id; id = transactionId });
-                let nft = { owner = to; id; metadata };
-                ignore Map.put<Nat64, Nft>(nfts, n64hash, id, nft);
-                transactionId += 1;
+                let result = #Ok({ token_id = tokenId; id = transactionId });
+                let nft = { owner = to; id = tokenId; metadata };
+                ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
                 ///////////////// transactionsLedger and nftHistory update /////////////////////////
                 let trx = {
-                    nftId = id;
+                    nftId = tokenId;
                     date = Time.now();
-                    trxType = #Mint
+                    trxType = #Mint(to)
                 };
-                ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId -1, trx);
-                ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, id, [transactionId]);
+                ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
+                ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, tokenId, [transactionId]);
                 ////////////////////////////////////////////////////////////////////////////////////
 
                 totalSupply += 1;
+                transactionId += 1;
                 result
             }
         }

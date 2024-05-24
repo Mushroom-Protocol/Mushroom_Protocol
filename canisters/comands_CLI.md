@@ -20,7 +20,7 @@ dfx canister call backend getUsersPendingVerification
 #### 4 Enter code Verification (User)
 
 ```
-dfx canister call backend enterVerificationCode "<code>"
+dfx canister call backend enterVerificationCode "834711"
 ```
 
 
@@ -50,7 +50,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner <PrincipalInStep6>
+dfx canister call backend getIncomingStartupByOwner '(principal "qcirp-tviue-bxtvo-bniam-zfaku-5yy25-h2dwp-cex5m-ojvxu-5b4zd-fae")'
 ```
 #### Approve Startup
 ```
@@ -58,12 +58,12 @@ dfx canister call backend approveStartUp '(
     <recordInStep7>,
     <Valotation: Nat>,
     owner: <PrincipalInStep6>
-)
+)'
 ```
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "replace with StartupID of caller";
+        startupID = "ST154766";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -83,13 +83,13 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "owner")
+dfx canister call backend approveProject '(principal "qcirp-tviue-bxtvo-bniam-zfaku-5yy25-h2dwp-cex5m-ojvxu-5b4zd-fae")'
 ```
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "StartUpID";
-    pojectID = "ProjectID";
+    startupID = "ST154766";
+    pojectID = "PR642279";
     collectionName = "FOUNDERS";
     shortStorytelling= "Histoty teling";
     storytellingCollection="stoasdjlajdoi";
@@ -116,17 +116,26 @@ Deploy collection: (Dip721NonFungibleToken, DeployConfig, fee)
 ```
 dfxcc backend deployCollection '(
     record {logo = record {logo_type = "JPG"; data = "09234907309"};
-    name = "PrimeraColleccion";
-    symbol = "Symbol";
+    name = "Coleccion1";
+    symbol = "Col1";
     maxLimit = 10
     },
     record {
-        proyectId = "ProjectID";
-        canisterIdAssets = "CanisterID Assets (Instructions.md)";
-        assetsNames  = vec {list from file.txt (Instructions.md)};
-        custodian = "same Admin"
+        proyectId = "PR642279";
+        baseUrl = "http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/";
+        assetsNames  = vec {"9nh4a-2c1ar-tjuf8-nuchz-5ys.jpg";
+                            "7vxh6-i0jkw-1bbt8-llk1p-jrs.jpg";
+                            "c5s7d-83ftv-c180o-f7fha-ov7.jpg";
+                            "nt7xw-3p0me-4y3d0-iy1xl-5ei.jpg";
+                            "rgcmo-l2d2t-nv2tw-tna76-nq8.jpg";
+                            "lgeju-w0cry-rdu4j-5yw8y-2jo.jpg";
+                            "90ew6-9r5us-8nzlg-45qjk-lsv.jpg";
+                            "v4the-ve3m4-0hbki-50ocm-m5d.jpg";
+                            "f70e3-j9ygr-vcvq2-car45-adt.jpg";
+                            "3q80t-bfuor-8zmj8-j3ldb-y02.jpg"};
+        custodian = "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe"
     },
-    100_692_307_692)'
+    50_692_307_692)'
 ```
 #### Mint NFT Collection
 ```

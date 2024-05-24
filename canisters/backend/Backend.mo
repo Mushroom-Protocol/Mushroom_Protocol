@@ -876,7 +876,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         ExperimentalCycles.add<system>(fee);
         try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.canisterIdAssets, cfg.assetsNames);
+            let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
             ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.proyectId, Principal.toText(canisterId));
             //Borrar del HashMap la entrada correspondiente a la solicitud de collección
@@ -902,6 +902,22 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                     mintDip721 : shared (Principal) -> async TypesNft.MintReceipt
                 };
                 await remoteCollection.mintDip721(caller)
+            }
+        }
+    };
+
+    ////////////////////////////// Transfer /////////////////////////////////////////////
+    
+    public shared ({caller}) func transferNFT(to: Principal, projectID : ProjectID, _tokenId: TokenId ): async TypesNft.TxReceipt {
+        assert (isUser(caller));
+        let collection = HashMap.get<ProjectID, Text>(nftCollections, thash, projectID);
+        switch collection {
+            case null {#Err(#InvalidCollection) };
+            case (?collection) {
+                let remoteCollection = actor(collection): actor {
+                    safeTransferFromDip721: shared (Principal, Principal, TokenId) -> async TypesNft.TxReceipt;
+                };
+                await remoteCollection.safeTransferFromDip721(caller, to, _tokenId);
             }
         }
     };

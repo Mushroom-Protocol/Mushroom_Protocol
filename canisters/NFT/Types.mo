@@ -18,6 +18,8 @@ module {
     #Unauthorized;
     #InvalidTokenId;
     #ZeroAddress;
+    #InvalidCollection;
+    #SenderIsNotOwner;
     #Other;
   };
 
@@ -97,7 +99,7 @@ module {
         nftId : Nat64;
         date : Int;
         trxType : {
-            #Mint;
+            #Mint: Principal;
             #Transfer : { from : Principal; to : Principal };
             #Burn;
             #Stacking;

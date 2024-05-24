@@ -224,7 +224,7 @@ module {
 
         public type DeployConfig = {
             proyectId: Text;
-            canisterIdAssets: Text;
+            baseUrl: Text; //Contiene el canister ID
             assetsNames: [Text];
             custodian: Text;
 
