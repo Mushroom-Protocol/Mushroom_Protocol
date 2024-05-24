@@ -952,13 +952,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Buffer.toArray<(ProjectID, TokenId, MetadataResult)>(tempBuffer)
     };
 
-    public func getNftHistory(colId : ProjectID, tokenId : TypesNft.TokenId) : async ?[TypesNft.Trx] {
+    public func getNftHistory(colId : ProjectID, tokenId : TypesNft.TokenId) : async ?[?TypesNft.Trx] {
         let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
         switch collection {
             case (?collection) {
                 Debug.print(collection);
                 let remoteCollection = actor (collection) : actor {
-                    getNftHistory : shared (TokenId) -> async [TypesNft.Trx]
+                    getNftHistory : shared (TokenId) -> async [?TypesNft.Trx]
                 };
                 ?(await remoteCollection.getNftHistory(tokenId))
             };
