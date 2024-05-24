@@ -16,6 +16,7 @@ import Random "mo:random/Rand";
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
+import Debug "mo:base/Debug";
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -384,7 +385,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
                     switch role {
                         case (#Startup(list)) { return list };
                         case _ {}
-                    };
+                    }
                 };
                 []
             }
@@ -395,7 +396,9 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let startUpsOfCaller = getStartupListOf(caller);
         let stOK = Array.find<StartupID>(startUpsOfCaller, func x = x == data.startupID);
         switch stOK {
-            case null { return "The Startup ID entered in the form does not correspond to a Startup associated with the caller"};
+            case null {
+                return "The Startup ID entered in the form does not correspond to a Startup associated with the caller"
+            };
             case _ {}
         };
         /////////////////////////////////////////////////////////////////////////////
@@ -908,17 +911,17 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     ////////////////////////////// Transfer /////////////////////////////////////////////
-    
-    public shared ({caller}) func transferNFT(to: Principal, projectID : ProjectID, _tokenId: TokenId ): async TypesNft.TxReceipt {
+
+    public shared ({ caller }) func transferNFT(to : Principal, projectID : ProjectID, _tokenId : TokenId) : async TypesNft.TxReceipt {
         assert (isUser(caller));
         let collection = HashMap.get<ProjectID, Text>(nftCollections, thash, projectID);
         switch collection {
-            case null {#Err(#InvalidCollection) };
+            case null { #Err(#InvalidCollection) };
             case (?collection) {
-                let remoteCollection = actor(collection): actor {
-                    safeTransferFromDip721: shared (Principal, Principal, TokenId) -> async TypesNft.TxReceipt;
+                let remoteCollection = actor (collection) : actor {
+                    safeTransferFromDip721 : shared (Principal, Principal, TokenId) -> async TypesNft.TxReceipt
                 };
-                await remoteCollection.safeTransferFromDip721(caller, to, _tokenId);
+                await remoteCollection.safeTransferFromDip721(caller, to, _tokenId)
             }
         }
     };
@@ -953,10 +956,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
         switch collection {
             case (?collection) {
+                Debug.print(collection);
                 let remoteCollection = actor (collection) : actor {
-                    getNftHistory : shared (TokenId) -> async ?[TypesNft.Trx]
+                    getNftHistory : shared (TokenId) -> async [TypesNft.Trx]
                 };
-                await remoteCollection.getNftHistory(tokenId)
+                ?(await remoteCollection.getNftHistory(tokenId))
             };
             case null { null }
         }

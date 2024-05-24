@@ -110,7 +110,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 return #Err(#InvalidTokenId)
             };
             case (?token) {
-                if (caller != token.owner and Set.has<Principal>(custodians, phash, caller)) {
+                if (caller != token.owner and not Set.has<Principal>(custodians, phash, caller)) {
                     //TODO Agregar validacion de no Staking
                     return #Err(#Unauthorized)
                 } else if (from != token.owner) {
