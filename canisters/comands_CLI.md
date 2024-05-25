@@ -20,7 +20,7 @@ dfx canister call backend getUsersPendingVerification
 #### 4 Enter code Verification (User)
 
 ```
-dfx canister call backend enterVerificationCode "834711"
+dfx canister call backend enterVerificationCode "485226"
 ```
 
 
@@ -50,7 +50,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "qcirp-tviue-bxtvo-bniam-zfaku-5yy25-h2dwp-cex5m-ojvxu-5b4zd-fae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Approve Startup
 ```
@@ -63,7 +63,7 @@ dfx canister call backend approveStartUp '(
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "ST154766";
+        startupID = "ST827284";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -83,13 +83,13 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "qcirp-tviue-bxtvo-bniam-zfaku-5yy25-h2dwp-cex5m-ojvxu-5b4zd-fae")'
+dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "ST154766";
-    pojectID = "PR642279";
+    startupID = "ST827284";
+    pojectID = "PR432948";
     collectionName = "FOUNDERS";
     shortStorytelling= "Histoty teling";
     storytellingCollection="stoasdjlajdoi";
@@ -121,7 +121,7 @@ dfxcc backend deployCollection '(
     maxLimit = 10
     },
     record {
-        proyectId = "PR642279";
+        proyectId = "PR432948";
         baseUrl = "http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/";
         assetsNames  = vec {"9nh4a-2c1ar-tjuf8-nuchz-5ys.jpg";
                             "7vxh6-i0jkw-1bbt8-llk1p-jrs.jpg";

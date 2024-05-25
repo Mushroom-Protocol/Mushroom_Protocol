@@ -10,8 +10,8 @@ module {
             #Mint;
             #Transfer : { from : Principal; to : Principal };
             #Burn;
-            #Stacking;
-        };
+            #Stacking
+        }
     };
 
     public func transactionHash(trx : Trx) : async Nat32 {
@@ -22,15 +22,15 @@ module {
             case (#Burn) { "b" };
             case (#Stacking) { "s" };
             case (#Transfer(p)) {
-                Principal.toText(p.from) # Principal.toText(p.to);
-            };
+                Principal.toText(p.from) # Principal.toText(p.to)
+            }
         };
 
         //http://www.cse.yorku.ca/~oz/hash.html (Hash algoritm djb2)
         var x : Nat32 = 5381;
         for (char in trxToText.chars()) {
             let c : Nat32 = Prim.charToNat32(char);
-            x := ((x << 5) +% x) +% c;
+            x := ((x << 5) +% x) +% c
         };
         return x;
 
@@ -42,8 +42,8 @@ module {
         let digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
         while (number > 0) {
             result := digits[number % 10] # result;
-            number /= 10;
+            number /= 10
         };
-        result;
-    };
-};
+        result
+    }
+}

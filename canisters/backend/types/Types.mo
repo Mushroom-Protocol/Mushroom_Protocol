@@ -44,7 +44,7 @@ module {
 
     public type Startup = {
         owner : Principal;
-        startupTeam: [Principal];
+        startupTeam : [Principal];
         admissionDate : Int;
         startupId : Text;
         startUpName : Text;
@@ -85,7 +85,7 @@ module {
         startUpName : Text;
         startupId : Text;
         fullNameTl : Text;
-        startUpSlogan: Text;
+        startUpSlogan : Text;
         logo : Blob
     };
 
@@ -144,8 +144,8 @@ module {
 
     };
     public type ErrorCode = {
-        #Err01: Text; //The startupID entered does not correspond to a registered Startup
-        #Err02: Text; //The caller's principal does not match the owner of the Startup
+        #Err01 : Text; //The startupID entered does not correspond to a registered Startup
+        #Err02 : Text; //The caller's principal does not match the owner of the Startup
     };
 
     public module NFT {
@@ -204,7 +204,7 @@ module {
             creator : Text
         };
 
-        public type CollectionInit =  {
+        public type CollectionInit = {
             startupID : Text;
             pojectID : Text;
             collectionName : Text;
@@ -223,10 +223,10 @@ module {
         };
 
         public type DeployConfig = {
-            proyectId: Text;
-            baseUrl: Text; //Contiene el canister ID
-            assetsNames: [Text];
-            custodian: Text;
+            proyectId : Text;
+            baseUrl : Text; //Contiene el canister ID
+            assetsNames : [Text];
+            custodian : Text;
 
         };
 

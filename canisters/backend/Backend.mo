@@ -895,6 +895,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type MintResult = Result.Result<Text, Text>;
     type TokenId = TypesNft.TokenId;
     type MetadataResult = TypesNft.MetadataResult;
+    type MetadataResultExtended = {projectId: ProjectID; tokenId: TokenId; metadata: MetadataResult};
 
     public shared ({ caller }) func mintNFT(project : ProjectID) : async TypesNft.MintReceipt {
         assert (isUser(caller));
@@ -927,29 +928,30 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     /////////////////////// getNFT ///////////////////////////////////
-    public shared ({ caller }) func getMyNfts() : async [(ProjectID, TokenId, MetadataResult)] {
+    public shared ({ caller }) func getMyNfts() : async [MetadataResultExtended] {
         if (not isUser(caller)) { return [] };
         await nftsOwnedBy(caller)
     };
 
-    public shared ({ caller }) func getNftByPrincipal(userPrincipal : Principal) : async [(ProjectID, TokenId, MetadataResult)] {
+    public shared ({ caller }) func getNftByPrincipal(userPrincipal : Principal) : async [MetadataResultExtended] {
         assert (authorizedCaller(caller));
         await nftsOwnedBy(userPrincipal)
     };
 
-    func nftsOwnedBy(userPrincipal : Principal) : async [(ProjectID, TokenId, MetadataResult)] {
-        let tempBuffer = Buffer.fromArray<(ProjectID, TokenId, MetadataResult)>([]);
-        for ((projectID, canisterId) in HashMap.entries<ProjectID, CollectionAddress>(nftCollections)) {
+    func nftsOwnedBy(userPrincipal : Principal) : async [MetadataResultExtended] {
+        let tempBuffer = Buffer.fromArray<MetadataResultExtended>([]);
+        for ((projectId, canisterId) in HashMap.entries<ProjectID, CollectionAddress>(nftCollections)) {
             let remoteCollection = actor (canisterId) : actor {
                 getTokenIdsForUserDip721 : shared (Principal) -> async [TokenId];
                 getMetadataDip721 : shared (TokenId) -> async MetadataResult
             };
             let tokensInCurrentCollection = await remoteCollection.getTokenIdsForUserDip721(userPrincipal);
-            for (token in tokensInCurrentCollection.vals()) {
-                tempBuffer.add((projectID, token, await remoteCollection.getMetadataDip721(token)))
+            for (tokenId in tokensInCurrentCollection.vals()) {
+                let metadata = await remoteCollection.getMetadataDip721(tokenId);
+                tempBuffer.add({projectId; tokenId; metadata})
             }
         };
-        Buffer.toArray<(ProjectID, TokenId, MetadataResult)>(tempBuffer)
+        Buffer.toArray<MetadataResultExtended>(tempBuffer)
     };
 
     public func getNftHistory(colId : ProjectID, tokenId : TypesNft.TokenId) : async ?[?TypesNft.Trx] {
