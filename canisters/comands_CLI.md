@@ -115,24 +115,24 @@ Deploy collection: (Dip721NonFungibleToken, DeployConfig, fee)
 
 ```
 dfxcc backend deployCollection '(
-    record {logo = record {logo_type = "JPG"; data = "09234907309"};
-    name = "Coleccion1";
-    symbol = "Col1";
+    record {logo = record {logo_type = "png"; data = "https://nys2z-xaaaa-aaaak-qddoq-cai.icp0.io/assets/MpFavicon.c07f4d7e.png"};
+    name = "Founders";
+    symbol = "MRPF";
     maxLimit = 10
     },
     record {
-        proyectId = "PR432948";
-        baseUrl = "http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/";
-        assetsNames  = vec {"9nh4a-2c1ar-tjuf8-nuchz-5ys.jpg";
-                            "7vxh6-i0jkw-1bbt8-llk1p-jrs.jpg";
-                            "c5s7d-83ftv-c180o-f7fha-ov7.jpg";
-                            "nt7xw-3p0me-4y3d0-iy1xl-5ei.jpg";
-                            "rgcmo-l2d2t-nv2tw-tna76-nq8.jpg";
-                            "lgeju-w0cry-rdu4j-5yw8y-2jo.jpg";
-                            "90ew6-9r5us-8nzlg-45qjk-lsv.jpg";
-                            "v4the-ve3m4-0hbki-50ocm-m5d.jpg";
-                            "f70e3-j9ygr-vcvq2-car45-adt.jpg";
-                            "3q80t-bfuor-8zmj8-j3ldb-y02.jpg"};
+        proyectId = 12;
+        baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
+        assetsNames  = vec {"m49y4-e209u-1vca2-k0xqi-3rv.jpg";
+                            "md14e-yz64m-zovii-2a5io-cpe.jpg";
+                            "jajcd-s1ndi-gsomc-9vn7w-ean.jpg";
+                            "kz4fs-mv9y7-5dobw-e842k-mc6.jpg";
+                            "y1l9l-5vn4t-5wmpu-vcrms-zpq.jpg";
+                            "rktq0-sypbn-uco8c-ttcjk-oot.jpg";
+                            "m4uax-mdpfl-3q8c3-gy9k7-sh1.jpg";
+                            "k00jl-65v0g-obsc2-itlt9-87n.jpg";
+                            "36ns1-jrwym-ps933-hw2ht-c27.jpg";
+                            "y7njg-kpxay-j32ip-ybzu2-0j1.jpg"};
         custodian = "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe"
     },
     50_692_307_692)'

@@ -224,11 +224,19 @@ module {
 
         public type DeployConfig = {
             proyectId : Text;
-            baseUrl : Text; //Contiene el canister ID
+            baseUrl : Text; 
             assetsNames : [Text];
             custodian : Text;
+            // initialStaking: ?StakingParams;
 
         };
+        /*
+        public type StakingParams = {
+            startStaking: {#Deploy; #Mint};
+            period: Int //In days
+        };
+        */
+
 
     }
 

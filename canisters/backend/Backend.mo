@@ -454,7 +454,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-
     /////////////////////////////////////////    user verification    ///////////////////////////////////////////
 
     public shared ({ caller }) func getCodeVerification() : async Result.Result<Text, Text> {
@@ -597,6 +596,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     public shared ({ caller }) func getProjectByID(id : Text) : async ?Project {
         assert authorizedCaller(caller);
         HashMap.get(projects, thash, id)
+    };
+
+    public query func getStartUpsIds(): async [StartupID]{
+        Iter.toArray(HashMap.keys<StartupID, Startup>(startUps));
     };
 
     public query func getStartUpByID(id : Text) : async ?Startup {
