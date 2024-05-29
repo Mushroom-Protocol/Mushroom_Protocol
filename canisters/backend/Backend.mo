@@ -44,7 +44,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
-    public shared ({caller}) func borrar(st: Text): async (){
+    public shared ({caller}) func removeStartUp(st: Text): async (){
         assert authorizedCaller(caller);
         ignore HashMap.remove<Text,Startup>(startUps, thash, st)
     };
