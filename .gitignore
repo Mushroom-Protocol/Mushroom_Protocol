@@ -5,6 +5,6 @@ dist-ssr
 .next/
 *.local
 .dfx
-
+.env
 .mops
 src/declarations

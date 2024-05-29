@@ -44,6 +44,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
+    public shared ({caller}) func borrar(st: Text): async (){
+        assert authorizedCaller(caller);
+        ignore HashMap.remove<Text,Startup>(startUps, thash, st)
+    };
+
     let randomStore = Random.Rand();
 
     func generateId(prefix : Text) : async Text {

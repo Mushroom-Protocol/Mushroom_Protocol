@@ -221,10 +221,10 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 let indexImgsArray = Nat64.toNat(tokenId) % available;
                 let metadata : Types.MetadataDesc = [{
                     purpose = #Rendered;
-                    key_val_data = [{
-                        key = "url";
-                        val = #TextContent(baseUrl # fileNames[indexImgsArray])
-                    }];
+                    key_val_data = [
+                        { key = "url"; val = #TextContent(baseUrl # fileNames[indexImgsArray])},
+                        // More elements
+                    ];
                     data : Blob = "/00/00"
                 }];
 
