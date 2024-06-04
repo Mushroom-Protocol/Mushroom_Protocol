@@ -44,6 +44,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
+    public shared ({ caller }) func removeStartUp(st : Text) : async () {
+        assert authorizedCaller(caller);
+        ignore HashMap.remove<Text, Startup>(startUps, thash, st)
+    };
+
     let randomStore = Random.Rand();
 
     func generateId(prefix : Text) : async Text {
@@ -498,11 +503,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ///////////////////////////////// query functions for identification ////////////////////////////////////////
 
-    public shared ({ caller }) func whoAmi() : async Text {
+    public query ({ caller }) func whoAmi() : async Text {
         Principal.toText(caller)
     };
 
-    public shared ({ caller }) func getMyUser() : async ?User {
+    public query ({ caller }) func getMyUser() : async ?User {
         // Debug.print("getMyUser---> " #Principal.toText(caller));
         let user = HashMap.get<Principal, User>(users, phash, caller);
         if (not Principal.isAnonymous(caller)) { recordConnection(caller) };
@@ -524,7 +529,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     /////////////////////////// Getters functions only Controllers or DAO ///////////////////////////////////////
 
-    public shared ({ caller }) func getIncomingStartUps() : async [StartupCard] {
+    public query ({ caller }) func getIncomingStartUps() : async [StartupCard] {
 
         assert authorizedCaller(caller);
         let resultBuffer = Buffer.fromArray<StartupCard>([]);
@@ -542,7 +547,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Buffer.toArray(resultBuffer)
     };
 
-    public shared ({ caller }) func getIncomingProjects() : async [ProjectCard] {
+    public query ({ caller }) func getIncomingProjects() : async [ProjectCard] {
         assert authorizedCaller(caller);
         let resultBuffer = Buffer.fromArray<ProjectCard>([]);
         for ((owner, pr) in HashMap.entries(incomingProjects)) {
@@ -569,7 +574,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     };
 
-    public shared ({ caller }) func getIncomingStartupByOwner(p : Principal) : async Result.Result<IncomingStartUp, Text> {
+    public query ({ caller }) func getIncomingStartupByOwner(p : Principal) : async Result.Result<IncomingStartUp, Text> {
         assert authorizedCaller(caller);
         let startup = HashMap.get(incomingStartUps, phash, p);
         switch startup {
@@ -582,7 +587,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    public shared ({ caller }) func getIncomingProjectByOwner(p : Principal) : async Result.Result<DataProject, Text> {
+    public query ({ caller }) func getIncomingProjectByOwner(p : Principal) : async Result.Result<DataProject, Text> {
         assert authorizedCaller(caller);
         let project = HashMap.get(incomingProjects, phash, p);
         switch project {
@@ -593,13 +598,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    public shared ({ caller }) func getProjectByID(id : Text) : async ?Project {
+    public query ({ caller }) func getProjectByID(id : Text) : async ?Project {
         assert authorizedCaller(caller);
         HashMap.get(projects, thash, id)
     };
 
-    public query func getStartUpsIds(): async [StartupID]{
-        Iter.toArray(HashMap.keys<StartupID, Startup>(startUps));
+    public query func getStartUpsIds() : async [StartupID] {
+        Iter.toArray(HashMap.keys<StartupID, Startup>(startUps))
     };
 
     public query func getStartUpByID(id : Text) : async ?Startup {
@@ -607,7 +612,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         HashMap.get(startUps, thash, id)
     };
 
-    public shared ({ caller }) func getStartUpsByPrincipal(p : Principal) : async [StartupID] {
+    public query ({ caller }) func getStartUpsByPrincipal(p : Principal) : async [StartupID] {
         assert (authorizedCaller(caller) or (caller == p));
         switch (getUser(p)) {
             case null { [] };
@@ -736,7 +741,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ////////////////////////////////////  Public Query Functions  ////////////////////////////////////////////////
 
-    public shared ({ caller }) func getUsersPendingVerification() : async [(Text, Text, Text)] {
+    public query ({ caller }) func getUsersPendingVerification() : async [(Text, Text, Text)] {
         assert (authorizedCaller(caller));
         let tmpBuffer = Buffer.fromArray<(Text, Text, Text)>([]);
         for (user in HashMap.vals<Principal, User>(users)) {
@@ -776,6 +781,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     public query func expandProject(id : Text) : async ?Project {
+        _expandProject(id)
+    };
+
+    func _expandProject(id : Text) : ?Project {
         var result = HashMap.get(projects, thash, id);
         switch result {
             case null { null };
@@ -789,14 +798,14 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    public func getProjectsFromStartup(stId : Text) : async [Project] {
+    public query func getProjectsFromStartup(stId : Text) : async [Project] {
         let startup = HashMap.get(startUps, thash, stId);
         switch startup {
             case null { return [] };
             case (?startup) {
                 let resultBuffer = Buffer.fromArray<Project>([]);
                 for (prId in startup.projects.vals()) {
-                    let pr = await expandProject(prId);
+                    let pr = _expandProject(prId);
                     switch pr {
                         case null {};
                         case (?pr) {
@@ -861,12 +870,12 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     type DeployResult = Result.Result<Principal, Text>;
 
-    public shared ({ caller }) func getIncomingCollectionsRequests() : async [StartupID] {
+    public query ({ caller }) func getIncomingCollectionsRequests() : async [StartupID] {
         assert (authorizedCaller(caller));
         Iter.toArray(HashMap.keys<StartupID, CollectionPreInit>(incommingCollections))
     };
 
-    public shared ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
+    public query ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
         assert (authorizedCaller(caller));
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
     };
@@ -898,7 +907,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type MintResult = Result.Result<Text, Text>;
     type TokenId = TypesNft.TokenId;
     type MetadataResult = TypesNft.MetadataResult;
-    type MetadataResultExtended = {projectId: ProjectID; tokenId: TokenId; metadata: MetadataResult};
+    type MetadataResultExtended = {
+        projectId : ProjectID;
+        tokenId : TokenId;
+        metadata : MetadataResult
+    };
 
     public shared ({ caller }) func mintNFT(project : ProjectID) : async TypesNft.MintReceipt {
         assert (isUser(caller));
@@ -951,7 +964,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             let tokensInCurrentCollection = await remoteCollection.getTokenIdsForUserDip721(userPrincipal);
             for (tokenId in tokensInCurrentCollection.vals()) {
                 let metadata = await remoteCollection.getMetadataDip721(tokenId);
-                tempBuffer.add({projectId; tokenId; metadata})
+                tempBuffer.add({ projectId; tokenId; metadata })
             }
         };
         Buffer.toArray<MetadataResultExtended>(tempBuffer)

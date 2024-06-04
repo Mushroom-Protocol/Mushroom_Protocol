@@ -224,19 +224,19 @@ module {
 
         public type DeployConfig = {
             proyectId : Text;
-            baseUrl : Text; 
+            baseUrl : Text;
             assetsNames : [Text];
             custodian : Text;
             // initialStaking: ?StakingParams;
 
         };
-        /*
-        public type StakingParams = {
-            startStaking: {#Deploy; #Mint};
-            period: Int //In days
-        };
-        */
-
+        
+        // public type StakingParams = {
+        //     startStaking: {#Deploy; #Mint};
+        //     period: Int //In days
+        // };
+        
+        
 
     }
 

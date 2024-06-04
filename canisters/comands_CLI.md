@@ -88,16 +88,16 @@ dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6i
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "ST827284";
-    pojectID = "PR432948";
-    collectionName = "FOUNDERS";
-    shortStorytelling= "Histoty teling";
+    startupID = "ST308645";
+    pojectID = "PR182655";
+    collectionName = "Mushroom Founders";
+    shortStorytelling= " NFT collection tells the story of 444 extraterrestrial mushrooms, who managed to escape the technological cataclysm that devastated their home 10 eons ago. Each NFT possesses a unique specialty, which is vital in their mission to spread knowledge and guide civilizations of the universe to a path of balance and harmony as a form of redemption. As they travel the universe in their ships, they become the disseminators of transcendental knowledge.";
     storytellingCollection="stoasdjlajdoi";
     totalSupply=10;
     distribution=vec {record {
                         category = variant {Airdrop};
                         percentage = 100.0}};
-    utilities= vec {};
+    utilities= vec {variant {Governance}};
     tokenPrice=10000;
     documentsFolderUrl="drive.com";
     typesImages= variant {JPG};
@@ -121,7 +121,7 @@ dfxcc backend deployCollection '(
     maxLimit = 10
     },
     record {
-        proyectId = 12;
+        proyectId = "PR182655";
         baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
         assetsNames  = vec {"m49y4-e209u-1vca2-k0xqi-3rv.jpg";
                             "md14e-yz64m-zovii-2a5io-cpe.jpg";
