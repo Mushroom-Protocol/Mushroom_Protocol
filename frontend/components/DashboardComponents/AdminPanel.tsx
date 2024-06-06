@@ -48,7 +48,7 @@ const AdminPanel: React.FC = () => {
           </ChakraLink>
         </ListItem>
         <ListItem>
-          <ChakraLink as={ReactRouterLink} to="CollectionReqs">
+          <ChakraLink as={ReactRouterLink} to="CollectionsReqs">
             <Text fontSize="xl">Collection registration requests</Text>
           </ChakraLink>
         </ListItem>

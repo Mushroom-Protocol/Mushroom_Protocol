@@ -34,7 +34,7 @@ import { ExternalLinkIcon } from "@chakra-ui/icons"
 
 const StartupsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [startups, setStartups] = useState<[Startup] | null>()
+  const [startups, setStartups] = useState<Startup[] | null>()
   const [incomingStartupDetails, setIncomingStartupDetails] =
     useState<Startup>()
   const [formApprove, setFormApprove] = useState({
@@ -47,8 +47,9 @@ const StartupsReqs: React.FC = () => {
   useEffect(() => {
     const getIncomingStartUps = async () => {
       try {
-        const response = await backend.getIncomingStartUps()
-        setStartups(response as [Startup])
+        const response: Startup[] = await backend.getIncomingStartUps() as Startup[]
+        setStartups(response)
+        return response
       } catch (error) {
         console.error("Error on backend.getIncomingStartUps() call:", error)
       }
@@ -97,8 +98,6 @@ const StartupsReqs: React.FC = () => {
         owner,
         // )) as {ok: string} | {err: string}
       )) as object
-      console.log("resApproveStartUp")
-      console.log(resApproveStartUp)
       setResponseBackend(resApproveStartUp["ok"])
 
       if (loadingToastId !== undefined) {

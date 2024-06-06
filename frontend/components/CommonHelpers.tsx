@@ -19,8 +19,6 @@ export function base64ToBlob(dataUrl: String) {
 }
 
 export const getUserRoles = (userRoles: any[]): string[] => {
-  console.log("userRoles")
-  console.log(userRoles)
   return userRoles?.map(userRole => Object.keys(userRole)).flat()
 }
 
@@ -54,13 +52,9 @@ export const isUserRoleAdmin = (roles: any[]): boolean => {
 }
 
 export const convertFileToBase64 = (file?: File): Promise<string> => {
-  console.log("file")
-  console.log(file)
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      console.log("reader.result")
-      console.log(reader.result)
       return resolve(reader.result as string)
     };
     reader.onerror = reject;

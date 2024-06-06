@@ -15,15 +15,20 @@ import { useCanister } from "@connect2ic/react"
 const LaunchpadNFT = () => {
   const navigate = useNavigate()
   const [backend] = useCanister("backend")
-  const [incomingStartUps, setIncomingStartUps] = useState([])
+  const [incomingCollectionsRequests, setIncomingCollectionsRequests] = useState<any[]>([])
 
   useEffect(() => {
-    const getIncomingStartUps = async () => {
-      const resIncomingStartUps = await backend.getIncomingStartUps()
-      setIncomingStartUps(resIncomingStartUps as any[])
+    const getIncomingCollectionsRequests = async () => {
+      try {
+        const resIncomingCollectionsRequests: string[] = await backend.getIncomingCollectionsRequests() as string[]
+        setIncomingCollectionsRequests(resIncomingCollectionsRequests)
+        return resIncomingCollectionsRequests
+      } catch (error) {
+        console.error("Error on backend.getIncomingCollectionsRequests() call:", error)
+      }
     }
 
-    getIncomingStartUps()
+    getIncomingCollectionsRequests().then(incomingCollectionsRequest => incomingCollectionsRequest).catch(error => console.error(error))
   }, [])
 
   return (
@@ -54,12 +59,12 @@ const LaunchpadNFT = () => {
           py="20px"
           marginBottom={100}
         >
-          {incomingStartUps.map((startUp) => (
+          {incomingCollectionsRequests.map((collection) => (
             <Box w="320px" h="460px" borderRadius="25px">
               <Center>
                 <Image
                   src={MpFavicon}
-                  alt={startUp.startUpName}
+                  alt={collection.startUpName}
                   w="500px"
                   h="290px"
                   mt="0px"
@@ -68,12 +73,12 @@ const LaunchpadNFT = () => {
               <Box mt="5px" ml="58px" display="flex" alignItems="center">
                 <Image
                   src={MpFavicon}
-                  alt={startUp.startUpName + " logo"}
+                  alt={collection.startUpName + " logo"}
                   w="40px"
                   h="40px"
                   mr="10px"
                 />
-                <Text fontSize="22px">{startUp.shortDes}</Text>
+                <Text fontSize="22px">{collection.shortDes}</Text>
               </Box>
               <Text
                 fontSize="14px"
@@ -122,7 +127,7 @@ const LaunchpadNFT = () => {
                   }}
                   onClick={() =>
                     navigate("/StartupInfo", {
-                      state: { owner: startUp.owner },
+                      state: { owner: collection.owner },
                     })
                   }
                 >

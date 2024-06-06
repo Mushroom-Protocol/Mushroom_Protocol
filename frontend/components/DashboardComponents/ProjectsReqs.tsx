@@ -9,10 +9,8 @@ import {
   Divider,
   Heading,
   Image,
-  Input,
   List,
   ListItem,
-  Stack,
   Text,
   useToast,
 } from "@chakra-ui/react"
@@ -22,7 +20,7 @@ import { blobToBase64 } from "../CommonHelpers"
 
 const ProjectsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [projects, setProjects] = useState<[ProjectCard]>()
+  const [projects, setProjects] = useState<ProjectCard[]>()
   const [responseBackend, setResponseBackend] = useState<
     string | null | DataProject
   >()
@@ -31,8 +29,9 @@ const ProjectsReqs: React.FC = () => {
   useEffect(() => {
     const getIncomingProjects = async () => {
       try {
-        const response = (await backend.getIncomingProjects()) as [ProjectCard]
+        const response: ProjectCard[] = (await backend.getIncomingProjects()) as ProjectCard[]
         setProjects(response)
+        return response
       } catch (error) {
         console.error("Error on backend.getIncomingStartUps() call:", error)
       }

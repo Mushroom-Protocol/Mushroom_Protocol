@@ -64,8 +64,6 @@ const ProjectsList: React.FC = () => {
         const resGetProjectsPreview = (await backend.getProjectsPreview()) as [
           ProjectCard,
         ]
-        console.log("backend.getProjectsPreview")
-        console.log(resGetProjectsPreview)
         setProjectsPreview(resGetProjectsPreview)
       } catch (error) {
         console.error("Error on backend.getProjectsPreview() call:", error)

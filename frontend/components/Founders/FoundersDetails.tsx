@@ -15,33 +15,21 @@ import { Link } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useCanister } from "@connect2ic/react";
 import { useLocation } from "react-router-dom";
+import { CollectionPreInit } from "../CommonTypes";
 
 const FoundersDetails = () => {
   const [backend] = useCanister("backend")
   const location = useLocation()
-  const [startupDetails, setStartupDetails] = useState({
-    startUpName: "",
-    email: "",
-    website: "",
-    startUpSlogan: "",
-    shortDes: "",
-    logo:  null, // Asegúrate de proporcionar un array válido aquí
-    startupStatus: "",
-    tlr: 1,
-    fullNameTl: "",
-    specializationTL: "",
-    linkedinTL: "",
-    industry: { 'MiningTech' : null },
-    country: ""
-  })
+  const [collectionRequestByStartUp, setCollectionRequestByStartUp] = useState<CollectionPreInit | null | undefined>()
 
   useEffect(() => {
-    getIncomingStartupByOwner(location.state.owner)
+    // getCollectionRequestByStartUp(location.state.startupID).then(collectionRequestByStartUp => collectionRequestByStartUp).catch(error => console.error(error))
   }, [])
 
-  const getIncomingStartupByOwner = async (owner) => {
-    const response = await backend.getIncomingStartupByOwner(owner)
-    setStartupDetails(response['ok'])
+  const getCollectionRequestByStartUp = async (startupID: string) => {
+    const resCollectionRequestByStartUp: CollectionPreInit | null | undefined = await backend.getCollectionRequestByStartUp(startupID) as CollectionPreInit | null | undefined
+    setCollectionRequestByStartUp(resCollectionRequestByStartUp)
+    return resCollectionRequestByStartUp
   };
 
   return (
@@ -70,19 +58,19 @@ const FoundersDetails = () => {
             height="50px"
           />
           <Box ml="10px">
-            <Text fontSize="18px">{startupDetails.startUpName}</Text>
+            {/* <Text fontSize="18px">{collectionRequestByStartUp.collectionName}</Text>
             <Text fontSize="12px" color="#737373" fontStyle="italic">
-              {startupDetails.startUpSlogan}
-            </Text>
+              {collectionRequestByStartUp.shortStorytelling}
+            </Text> */}
           </Box>
         </Box>
         <Text fontSize="18px" textAlign="justify">
-          Startup Details
+          Collection Details
           <br />
         </Text>
         <Text fontSize="15px" color="#737373" textAlign="justify">
         <br />
-          {startupDetails.shortDes}
+          {/* {collectionRequestByStartUp.storytellingCollection} */}
           <br />
           <br />
           The protocol allows investors from around the world to fund science

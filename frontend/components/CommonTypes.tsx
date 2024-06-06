@@ -130,3 +130,28 @@ export const initialStateCollectionPreInit: CollectionPreInit = {
   nftImagesUrl: "",
   creator: "",
 }
+
+export interface LogoResult {
+  logo_type: string;
+  data: string;
+}
+
+export interface Dip721NonFungibleToken {
+  logo: LogoResult;
+  name: string;
+  symbol: string;
+  maxLimit : number;
+}
+
+export interface DeployConfig {
+  proyectId: string;
+  baseUrl: string;
+  assetsNames: string[];
+  custodian: string;
+}
+
+export interface MetadataResultExtended {
+  projectId: string;
+  tokenId: string;
+  metadata: any;
+}
