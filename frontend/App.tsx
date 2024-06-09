@@ -3,7 +3,7 @@ import React, { useEffect } from "react"
  * Connect2ic provides essential utilities for IC app development
  */
 import { createClient } from "@connect2ic/core"
-import { InternetIdentity, PlugWallet, NFID } from "@connect2ic/core/providers"
+import { InternetIdentity, /* PlugWallet, NFID */ } from "@connect2ic/core/providers"
 import { Connect2ICProvider, useConnect } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
 import { RouterProvider } from "react-router-dom"
@@ -62,8 +62,8 @@ const client = createClient({
       dev: true,
       providerUrl: internetIdentityUrl,
     }),
-    new PlugWallet(),
-    new NFID(),
+    // new PlugWallet(),
+    // new NFID(),
   ],
   globalProviderConfig: {
     // dev: import.meta.env.DEV,
