@@ -889,7 +889,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         assert (authorizedCaller(caller));
         assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.proyectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
-        ExperimentalCycles.add<system>(fee);
+        // ExperimentalCycles.add<system>(fee);
+        ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);

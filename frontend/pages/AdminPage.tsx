@@ -7,6 +7,7 @@ import ProjectsList from '../components/DashboardComponents/ProjectsList';
 import ProjectsReqs from '../components/DashboardComponents/ProjectsReqs';
 import UsersPendingVerification from '../components/DashboardComponents/UsersPendingVerification';
 import ConnectionsRecords from '../components/DashboardComponents/ConnectionsRecords';
+import CollectionsReqs from '../components/DashboardComponents/CollectionsReqs';
 
 export default function AdminPage() {
     const location = useLocation()
@@ -31,6 +32,10 @@ export default function AdminPage() {
         case "/Dashboard/Admin/Projects":
             return (
                 <ProjectsList />
+            )
+        case "/Dashboard/Admin/CollectionsReqs":
+            return (
+                <CollectionsReqs />
             )
         case "/Dashboard/Admin/UsersPendingVerification":
             return (

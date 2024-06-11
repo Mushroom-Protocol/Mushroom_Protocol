@@ -200,9 +200,10 @@ export default function WithSubnavigation() {
               spacing={8}
               display={{ base: "none", md: "flex" }}
             >
-              {Links.map((link) => (
+              {Links.map((link) => {
+                if (link === "Apply" && currentUser?.verified.Success !== true) return;
                 //<Text key={link}>{link}</Text>
-                <Box
+                return (<Box
                   px={3}
                   py={3}
                   rounded={"md"}
@@ -217,9 +218,9 @@ export default function WithSubnavigation() {
                       {link}
                     </Text>
                   </ChakraLink>
-                </Box>
+                </Box>)
                 //<NavLink key={link}><Text fontSize='2xl' as='b'>{link}</Text></NavLink>
-              ))}
+              })}
             </HStack>
           </HStack>
           <Flex alignItems={"center"}>

@@ -20,14 +20,17 @@ import {
   ModalFooter,
   useDisclosure,
   HStack,
+  useToast,
 } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa6"
+import { useCanister } from "@connect2ic/react"
 // import MpFavicon from "../../assets/MpFavicon.png"
 // import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 // import favicon from "../../assets/favicon.ico"
 
 const FoundersItems = () => {
   const [quantity, setQuantity] = useState(1)
+  const [backend] = useCanister("backend")
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -42,6 +45,55 @@ const FoundersItems = () => {
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const toast = useToast()
+
+  const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
+    // event.preventDefault()
+    let loadingToastId: string | number | undefined
+
+    try {
+      loadingToastId = toast({
+        title: "Submitting Form",
+        status: "loading", // 'loading' es el status para el estilo de carga
+        duration: null,
+        isClosable: false,
+        variant: "solid",
+      })
+      const resMintNFT: any = (await backend.mintNFT(
+        "PR182655",
+      )) as any
+
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Successful Submission",
+        description: JSON.stringify(resMintNFT),
+        status: "success", // 'success' es el status para el estilo de éxito
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+
+      onClose()
+    } catch (error) {
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId)
+      }
+
+      toast({
+        title: "Submission Error",
+        description:
+          "There was an error submitting the form. Please try again.",
+        status: "error", // 'error' es el status para el estilo de error
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+      console.error("Error on backend.mintNFT() call:", error)
+    }
+  }
 
   return (
     <Center>
@@ -252,7 +304,7 @@ const FoundersItems = () => {
                 backgroundColor="#1FAFC8"
                 variant="solid"
                 borderRadius="10px"
-                onClick={onClose}
+                onClick={() => handleSubmitMint()}
               >
                 Mint
               </Button>
