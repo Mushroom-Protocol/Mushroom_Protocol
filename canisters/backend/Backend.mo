@@ -507,7 +507,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Principal.toText(caller)
     };
 
-    public query ({ caller }) func getMyUser() : async ?User {
+    public shared ({ caller }) func getMyUser() : async ?User {
         // Debug.print("getMyUser---> " #Principal.toText(caller));
         let user = HashMap.get<Principal, User>(users, phash, caller);
         if (not Principal.isAnonymous(caller)) { recordConnection(caller) };
