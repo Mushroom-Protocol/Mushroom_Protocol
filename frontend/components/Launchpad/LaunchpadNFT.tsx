@@ -15,15 +15,20 @@ import { useCanister } from "@connect2ic/react"
 const LaunchpadNFT = () => {
   const navigate = useNavigate()
   const [backend] = useCanister("backend")
-  const [incomingStartUps, setIncomingStartUps] = useState([])
+  const [incomingCollectionsRequests, setIncomingCollectionsRequests] = useState<any[]>([])
 
   useEffect(() => {
-    const getIncomingStartUps = async () => {
-      const resIncomingStartUps = await backend.getIncomingStartUps()
-      setIncomingStartUps(resIncomingStartUps as any[])
+    const getIncomingCollectionsRequests = async () => {
+      try {
+        const resIncomingCollectionsRequests: string[] = await backend.getIncomingCollectionsRequests() as string[]
+        setIncomingCollectionsRequests(resIncomingCollectionsRequests)
+        return resIncomingCollectionsRequests
+      } catch (error) {
+        console.error("Error on backend.getIncomingCollectionsRequests() call:", error)
+      }
     }
 
-    getIncomingStartUps()
+    getIncomingCollectionsRequests().then(incomingCollectionsRequest => incomingCollectionsRequest).catch(error => console.error(error))
   }, [])
 
   return (
@@ -46,19 +51,20 @@ const LaunchpadNFT = () => {
           borderRadius="15px"
           borderColor="#FFFFFFF"
           backgroundColor="#000000"
-          // w="120%"
+          w="1024px"
+          overflowX="scroll"
           display={{ md: "flex" }}
           alignItems="center"
           // px="150px"
           py="20px"
           marginBottom={100}
         >
-          {incomingStartUps.map((startUp) => (
+          {incomingCollectionsRequests.map((collection) => (
             <Box w="320px" h="460px" borderRadius="25px">
               <Center>
                 <Image
                   src={MpFavicon}
-                  alt={startUp.startUpName}
+                  alt={collection.startUpName}
                   w="500px"
                   h="290px"
                   mt="0px"
@@ -67,12 +73,12 @@ const LaunchpadNFT = () => {
               <Box mt="5px" ml="58px" display="flex" alignItems="center">
                 <Image
                   src={MpFavicon}
-                  alt={startUp.startUpName + " logo"}
+                  alt={collection.startUpName + " logo"}
                   w="40px"
                   h="40px"
                   mr="10px"
                 />
-                <Text fontSize="22px">{startUp.shortDes}</Text>
+                <Text fontSize="22px">{collection.shortDes}</Text>
               </Box>
               <Text
                 fontSize="14px"
@@ -121,7 +127,7 @@ const LaunchpadNFT = () => {
                   }}
                   onClick={() =>
                     navigate("/StartupInfo", {
-                      state: { owner: startUp.owner },
+                      state: { owner: collection.owner },
                     })
                   }
                 >
@@ -130,6 +136,215 @@ const LaunchpadNFT = () => {
               </Flex>
             </Box>
           ))}
+          <Box w="320px" h="460px" borderRadius="25px">
+            <Center>
+              <Image
+                src={NatheraNFTBoceto}
+                alt="Nathera NFT"
+                w="500px"
+                h="290px"
+                mt="0px"
+              />
+            </Center>
+            <Box mt="5px" ml="58px" display="flex" alignItems="center">
+              <Image
+                src={Natheralogo}
+                alt="Nathera Logo"
+                w="40px"
+                h="40px"
+                mr="10px"
+              />
+              <Text fontSize="22px">Warrior Cells</Text>
+            </Box>
+            <Text
+              fontSize="14px"
+              color="#737373"
+              mt="5px"
+              mb="10px"
+              textAlign="center"
+            >
+              Minted: 0 / 600
+              <br />
+              Raised: 0 / 3,000 ICP
+            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Badge
+                ml="50px"
+                bg="#000000"
+                borderColor="#1FAFC8"
+                borderWidth="0.5px"
+                color="#FFFFFF"
+                fontSize="20px"
+                p="5px"
+                borderRadius="0.5rem"
+                textTransform="capitalize"
+                display="flex"
+                alignItems="center"
+              >
+                5
+                <Image
+                  src={favicon}
+                  alt="ICP logo"
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                />
+              </Badge>
+              <Button
+                mr="50px"
+                colorScheme="teal"
+                backgroundColor="#1FAFC8"
+                variant="solid"
+                color="#000000"
+                fontSize="xl"
+                borderRadius="5px"
+                _hover={{
+                  bg: "#01B994",
+                }}
+                onClick={() => navigate("/Nathera")}
+              >
+                Details
+              </Button>
+            </Flex>
+          </Box>
+          <Box w="320px" h="460px" borderRadius="25px">
+            <Center>
+              <Image
+                src={MushroomFoundersBoceto}
+                alt="Founders NFT"
+                w="350px"
+                h="290px"
+                mt="0px"
+              />
+            </Center>
+            <Box mt="5px" ml="20px" display="flex" alignItems="center">
+              <Image
+                src={MpFavicon}
+                alt="Mushroom Logo"
+                w="40px"
+                h="40px"
+                mr="5px"
+              />
+              <Text fontSize="22px">Mushroom Founders</Text>
+            </Box>
+            <Text
+              fontSize="14px"
+              color="#737373"
+              mt="5px"
+              mb="10px"
+              textAlign="center"
+            >
+              Minted: 0 / 250
+              <br />
+              Raised: 0 / 1250 ICP
+            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Badge
+                ml="50px"
+                bg="#000000"
+                borderColor="#1FAFC8"
+                borderWidth="0.5px"
+                color="#FFFFFF"
+                fontSize="20px"
+                p="5px"
+                borderRadius="0.5rem"
+                textTransform="capitalize"
+                display="flex"
+                alignItems="center"
+              >
+                5
+                <Image
+                  src={favicon}
+                  alt="ICP logo"
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                />
+              </Badge>
+              <Button
+                mr="50px"
+                colorScheme="teal"
+                backgroundColor="#1FAFC8"
+                variant="solid"
+                color="#000000"
+                fontSize="xl"
+                borderRadius="5px"
+                _hover={{
+                  bg: "#01B994",
+                }}
+                onClick={() => navigate("/Founders")}
+              >
+                Details
+              </Button>
+            </Flex>
+          </Box>
+          <Box w="320px" h="460px" borderRadius="25px">
+            <Center>
+              <Image
+                src={EONNFTboceto}
+                alt="EON NFT"
+                w="350px"
+                h="290px"
+                mt="0px"
+              />
+            </Center>
+            <Box mt="5px" ml="48px" display="flex" alignItems="center">
+              <Image src={EONlogo} alt="EON Logo" w="40px" h="40px" mr="10px" />
+              <Text fontSize="22px">Brocoli Pickers</Text>
+            </Box>
+            <Text
+              fontSize="14px"
+              color="#737373"
+              mt="5px"
+              mb="10px"
+              textAlign="center"
+            >
+              Minted: 0 / 600
+              <br />
+              Raised: 0 / 3,000 ICP
+            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Badge
+                ml="50px"
+                bg="#000000"
+                borderColor="#1FAFC8"
+                borderWidth="0.5px"
+                color="#FFFFFF"
+                fontSize="20px"
+                p="5px"
+                borderRadius="0.5rem"
+                textTransform="capitalize"
+                display="flex"
+                alignItems="center"
+              >
+                5
+                <Image
+                  src={favicon}
+                  alt="ICP logo"
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                />
+              </Badge>
+              <Button
+                mr="50px"
+                colorScheme="teal"
+                backgroundColor="#1e1e1e"
+                variant="solid"
+                color="#000000"
+                fontSize="xl"
+                borderRadius="5px"
+                _hover={{
+                  bg: "#1e1e1e",
+                  //bg: '#01B994',
+                }}
+              >
+                Details
+              </Button>
+            </Flex>
+          </Box>
+
+
           <Box w="320px" h="460px" borderRadius="25px">
             <Center>
               <Image

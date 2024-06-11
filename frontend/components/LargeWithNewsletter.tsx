@@ -16,7 +16,7 @@ import {
 import { ReactNode } from 'react'
 import { FaLinkedin, FaTwitter, FaYoutube, FaDiscord, FaGithub } from 'react-icons/fa'
 import { BiMailSend } from 'react-icons/bi'
-import LogoM from './../assets/Logo.png' 
+import LogoM from '../assets/Logo.png' 
 
 const Logo = (props: any) => {
   return (

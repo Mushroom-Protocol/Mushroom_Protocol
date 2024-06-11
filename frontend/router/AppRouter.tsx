@@ -1,45 +1,62 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import { WithSubnavigation, LargeWithNewsletter } from '../components';
-import { useEffect } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
-import { HomePage } from "../pages/HomePage";
-import LaunchPadPage from '../pages/LaunchPadPage';
-import ErrorPage from "../pages/error-page";
-import FungiDAOPage from "../pages/FungiDAOPage";
-import MarketPlacePage from "../pages/MarketPlacePage";
-import StakingPage from "../pages/StakinPage";
-import VaultPage from "../pages/VaultPage";
-import NatheraPage from "../pages/NatheraPage";
-import FoundersPage from "../pages/FoundersPage";
-import ApplyPage from "../pages/ApplyPage";
-import DashboardSidebar from "../components/DashboardSidebar";
-import AdminPage from "../pages/AdminPage";
-import { EstadoProvider } from '../components/utils/estadoContex';
-import React from "react";
-import StartupsReqs from "../components/DashboardComponents/StartupsReqs";
-import Whitelist from "../components/DashboardComponents/Whitelist";
+import { createBrowserRouter, Navigate } from "react-router-dom"
+import {
+  WithSubnavigation,
+  LargeWithNewsletter,
+} from "../components"
+import { useEffect } from "react"
+import { useNavigate, Outlet } from "react-router-dom"
+import { HomePage } from "../pages/HomePage"
+import LaunchPadPage from "../pages/LaunchPadPage"
+import ErrorPage from "../pages/error-page"
+import FungiDAOPage from "../pages/FungiDAOPage"
+import MarketPlacePage from "../pages/MarketPlacePage"
+import StakingPage from "../pages/StakinPage"
+import VaultPage from "../pages/VaultPage"
+import NatheraPage from "../pages/NatheraPage"
+import FoundersPage from "../pages/FoundersPage"
+import ApplyPage from "../pages/ApplyPage"
+import DashboardSidebar from "../components/DashboardSidebar"
+import AdminPage from "../pages/AdminPage"
+import { EstadoProvider } from "../components/utils/estadoContex"
+import React from "react"
+import StartupsReqs from "../components/DashboardComponents/StartupsReqs"
+import Whitelist from "../components/DashboardComponents/Whitelist"
+import LaunchpadNFT from "../components/Launchpad/LaunchpadNFT"
+import DashboardHome from "../components/DashboardComponents/DashboardHome"
+import Portfolio from "../components/DashboardComponents/Portfolio"
+import StartupsList from "../components/DashboardComponents/StartupsList"
+import ProjectsList from "../components/DashboardComponents/ProjectsList"
+import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
+import UsersPendingVerification from "../components/DashboardComponents/UsersPendingVerification"
+import ConnectionsRecords from "../components/DashboardComponents/ConnectionsRecords"
+import CollectionsReqs from "../components/DashboardComponents/CollectionsReqs"
 
 function Layout() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Ejemplo: Si la ruta actual comienza con "/Dashboard", navegar sin el menú principal
-    if (window.location.pathname.startsWith('/Dashboard')) {
-      navigate('/Dashboard', { replace: true });
+    if (window.location.pathname.startsWith("/Dashboard")) {
+      navigate("/Dashboard", { replace: true })
     }
-  }, [navigate]);
+  }, [navigate])
 
   return (
     <>
       <EstadoProvider>
         {/* Renderizar el menú principal solo si no es la ruta del dashboard */}
-        {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation />}
+        {/* {!window.location.pathname.startsWith('/Dashboard') && <WithSubnavigation />} */}
+        {!window.location.pathname.startsWith("/Dashboard") && (
+          <WithSubnavigation />
+        )}
         {/* Outlet renderizará las rutas anidadas */}
         <Outlet />
-        {!window.location.pathname.startsWith('/Dashboard') && <LargeWithNewsletter />}
+        {!window.location.pathname.startsWith("/Dashboard") && (
+          <LargeWithNewsletter />
+        )}
       </EstadoProvider>
     </>
-  );
+  )
 }
 
 export const router = createBrowserRouter([
@@ -56,22 +73,28 @@ export const router = createBrowserRouter([
       { path: "Apply", element: <ApplyPage /> },
       {
         path: "Dashboard",
+        // element: <DashboardSidebar children={undefined} />,
         element: <DashboardSidebar children={undefined} />,
         children: [
-          { path: "", element: <Navigate to="Admin" /> }, // Cambié "/" a ""
+          { path: "", element: <DashboardHome /> }, // Cambié "/" a ""
           { path: "Admin", element: <AdminPage /> },
-          { path: "Whitelist", element: <Whitelist /> },
-          { path: "StartupsReqs", element: <StartupsReqs /> },
+          { path: "Portfolio", element: <Portfolio /> },
+          { path: "Launchpad", element: <LaunchpadNFT /> },
+          { path: "ForResearcher", element: <ApplyPage /> },
           {
             path: "Admin",
             element: <AdminPage />,
             children: [
-              { path: "Whitelist", element: <Whitelist />},
-              { path: "StartupsReqs", element: <StartupsReqs />},
-              { path: "Startups", element: <Navigate to="Home" />},
-              { path: "FundReqs", element: <Navigate to="Home" />},
-              { path: "Projects", element: <Navigate to="Home" />}
-            ]
+              { path: "Whitelist", element: <Whitelist /> },
+              { path: "StartupsReqs", element: <StartupsReqs /> },
+              { path: "StartupsList", element: <StartupsList /> },
+              { path: "ProjectsReqs", element: <ProjectsReqs /> },
+              { path: "Projects", element: <ProjectsList /> },
+              { path: "CollectionsReqs", element: <CollectionsReqs /> },
+              { path: "UsersPendingVerification", element: <UsersPendingVerification /> },
+              { path: "ConnectionsRecords", element: <ConnectionsRecords /> },
+              { path: "FundReqs", element: <Navigate to="Home" /> },
+            ],
           },
         ],
       },
@@ -81,5 +104,4 @@ export const router = createBrowserRouter([
       { path: "Vault", element: <VaultPage /> },
     ],
   },
-]);
-
+])

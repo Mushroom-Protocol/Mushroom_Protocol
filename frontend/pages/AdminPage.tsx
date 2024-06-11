@@ -1,9 +1,13 @@
 import React from 'react'
-import { Flex, Center } from '@chakra-ui/react';
 import AdminPanel from '../components/DashboardComponents/AdminPanel';
-import NatheraDetails from '../components/Nathera/NatheraDetails';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import StartupsReqs from '../components/DashboardComponents/StartupsReqs';
+import StartupsList from '../components/DashboardComponents/StartupsList';
+import ProjectsList from '../components/DashboardComponents/ProjectsList';
+import ProjectsReqs from '../components/DashboardComponents/ProjectsReqs';
+import UsersPendingVerification from '../components/DashboardComponents/UsersPendingVerification';
+import ConnectionsRecords from '../components/DashboardComponents/ConnectionsRecords';
+import CollectionsReqs from '../components/DashboardComponents/CollectionsReqs';
 
 export default function AdminPage() {
     const location = useLocation()
@@ -16,6 +20,30 @@ export default function AdminPage() {
         case "/Dashboard/Admin/StartupsReqs":
             return (
                 <StartupsReqs />
+            )
+        case "/Dashboard/Admin/StartupsList":
+            return (
+                <StartupsList />
+            )
+        case "/Dashboard/Admin/ProjectsReqs":
+            return (
+                <ProjectsReqs />
+            )
+        case "/Dashboard/Admin/Projects":
+            return (
+                <ProjectsList />
+            )
+        case "/Dashboard/Admin/CollectionsReqs":
+            return (
+                <CollectionsReqs />
+            )
+        case "/Dashboard/Admin/UsersPendingVerification":
+            return (
+                <UsersPendingVerification />
+            )
+        case "/Dashboard/Admin/ConnectionsRecords":
+            return (
+                <ConnectionsRecords />
             )
     
         default:

@@ -38,8 +38,8 @@ const Banner = () => {
               // position="absolute"
               // top="50px"
               // left="-20px"
-              textAlign="left"
-              maxWidth="50%"
+              textAlign="center"
+              // maxWidth="50%"
             >
               <Heading fontSize="35px">
                 Supports the science and technology development in LATAM

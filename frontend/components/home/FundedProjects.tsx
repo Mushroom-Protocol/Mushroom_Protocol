@@ -14,7 +14,7 @@ const FundedProjects = () => {
         color="#FFFFFF"
         flexDirection="column"
         alignItems="center"
-        width="1024px"
+        // width="1024px"
         // height="700px"
         position="relative"
         marginLeft="0px"
@@ -23,12 +23,13 @@ const FundedProjects = () => {
           Funded Projects
         </Text>
 
-        <Box display={{ md: "flex" }}>
+        {/* <Box display={{ md: "flex" }}> */}
+        <Flex flexDirection={{ base: "column", md: "row" }} overflowX="scroll" width="1024px">
           {/* Caja 1 - Izquierda */}
           <Box
             border="1px solid #1FAFC8"
             borderRadius="8px"
-            width="340px" // Cambiar el tamaño a 300px
+            minWidth="340px" // Cambiar el tamaño a 300px
             // position="absolute"
             // top="100px"
             // left="-10px"
@@ -87,7 +88,7 @@ const FundedProjects = () => {
           <Box
             border="1px solid #1FAFC8"
             borderRadius="8px"
-            width="340px" // Tamaño igual al de la Caja 1
+            minWidth="340px" // Tamaño igual al de la Caja 1
             // position="absolute"
             // top="100px"
             // left="342px" // Espacio adicional para acomodar la tercera caja
@@ -145,7 +146,7 @@ const FundedProjects = () => {
           <Box
             border="1px solid #1FAFC8"
             borderRadius="8px"
-            width="340px"
+            minWidth="340px"
             // position="absolute"
             // top="100px"
             // right="-10px"
@@ -200,7 +201,7 @@ const FundedProjects = () => {
               Agro Tech
             </Text>
           </Box>
-        </Box>
+        </Flex>
       </Flex>
     </Center>
   )
