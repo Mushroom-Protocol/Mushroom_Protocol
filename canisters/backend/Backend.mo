@@ -507,7 +507,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         Principal.toText(caller)
     };
 
-    public query ({ caller }) func getMyUser() : async ?User {
+    public shared ({ caller }) func getMyUser() : async ?User {
         // Debug.print("getMyUser---> " #Principal.toText(caller));
         let user = HashMap.get<Principal, User>(users, phash, caller);
         if (not Principal.isAnonymous(caller)) { recordConnection(caller) };
@@ -889,7 +889,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         assert (authorizedCaller(caller));
         assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.proyectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
-        ExperimentalCycles.add<system>(fee);
+        // ExperimentalCycles.add<system>(fee);
+        ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);

@@ -53,7 +53,7 @@ const Portfolio: React.FC = () => {
                     {/* <Text size="md">{startup.startUpSlogan}</Text> */}
                   </Stack>
                 </CardBody>
-                <Divider />
+                {/* <Divider />
                 <CardFooter>
                   <ButtonGroup spacing="2">
                     <Button
@@ -63,7 +63,7 @@ const Portfolio: React.FC = () => {
                       Details
                     </Button>
                   </ButtonGroup>
-                </CardFooter>
+                </CardFooter> */}
               </Card>
             </ListItem>
           )
