@@ -13,18 +13,13 @@ export const HomePage = () => {
   return (
     <>
       <Flex p={8}></Flex>
-      <PrincipalBanner />
-      <Statistics />
-      <Flex p={8}></Flex>
-      <Banner />
-      <Flex p={8}></Flex>
       <FundedProjects />
-      <Flex p={8}></Flex>
-      <Dappfunctions />
-      <Flex p={8}></Flex>
+      <Statistics />
+      <Flex p={0}></Flex>
       <DeSciEcosystem />
-      <Flex p={8}></Flex>
-      <JoinDiscord />
+      <Flex p={0}></Flex>
+      <Dappfunctions />
+      <br/>
 
       {/*<TableTopUser4iIndustria/>*/}
     </>

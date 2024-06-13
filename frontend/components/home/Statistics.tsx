@@ -1,6 +1,7 @@
 import React from "react";
 import {
     Box,
+    Text,
     chakra,
     Flex,
     SimpleGrid,
@@ -44,7 +45,8 @@ import {
           </Box>
           <Box
             my={'auto'}
-            color="#FFFFFF"
+            color="#FFFFFFF"
+            backgroundColor="#FFFFFFF"
             alignContent={'center'}>
             {icon}
           </Box>
@@ -59,26 +61,26 @@ import {
         
         <SimpleGrid columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 5 }}>
           <StatsCard
-            title={'4'}
+            title={'7'}
             stat={'Collections'}
             icon={<BsCollectionFill size={'4em'} />}
           />
           <StatsCard
-            title={'80,000'}
+            title={'212,000'}
             stat={'Value Locked'}
             icon={<IoLogoUsd size={'3.5em'} />}
           />
           <StatsCard
-            title={'7'}
+            title={'125'}
             stat={'NFT Minted'}
             icon={<RiNftFill size={'4em'} />}
           />
           <StatsCard
-            title={'7'}
-            stat={'Transactions'}
+            title={'700'}
+            stat={'Users'}
             icon={<RiTokenSwapFill size={'4em'} />}
           />
         </SimpleGrid>
-      </Box>
+    </Box>
     );
   }
