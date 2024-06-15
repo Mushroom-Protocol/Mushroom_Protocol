@@ -306,7 +306,7 @@ const CollectionsReqs: React.FC = () => {
                       onChange={handleChangeForm}
                     />
                   </FormControl>
-                  <FormControl>
+                  {/* <FormControl>
                     <Input
                       placeholder="Canister Id assets..."
                       id="nftCanisterIdAssets"
@@ -314,7 +314,7 @@ const CollectionsReqs: React.FC = () => {
                       value={formDataDeploy.nftBaseUrl}
                       onChange={handleChangeForm}
                     />
-                  </FormControl>
+                  </FormControl> */}
                   <FormControl>
                     <Input
                       placeholder="Assets names..."
