@@ -1,5 +1,5 @@
 
-#### Canister url. Test Frontend &emsp;&emsp; https://h4ggk-fiaaa-aaaal-qcjha-cai.icp0.io/
+#### Canister url. Test Frontend &emsp;&emsp; https://nys2z-xaaaa-aaaak-qddoq-cai.icp0.io/
 
 #### Starting
 #### ```git clone https://github.com/Mushroom-Protocol/Mushroom_Protocol.git```

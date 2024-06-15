@@ -61,15 +61,16 @@ const FoundersItems = () => {
       })
       const resMintNFT: any = (await backend.mintNFT(
         "PR182655",
-      )) as any
-
+      )) as {Ok: String; Err: String}
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
+      };
+      if (resMintNFT.Err !== undefined){
+        toast.close("loadingToastId");
       }
-
       toast({
         title: "Successful Submission",
-        description: JSON.stringify(resMintNFT),
+        description: 'Token ID:  ' + String(resMintNFT?.Ok.token_id),
         status: "success", // 'success' es el status para el estilo de éxito
         duration: 5000,
         isClosable: true,
