@@ -63,7 +63,7 @@ dfx canister call backend approveStartUp '(
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "ST827284";
+        startupID = "";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -83,13 +83,13 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
+dfx canister call backend approveProject '(principal "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe")'
 ```
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "ST308645";
-    pojectID = "PR182655";
+    startupID = "ST938896";
+    pojectID = "PR142998";
     collectionName = "Mushroom Founders";
     shortStorytelling= " NFT collection tells the story of 444 extraterrestrial mushrooms, who managed to escape the technological cataclysm that devastated their home 10 eons ago. Each NFT possesses a unique specialty, which is vital in their mission to spread knowledge and guide civilizations of the universe to a path of balance and harmony as a form of redemption. As they travel the universe in their ships, they become the disseminators of transcendental knowledge.";
     storytellingCollection="stoasdjlajdoi";

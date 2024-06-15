@@ -234,9 +234,7 @@ export default function WithSubnavigation() {
                 </Button>
               )}
               {isConnected && currentUser && currentUser?.name !== "" && (
-                <div style={{ backgroundColor: "#333333" }}>
-                  <MenuUser />
-                </div>
+                <MenuUser />
               )}
             </Box>
 
