@@ -125,12 +125,13 @@ const CollectionsReqs: React.FC = () => {
         cfgMushroom,
         feeDeploy,
       )) as any
+      console.log(resDeployCollection)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
       }
 
-      if (resDeployCollection["ok"]) {
+      if (resDeployCollection["Ok"]) {
         toast({
           title: "Successful Submission",
           description: `Collection deployed`,
