@@ -119,6 +119,7 @@ const CollectionsReqs: React.FC = () => {
         custodian: "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe",
       }
       const feeDeploy: number = 50692307692
+      console.log(cfgMushroom)
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
