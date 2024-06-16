@@ -102,7 +102,7 @@ const CollectionsReqs: React.FC = () => {
         maxLimit: 10,
       }
       const cfgMushroom: DeployConfig = {
-        proyectId: "PR182655",
+        proyectId: "PR504453",
         baseUrl: "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/",
         assetsNames: [
           "m49y4-e209u-1vca2-k0xqi-3rv.jpg",
