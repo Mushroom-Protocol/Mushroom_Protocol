@@ -1,120 +1,98 @@
+import React from "react";
 import {
-  Center,
-  Flex,
+  Box,
   Text,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-} from "@chakra-ui/react"
-import React from "react"
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+} from '@chakra-ui/react';
 
-const DeSciEcosystem = () => {
-  const data = [
-    {
-      tag: "Health Tech",
-      treasury: "$20,000",
-      projects: "1",
-      raised: "$12,000",
-      industry: "Health",
-    },
-    {
-      tag: "AgroFood Tech",
-      treasury: "$20,000",
-      projects: "1",
-      raised: "$12,000",
-      industry: "Agriculture",
-    },
-    {
-      tag: "Green Tech",
-      treasury: "$40,000",
-      projects: "1",
-      raised: "$30,000",
-      industry: "Sustainability",
-    },
-    {
-      tag: "Synthetic Tech",
-      treasury: "$0",
-      projects: "0",
-      raised: "$0",
-      industry: "Data & Energy",
-    },
-    {
-      tag: "Mining Tech",
-      treasury: "$0",
-      projects: "0",
-      raised: "$0",
-      industry: "Mining",
-    },
-  ]
+// Importa la imagen que deseas utilizar
+import GreenTech from "../../assets/GreenTech.png";
+import FoodTech from "../../assets/FoodTech.png";
+import HealthTech from "../../assets/HealthTech.png";
+import SyntheticTech from "../../assets/SyntheticTech.png";
+import MinningTech from "../../assets/MinnigTech.png";
 
-  return (
-    <Center>
-      <Flex
-        color="#FFFFFF"
-        flexDirection="column"
-        alignItems="center"
-        width="1024px"
-        // height="450px"
-        top="50px"
-      >
-        <Text fontSize="36px" mt="20px">
-          DeSci Ecosystem
-        </Text>
-        <Table
-          borderColor="#000000"
-          variant="simple"
-          size="md"
-          width="100%"
-          mt="30px"
-          borderRadius="full"
-        >
-          <Thead>
-            <Tr>
-              <Th fontSize="18px" color="#FFFFFF" textTransform="capitalize">
-                Badge
-              </Th>
-              <Th fontSize="18px" color="#FFFFFF" textTransform="capitalize">
-                Treasury
-              </Th>
-              <Th fontSize="18px" color="#FFFFFF" textTransform="capitalize">
-                N° Projects
-              </Th>
-              <Th fontSize="18px" color="#FFFFFF" textTransform="capitalize">
-                $ Raised
-              </Th>
-              <Th fontSize="18px" color="#FFFFFF" textTransform="capitalize">
-                Industry
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {data.map((row, index) => (
-              <Tr key={index}>
-                <Td fontSize="16px" color="#737373" borderRadius="15px">
-                  {row.tag}
-                </Td>
-                <Td fontSize="16px" color="#737373" borderRadius="15px">
-                  {row.treasury}
-                </Td>
-                <Td fontSize="16px" color="#737373" borderRadius="15px">
-                  {row.projects}
-                </Td>
-                <Td fontSize="16px" color="#737373" borderRadius="15px">
-                  {row.raised}
-                </Td>
-                <Td fontSize="16px" color="#737373" borderRadius="15px">
-                  {row.industry}
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Flex>
-    </Center>
-  )
+
+
+interface StatsCardProps {
+  title: string;
+  stat: string;
+  image: string; // Cambia 'icon' por 'image' y usa string para la ruta de la imagen
+  tvl: string;
+  industry: string;
 }
 
-export default DeSciEcosystem
+function StatsCard(props: StatsCardProps) {
+  const { title, stat, image, tvl, industry } = props;
+  return (
+    <Stat
+      px={{ base: 2, md: 4 }}
+      py={'5'}
+      shadow={'xl'}
+      borderWidth="1px"
+      bg="#000000"
+      borderColor="#FFFFFFF"
+      rounded={'lg'}>
+      <Box>
+        <StatLabel fontSize={'4xl'} fontWeight={'medium'} isTruncated>
+          {title}
+        </StatLabel>
+        <StatNumber fontSize={'2xl'} fontWeight={'medium'} color="gray.500">
+          {stat}
+        </StatNumber>
+        <Text mt={2} fontSize="sm" color="gray.500">
+          TVL: {tvl}
+        </Text>
+        <Text mt={1} fontSize="sm" color="gray.500">
+          Industry: {industry}
+        </Text>
+      </Box>
+      <Box my={'auto'} alignContent={'center'}>
+        <img src={image} alt={title} style={{ maxWidth: '100%', height: 'auto' }} />
+      </Box>
+    </Stat>
+  );
+}
+
+const DeSciEcosystem: React.FC = () => {
+  return (
+    <Box maxW="6x1" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+
+      <SimpleGrid columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 5 }}>
+        <StatsCard
+          title={'Green Tech'}
+          stat={'2 Projects'}
+          image={GreenTech} // Usa la imagen importada
+          tvl={'$150,000'}
+          industry={'Sustainability'}
+        />
+        <StatsCard
+          title={'Health Tech'}
+          stat={'1 Project'}
+          image={HealthTech} // Cambia la imagen según corresponda
+          tvl={'$17,000'}
+          industry={'Health & Medicine'}
+        />
+        <StatsCard
+          title={'Agro-Food Tech'}
+          stat={'2 Projects'}
+          image={FoodTech} // Cambia la imagen según corresponda
+          tvl={'$67,000'}
+          industry={'Agriculture & food'}
+        />
+        <StatsCard
+          title={'Synthetic Tech'}
+          stat={'2 Project'}
+          image={SyntheticTech} // Cambia la imagen según corresponda
+          tvl={'$122,000'}
+          industry={'Data & Energy'}
+        />
+      </SimpleGrid>
+    </Box>
+  );
+};
+
+export default DeSciEcosystem;

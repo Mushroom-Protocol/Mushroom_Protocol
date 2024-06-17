@@ -17,10 +17,10 @@ const PrincipalBanner = () => {
           lineHeight={'110%'}
           color={'#1FAFC8'}
           noOfLines={1}>
-          ENABLING RESEARCH TALENT TO GET CAPITAL
+          DRIVING A FINANCIAL REVOLUTION IN BIOTECHNOLOGY​
         </Heading>
         <Text fontSize={{ base: '2xl', sm: '3xl', md: '3xl' }} color={'white'}>
-          Driving a financial revolution in biotechnology
+          Making it accessible to everyone
         </Text>
         <Stack
           align={'center'}
