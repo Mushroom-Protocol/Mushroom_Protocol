@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
+import { Link } from "react-router-dom";  // Import Link from react-router-dom
 import { Center, Box, Flex, Text, Image } from "@chakra-ui/react";
 import PathNathera from "../../assets/PathNathera.jpg";
 import biopolimero from "../../assets/biopolimero.jpg";
@@ -53,6 +54,7 @@ const FundedProjects: React.FC = () => {
         "We develop alternative raw materials to plastic that come from the earth and return to it, respecting the environment, without toxics and 100% organic.",
       tag: "Green Tech",
       tagColor: "#64B344",
+      link: "/landopp"
     },
     {
       imgSrc: CityFounders,
@@ -63,6 +65,7 @@ const FundedProjects: React.FC = () => {
         "The protocol enables global investors to fund biotech research by tokenizing it and using intellectual property as collateral.",
       tag: "Synthetic Tech",
       tagColor: "#4A1985",
+      link: "/founders"
     },
     {
       imgSrc: SilkongProduct,
@@ -73,6 +76,7 @@ const FundedProjects: React.FC = () => {
         "Reciqlo is a company dedicated to the promotion and innovation of the recycling system, with the aim of moving towards a sustainable circular economy.",
       tag: "Green Tech",
       tagColor: "#64B344",
+      link: "/reciqlo"
     },
     {
       imgSrc: PathNathera,
@@ -83,6 +87,7 @@ const FundedProjects: React.FC = () => {
         "The project is developing a treatment for musculoskeletal diseases such as arthrosis, low back pain, and rheumatoid arthritis using nanotechnology.",
       tag: "Health Tech",
       tagColor: "#1FAFC8",
+      link: "/nathera"
     },
     {
       imgSrc: nanocouting,
@@ -93,6 +98,7 @@ const FundedProjects: React.FC = () => {
         "Every year, tons of food are wasted during export and transportation. EON develops a coating to extend the shelf life of food.",
       tag: "Agro Tech",
       tagColor: "#EA332B",
+      link: "/eon"
     },
   ];
 
@@ -116,7 +122,9 @@ const FundedProjects: React.FC = () => {
               color="#FFFFFF"
             >
               <Box position="relative" height="250px" width="100%">
-                <Image src={project.imgSrc} alt={`Main Image ${index + 1}`} objectFit="cover" borderRadius="8px 8px 0 0" height="100%" width="100%" />
+                <Link to={project.link}>
+                  <Image src={project.imgSrc} alt={`Main Image ${index + 1}`} objectFit="cover" borderRadius="8px 8px 0 0" height="100%" width="100%" />
+                </Link>
               </Box>
               <Box display="flex" alignItems="center" mt="20px">
                 <Image src={project.logoSrc} alt={`Secondary Image ${index + 1}`} borderRadius="10px" w="50px" h="50px" mr="10px" />

@@ -12,7 +12,7 @@ import CityFounders from "../../assets/CityFounders.jpg";
 import Silkongv1 from "../../assets/SilkongV1.jpg";
 import EONNFTV1 from "../../assets/EONNFTV1.jpg";
 import Landoppicon from "../../assets/Landopp_icon.png";
-import Landoppnft01 from "../../assets/Landoppnft01.gif";
+import Landoppnft01 from "../../assets/Landoppnft01.mp4"; // Importar el video aquí
 import NatheraNFTv1 from "../../assets/NatheraNFTv1.jpg";
 import ReciqloLogo from "../../assets/ReciqloLogo.jpg";
 import EONlogo from "../../assets/EONlogo.png";
@@ -41,7 +41,7 @@ const LaunchpadNFT: React.FC = () => {
         url: "/founders" // Ruta específica para este startup
       },
       {
-        imgSrc: Landoppnft01,
+        imgSrc: Landoppnft01, // Utilizando el video Landoppnft01 directamente
         logoSrc: Landoppicon,
         startUpName: "Landopp",
         shortDes: "NoPlas",
@@ -52,7 +52,8 @@ const LaunchpadNFT: React.FC = () => {
         badgeSrc: [GreenTech, FoodTech], // Array de insignias
         owner: "Owner2",
         url: "/landopp" // Ruta específica para este startup
-      },{
+      },
+      {
         imgSrc: Silkongv1,
         logoSrc: ReciqloLogo,
         startUpName: "Reciqlo",
@@ -64,7 +65,8 @@ const LaunchpadNFT: React.FC = () => {
         badgeSrc: [GreenTech, SyntheticTech], // Array de insignias
         owner: "Owner3",
         url: "/reciqlo" // Ruta específica para este startup
-      },{
+      },
+      {
         imgSrc: NatheraNFTv1,
         logoSrc: Natheralogo,
         startUpName: "Nathera",
@@ -76,7 +78,8 @@ const LaunchpadNFT: React.FC = () => {
         badgeSrc: [HealthTech], // Array de insignias
         owner: "Owner4",
         url: "/nathera" // Ruta específica para este startup
-      },{
+      },
+      {
         imgSrc: EONNFTV1,
         logoSrc: EONlogo,
         startUpName: "EON",
@@ -89,7 +92,6 @@ const LaunchpadNFT: React.FC = () => {
         owner: "Owner5",
         url: "/eon" // Ruta específica para este startup
       },
-      
     ];
 
     setIncomingCollectionsRequests(hardcodedData);
@@ -151,13 +153,29 @@ const LaunchpadNFT: React.FC = () => {
               color="#FFFFFF"
             >
               <Center>
-                <Image src={collection.imgSrc} alt={collection.startUpName} w="250px" h="300px" borderRadius="10px" />
+                {collection.startUpName === "Landopp" ? (
+                  <video
+                    src={collection.imgSrc} // Utilizando imgSrc para el video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      borderRadius: "10px",
+                      objectFit: "cover",
+                      width: "250px",
+                      height: "300px",
+                    }}
+                  />
+                ) : (
+                  <Image src={collection.imgSrc} alt={collection.startUpName} w="250px" h="300px" borderRadius="10px" />
+                )}
               </Center>
               <Box display="flex" alignItems="center" mt="20px">
                 <Image src={collection.logoSrc} alt={collection.startUpName + " logo"} borderRadius="10px" w="50px" h="50px" mr="10px" />
                 <Text fontSize="25px">{collection.shortDes}</Text>
               </Box>
-              <Text fontSize="18px"  my="10px" textAlign="justify">
+              <Text fontSize="18px" my="10px" textAlign="justify">
                 {collection.story}
               </Text>
               <Text fontSize="16px" color="gray.500" my="10px" textAlign="justify">
