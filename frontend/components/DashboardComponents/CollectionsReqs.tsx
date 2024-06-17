@@ -131,7 +131,7 @@ const CollectionsReqs: React.FC = () => {
         toast.close(loadingToastId)
       }
 
-      if (resDeployCollection["Ok"]) {
+      if (resDeployCollection["ok"]) {
         toast({
           title: "Successful Submission",
           description: `Collection deployed`,
