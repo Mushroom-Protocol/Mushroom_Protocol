@@ -76,7 +76,7 @@ import {
             icon={<RiNftFill size={'4em'} />}
           />
           <StatsCard
-            title={'700'}
+            title={'125'}
             stat={'Users'}
             icon={<RiTokenSwapFill size={'4em'} />}
           />

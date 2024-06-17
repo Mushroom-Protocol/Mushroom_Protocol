@@ -12,16 +12,13 @@ import JoinDiscord from "../components/home/JoinDiscord"
 export const HomePage = () => {
   return (
     <>
-      <Flex p={8}></Flex>
+    <Flex p={2}></Flex>
       <FundedProjects />
       <Statistics />
       <Flex p={0}></Flex>
       <DeSciEcosystem />
       <Flex p={0}></Flex>
-      <Dappfunctions />
       <br/>
-
-      {/*<TableTopUser4iIndustria/>*/}
     </>
   )
 }

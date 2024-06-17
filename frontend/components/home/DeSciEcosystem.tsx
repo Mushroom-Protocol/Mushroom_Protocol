@@ -40,7 +40,7 @@ function StatsCard(props: StatsCardProps) {
         <StatLabel fontSize={'4xl'} fontWeight={'medium'} isTruncated>
           {title}
         </StatLabel>
-        <StatNumber fontSize={'2xl'} fontWeight={'medium'}>
+        <StatNumber fontSize={'2xl'} fontWeight={'medium'} color="gray.500">
           {stat}
         </StatNumber>
         <Text mt={2} fontSize="sm" color="gray.500">
@@ -77,17 +77,17 @@ const DeSciEcosystem: React.FC = () => {
           industry={'Health & Medicine'}
         />
         <StatsCard
-          title={'AgroFood Tech'}
+          title={'Agro-Food Tech'}
           stat={'2 Projects'}
           image={FoodTech} // Cambia la imagen según corresponda
-          tvl={'$117,000'}
+          tvl={'$67,000'}
           industry={'Agriculture & food'}
         />
         <StatsCard
           title={'Synthetic Tech'}
-          stat={'1 Project'}
+          stat={'2 Project'}
           image={SyntheticTech} // Cambia la imagen según corresponda
-          tvl={'$22,000'}
+          tvl={'$122,000'}
           industry={'Data & Energy'}
         />
       </SimpleGrid>

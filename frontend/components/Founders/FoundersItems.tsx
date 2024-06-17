@@ -24,9 +24,9 @@ import {
 } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa6"
 import { useCanister } from "@connect2ic/react"
-// import MpFavicon from "../../assets/MpFavicon.png"
-// import Mushroomfounders from "../../assets/Mushroomfounders.gif"
-// import favicon from "../../assets/favicon.ico"
+import faviconico from "../../assets/Faviconico.png";
+import Mushroomfounders from "../../assets/Mushroomfounders.gif"
+import favicon from "../../assets/favicon.ico"
 
 const FoundersItems = () => {
   const [quantity, setQuantity] = useState(1)
@@ -102,9 +102,9 @@ const FoundersItems = () => {
                       "nav main"
                       "nav footer"`}
         gridTemplateRows={"120px 1fr 30px"}
-        gridTemplateColumns={"450px 1fr"}
-        h="530px"
-        w="1024px"
+        gridTemplateColumns={"600px 1fr"}
+        maxWidth="100%"
+        width="100%"
         gap="0"
         color="#000"
         fontWeight="bold"
@@ -116,23 +116,18 @@ const FoundersItems = () => {
           area="header"
           display="flex"
           alignItems="center"
+          justifyContent="space-between"
         >
-          <Flex>
+          <Flex alignItems="center">
             <Box
-              // bgImage={MpFavicon}
+              bgImage={faviconico}
               bgSize="60px 60px"
               bgRepeat="no-repeat"
               w="60px"
               h="60px"
-              marginTop="10px"
+              marginTop="0px"
             />
-            <Box
-              ml="4"
-              marginBottom="0"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-            >
+            <Box ml="4" display="flex" flexDirection="column">
               <Text fontSize="19px" color="#FFFFFF">
                 Mushroom Founders
               </Text>
@@ -140,38 +135,28 @@ const FoundersItems = () => {
                 variant="subtle"
                 backgroundColor="#000000"
                 color="#FFFFFF"
-                borderColor="#1FAFC8"
                 borderWidth="1px"
-                fontSize="12px"
-                mr="20"
+                fontSize="14px"
+                mt="2"
               >
-                Total Items: 500
+                Total Items: 444
               </Tag>
             </Box>
-            <Spacer />
-            <HStack spacing={4}>
-              {["lg"].map((size) => (
-                <Tag
-                  size="lg" // Tamaño del tag (puedes ajustarlo según tus necesidades)
-                  variant="subtle"
-                  colorScheme="orange" // Cambia a naranja
-                  backgroundColor="#000000"
-                  color="#FFFFFF"
-                  borderColor="#FFFFFFF"
-                  textColor="#FFFFFF"
-                  borderWidth="1px"
-                  ml="530px"
-                  fontSize="16px"
-                  display="flex"
-                  alignItems="center" // Alinea el icono y el texto verticalmente
-                >
-                  <FaClock color="#F47629" style={{ marginRight: "9px" }} />{" "}
-                  {/* Cambia el color del icono a naranja */}
-                  <TagLabel>Coming Soon</TagLabel>
-                </Tag>
-              ))}
-            </HStack>
           </Flex>
+          <HStack spacing={4} alignItems="center" display={{ base: "none", md: "flex" }}>
+            <Tag
+              size="lg"
+              variant="subtle"
+              colorScheme="orange"
+              fontSize="20px"
+              backgroundColor="#000000"
+              color="#FFFFFF"
+              borderWidth="1px"
+            >
+              <FaClock color="#64B344" style={{ marginRight: "9px" }} />
+              <TagLabel>Active</TagLabel>
+            </Tag>
+          </HStack>
         </GridItem>
         <GridItem
           area="nav"
@@ -180,11 +165,12 @@ const FoundersItems = () => {
           justifyContent="center"
         >
           <Image
-            // src={Mushroomfounders}
+            src={Mushroomfounders}
             alt="Descripción de la imagen"
+            borderRadius="10px"
             objectFit="cover"
-            width="300px" // Ajusta el ancho según tus necesidades
-            height="400px" // Ajusta la altura según tus necesidades
+            width="400px" // Ajusta el ancho según tus necesidades
+            height="500px" // Ajusta la altura según tus necesidades
           />
         </GridItem>
         <GridItem
@@ -194,11 +180,12 @@ const FoundersItems = () => {
           flexDirection="column"
           alignItems="flex-start"
           justifyContent="flex-start"
-          border="1px"
           borderColor="#1FAFC8"
           mt="25px"
           borderRadius="10px"
-          padding="30px"
+          padding="20px"
+          maxWidth={{ base: "100%", md: "800px" }} // Ajuste de ancho máximo responsivo
+          width="100%" // Ajuste de ancho al 100% para ocupar el espacio disponible
         >
           <Box display="flex" alignItems="flex-start">
             <Box
@@ -212,9 +199,9 @@ const FoundersItems = () => {
               border="1px"
               borderColor="#1FAFC8"
             >
-              Price: 5
+              Price: 1
               <img
-                // src={favicon}
+                src={favicon}
                 alt="Icon"
                 width="22"
                 height="22"
@@ -225,7 +212,8 @@ const FoundersItems = () => {
           <Box
             backgroundColor="#1E1E1E"
             height="30px"
-            width="500px"
+            width="100%" // Ajuste el ancho al 100% para que se expanda correctamente
+            maxWidth="400px" // Establecer un ancho máximo para evitar que se extienda demasiado en pantallas grandes
             borderRadius="5px"
             marginTop="30px"
             position="relative"
@@ -233,19 +221,16 @@ const FoundersItems = () => {
             <Box
               backgroundColor="#1FAFC8"
               height="100%"
-              width="1%" // Ajusta el ancho según el progreso real
+              width="10%" // Ajusta el ancho según el progreso real
               borderRadius="15px"
               display="flex"
               alignItems="center"
               justifyContent="flex-start"
             >
-              <Text fontSize="18px" color="#FFFFFF" marginLeft="5px">
-                0%
-              </Text>
             </Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
-            Minted: 0 / 250
+            Minted: 7 / 444
           </Text>
           <Box display="flex" alignItems="center" marginTop="20px">
             <Button size="sm" marginRight="10px" onClick={handleDecrease}>
@@ -258,18 +243,22 @@ const FoundersItems = () => {
               +
             </Button>
             <Button
-              backgroundColor="#1E1E1E"
+              backgroundColor="#1FAFC8"
               textColor="#000000"
               variant="solid"
               ml="10px"
               borderRadius="10px"
               onClick={onOpen} // Abre modal de confirmación de minted
+              _hover={{
+                backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
+                textColor: "#000000", // Mantener el mismo color de texto
+              }}
             >
               Mint
             </Button>
           </Box>
           <Text
-            fontSize="14px"
+            fontSize="16px"
             color="#737373"
             fontStyle="italic"
             mr="20"
@@ -278,7 +267,16 @@ const FoundersItems = () => {
             * At the time of minted you are exchanging your crypto assets for a
             random NFT within the NFTs pool.
           </Text>
+          <Text
+            fontSize="22px"
+            color="#FFFFFF"
+            mr="20"
+            marginTop="50px"
+          >
+            Closing date: August 12, 2024
+          </Text>
         </GridItem>
+
 
         <Modal isOpen={isOpen} onClose={onClose} size="md">
           {/* Agregar el estilo para el ModalOverlay */}
@@ -292,11 +290,11 @@ const FoundersItems = () => {
             left="40%"
             transform="translate(-50%, -50%)"
           >
-            <ModalHeader>Do you confirm the minting?</ModalHeader>
+            <ModalHeader>Confirm transaction</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               {/* Contenido del modal */}
-              <p>You are about to mint a founder.</p>
+              <p>If you confirm the transaction, an NFTs will be minted to your wallet address.</p>
             </ModalBody>
             <ModalFooter>
               <Button
@@ -306,7 +304,7 @@ const FoundersItems = () => {
                 borderRadius="10px"
                 onClick={() => handleSubmitMint()}
               >
-                Mint
+                Approve
               </Button>
             </ModalFooter>
           </ModalContent>
