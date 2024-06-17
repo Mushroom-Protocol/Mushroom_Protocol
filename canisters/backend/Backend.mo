@@ -11,12 +11,11 @@ import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
-// import Debug "mo:base/Debug";
 
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
-import Debug "mo:base/Debug";
+import {print} "mo:base/Debug";
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -46,7 +45,33 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func removeStartUp(st : Text) : async () {
         assert authorizedCaller(caller);
-        ignore HashMap.remove<Text, Startup>(startUps, thash, st)
+        let stDeleted = HashMap.remove<Text, Startup>(startUps, thash, st);
+        switch stDeleted {
+            case null {};
+            case (?stDeleted) {
+                for (pr in stDeleted.projects.vals()) {
+                    //ToDo: Implementar una papelera de reciclaje
+                    ignore HashMap.remove<Text, Project>(projects, thash, pr);
+                };
+                let user = _getUser(stDeleted.owner);
+                switch user{
+                    case null {assert false};
+                    case (?user) {
+                        var rolesBuffer = Buffer.fromArray<Role>([]);
+                        for(role in user.roles.vals()){
+                            switch role{
+                                case (#Startup(stIDS)){
+                                    let idsUpdate = Array.filter<Text>(stIDS, func x = x != st );
+                                    if(idsUpdate.size() > 0){ rolesBuffer.add(#Startup(idsUpdate))};
+                                };
+                                case (_) {rolesBuffer.add(role)};
+                            }
+                        };
+                        ignore HashMap.put<Principal, User>(users, phash, stDeleted.owner, {user with roles = Buffer.toArray(rolesBuffer)})
+                    };
+                }
+            };
+        }
     };
 
     let randomStore = Random.Rand();
@@ -252,19 +277,19 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    func getUser(p : Principal) : ?User {
+    func _getUser(p : Principal) : ?User {
         HashMap.get(users, phash, p)
     };
 
     func isUser(p : Principal) : Bool {
-        return switch (getUser(p)) {
+        return switch (_getUser(p)) {
             case null { false };
             case _ { true }
         }
     };
 
     func userVerified(p : Principal) : Bool {
-        switch (getUser(p)) {
+        switch (_getUser(p)) {
             case null { return false };
             case (?user) {
                 if (user.verified == #Success(true)) {
@@ -275,21 +300,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-
-    // func isStartUp(p : Principal) : Bool {
-    //     switch (getUser(p)) {
-    //         case null { return false };
-    //         case (?user) {
-    //             for (r in user.roles.vals()) {
-    //                 switch r {
-    //                     case (#Startup(_)) { return true };
-    //                     case _ {}
-    //                 }
-    //             };
-    //             return false
-    //         }
-    //     }
-    // };
 
     func isAdmin(p : Principal) : Bool {
         Set.has(admins, phash, p)
@@ -382,7 +392,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
     func getStartupListOf(p : Principal) : [StartupID] {
-        let user = getUser(p);
+        let user = _getUser(p);
         switch user {
             case null { [] };
             case (?user) {
@@ -529,6 +539,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     /////////////////////////// Getters functions only Controllers or DAO ///////////////////////////////////////
 
+    public query ({ caller }) func getUser(p: Principal): async ?User{ 
+        assert(authorizedCaller(caller));
+        _getUser(p) 
+    };
+
     public query ({ caller }) func getIncomingStartUps() : async [StartupCard] {
 
         assert authorizedCaller(caller);
@@ -614,7 +629,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public query ({ caller }) func getStartUpsByPrincipal(p : Principal) : async [StartupID] {
         assert (authorizedCaller(caller) or (caller == p));
-        switch (getUser(p)) {
+        switch (_getUser(p)) {
             case null { [] };
             case (?user) {
                 for (r in user.roles.vals()) {
@@ -975,7 +990,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
         switch collection {
             case (?collection) {
-                Debug.print(collection);
+                print(collection);
                 let remoteCollection = actor (collection) : actor {
                     getNftHistory : shared (TokenId) -> async [?TypesNft.Trx]
                 };
