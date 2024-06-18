@@ -50,7 +50,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "epvyw-ddnza-4wy4p-joxft-ciutt-s7pji-cfxm3-khwlb-x2tb7-uo7tc-xae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Approve Startup
 ```
@@ -63,7 +63,7 @@ dfx canister call backend approveStartUp '(
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "";
+        startupID = "ST792644";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -83,13 +83,13 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe")'
+dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "ST938896";
-    pojectID = "PR142998";
+    startupID = "ST792644";
+    pojectID = "PR141541";
     collectionName = "Mushroom Founders";
     shortStorytelling= " NFT collection tells the story of 444 extraterrestrial mushrooms, who managed to escape the technological cataclysm that devastated their home 10 eons ago. Each NFT possesses a unique specialty, which is vital in their mission to spread knowledge and guide civilizations of the universe to a path of balance and harmony as a form of redemption. As they travel the universe in their ships, they become the disseminators of transcendental knowledge.";
     storytellingCollection="stoasdjlajdoi";
@@ -121,7 +121,7 @@ dfxcc backend deployCollection '(
     maxLimit = 10
     },
     record {
-        proyectId = "PR182655";
+        projectId = "PR141541";
         baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
         assetsNames  = vec {"m49y4-e209u-1vca2-k0xqi-3rv.jpg";
                             "md14e-yz64m-zovii-2a5io-cpe.jpg";
