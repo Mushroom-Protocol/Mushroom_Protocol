@@ -11,12 +11,11 @@ import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
-// import Debug "mo:base/Debug";
 
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
-import Debug "mo:base/Debug";
+import {print} "mo:base/Debug";
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -46,7 +45,33 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func removeStartUp(st : Text) : async () {
         assert authorizedCaller(caller);
-        ignore HashMap.remove<Text, Startup>(startUps, thash, st)
+        let stDeleted = HashMap.remove<Text, Startup>(startUps, thash, st);
+        switch stDeleted {
+            case null {};
+            case (?stDeleted) {
+                for (pr in stDeleted.projects.vals()) {
+                    //ToDo: Implementar una papelera de reciclaje
+                    ignore HashMap.remove<Text, Project>(projects, thash, pr);
+                };
+                let user = _getUser(stDeleted.owner);
+                switch user{
+                    case null {assert false};
+                    case (?user) {
+                        var rolesBuffer = Buffer.fromArray<Role>([]);
+                        for(role in user.roles.vals()){
+                            switch role{
+                                case (#Startup(stIDS)){
+                                    let idsUpdate = Array.filter<Text>(stIDS, func x = x != st );
+                                    if(idsUpdate.size() > 0){ rolesBuffer.add(#Startup(idsUpdate))};
+                                };
+                                case (_) {rolesBuffer.add(role)};
+                            }
+                        };
+                        ignore HashMap.put<Principal, User>(users, phash, stDeleted.owner, {user with roles = Buffer.toArray(rolesBuffer)})
+                    };
+                }
+            };
+        }
     };
 
     let randomStore = Random.Rand();
@@ -136,10 +161,14 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
-    func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
+    func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }, canisterId: ?Principal) : async Bool {
         let IC = "aaaaa-aa";
         let ic = actor (IC) : Interface.Self;
-        let canister_id = Principal.fromActor(Mushroom);
+
+        let canister_id = switch(canisterId){
+            case null {Principal.fromActor(Mushroom)};
+            case (?canisterID) {canisterID};
+        };
         let status = await ic.canister_status({ canister_id });
         var oldSettings = status.settings;
         var tempBufferControllers = Buffer.fromArray<Principal>(oldSettings.controllers);
@@ -177,13 +206,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     //  adds the main of the canister to its own list of controllers and that allows the function to be executed
     //  private safeUpdateControllers()
 
-    public shared ({ caller }) func addControllers(controllers : [Principal]) : async Bool {
+    public shared ({ caller }) func addControllers(controllers : [Principal], canisterId: ?Principal) : async Bool {
         assert (Principal.isController(caller));
-        await safeUpdateControllers(controllers, #Add)
+        await safeUpdateControllers(controllers, #Add, canisterId)
     };
-    public shared ({ caller }) func removeControllers(controllers : [Principal]) : async Bool {
+    public shared ({ caller }) func removeControllers(controllers : [Principal], canisterId: ?Principal) : async Bool {
         assert (Principal.isController(caller));
-        await safeUpdateControllers(controllers, #Remove)
+        await safeUpdateControllers(controllers, #Remove, canisterId)
     };
 
     public shared ({ caller }) func addAdmin(p : Principal) : async Result.Result<Bool, Text> {
@@ -252,19 +281,19 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
-    func getUser(p : Principal) : ?User {
+    func _getUser(p : Principal) : ?User {
         HashMap.get(users, phash, p)
     };
 
     func isUser(p : Principal) : Bool {
-        return switch (getUser(p)) {
+        return switch (_getUser(p)) {
             case null { false };
             case _ { true }
         }
     };
 
     func userVerified(p : Principal) : Bool {
-        switch (getUser(p)) {
+        switch (_getUser(p)) {
             case null { return false };
             case (?user) {
                 if (user.verified == #Success(true)) {
@@ -275,21 +304,6 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
             }
         }
     };
-
-    // func isStartUp(p : Principal) : Bool {
-    //     switch (getUser(p)) {
-    //         case null { return false };
-    //         case (?user) {
-    //             for (r in user.roles.vals()) {
-    //                 switch r {
-    //                     case (#Startup(_)) { return true };
-    //                     case _ {}
-    //                 }
-    //             };
-    //             return false
-    //         }
-    //     }
-    // };
 
     func isAdmin(p : Principal) : Bool {
         Set.has(admins, phash, p)
@@ -382,7 +396,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
     func getStartupListOf(p : Principal) : [StartupID] {
-        let user = getUser(p);
+        let user = _getUser(p);
         switch user {
             case null { [] };
             case (?user) {
@@ -529,6 +543,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     /////////////////////////// Getters functions only Controllers or DAO ///////////////////////////////////////
 
+    public query ({ caller }) func getUser(p: Principal): async ?User{ 
+        assert(authorizedCaller(caller));
+        _getUser(p) 
+    };
+
     public query ({ caller }) func getIncomingStartUps() : async [StartupCard] {
 
         assert authorizedCaller(caller);
@@ -614,7 +633,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public query ({ caller }) func getStartUpsByPrincipal(p : Principal) : async [StartupID] {
         assert (authorizedCaller(caller) or (caller == p));
-        switch (getUser(p)) {
+        switch (_getUser(p)) {
             case null { [] };
             case (?user) {
                 for (r in user.roles.vals()) {
@@ -887,15 +906,22 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
         assert (authorizedCaller(caller));
-        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.proyectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
+        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
         ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
-            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.proyectId, Principal.toText(canisterId));
-            //Borrar del HashMap la entrada correspondiente a la solicitud de collección
+            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.projectId, Principal.toText(canisterId));
+            ignore addControllers([Principal.fromActor(Mushroom), deployer], ?canisterId); //Para eventuales actualizaciones del standard Dip721
+            ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
+            let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
+                case null {""};
+                case (?pr){pr.startupID};
+            };
+            HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             return #ok(canisterId)
         } catch (e) {
             return #err(Error.message(e))
@@ -975,7 +1001,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
         switch collection {
             case (?collection) {
-                Debug.print(collection);
+                print(collection);
                 let remoteCollection = actor (collection) : actor {
                     getNftHistory : shared (TokenId) -> async [?TypesNft.Trx]
                 };
