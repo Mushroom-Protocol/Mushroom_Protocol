@@ -1,4 +1,3 @@
-// ConnectPlugButton.tsx
 import React, { useState, useEffect } from 'react';
 import { connectToPlug, checkIsConnected, getSessionData } from './plug';
 

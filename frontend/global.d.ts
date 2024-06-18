@@ -1,4 +1,3 @@
-// global.d.ts
 interface Window {
     ic: {
       plug: {

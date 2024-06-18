@@ -1,4 +1,3 @@
-// plug.ts
 interface RequestConnectParams {
     whitelist?: string[];
     host?: string;

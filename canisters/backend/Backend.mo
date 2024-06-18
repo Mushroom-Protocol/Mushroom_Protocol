@@ -161,10 +161,14 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     //////////////////////////////  Management of the main Canister (this)  /////////////////////////////////////
 
-    func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }) : async Bool {
+    func safeUpdateControllers(controllers : [Principal], mode : { #Add; #Remove }, canisterId: ?Principal) : async Bool {
         let IC = "aaaaa-aa";
         let ic = actor (IC) : Interface.Self;
-        let canister_id = Principal.fromActor(Mushroom);
+
+        let canister_id = switch(canisterId){
+            case null {Principal.fromActor(Mushroom)};
+            case (?canisterID) {canisterID};
+        };
         let status = await ic.canister_status({ canister_id });
         var oldSettings = status.settings;
         var tempBufferControllers = Buffer.fromArray<Principal>(oldSettings.controllers);
@@ -202,13 +206,13 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     //  adds the main of the canister to its own list of controllers and that allows the function to be executed
     //  private safeUpdateControllers()
 
-    public shared ({ caller }) func addControllers(controllers : [Principal]) : async Bool {
+    public shared ({ caller }) func addControllers(controllers : [Principal], canisterId: ?Principal) : async Bool {
         assert (Principal.isController(caller));
-        await safeUpdateControllers(controllers, #Add)
+        await safeUpdateControllers(controllers, #Add, canisterId)
     };
-    public shared ({ caller }) func removeControllers(controllers : [Principal]) : async Bool {
+    public shared ({ caller }) func removeControllers(controllers : [Principal], canisterId: ?Principal) : async Bool {
         assert (Principal.isController(caller));
-        await safeUpdateControllers(controllers, #Remove)
+        await safeUpdateControllers(controllers, #Remove, canisterId)
     };
 
     public shared ({ caller }) func addAdmin(p : Principal) : async Result.Result<Bool, Text> {
@@ -902,15 +906,22 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
         assert (authorizedCaller(caller));
-        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.proyectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
+        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
         ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
-            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.proyectId, Principal.toText(canisterId));
-            //Borrar del HashMap la entrada correspondiente a la solicitud de collección
+            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.projectId, Principal.toText(canisterId));
+            ignore addControllers([Principal.fromActor(Mushroom), deployer], ?canisterId); //Para eventuales actualizaciones del standard Dip721
+            ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
+            let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
+                case null {""};
+                case (?pr){pr.startupID};
+            };
+            HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             return #ok(canisterId)
         } catch (e) {
             return #err(Error.message(e))

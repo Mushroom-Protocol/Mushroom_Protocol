@@ -50,7 +50,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "epvyw-ddnza-4wy4p-joxft-ciutt-s7pji-cfxm3-khwlb-x2tb7-uo7tc-xae")'
 ```
 #### Approve Startup
 ```
