@@ -60,7 +60,7 @@ const FoundersItems = () => {
         variant: "solid",
       })
       const resMintNFT: any = (await backend.mintNFT(
-        "PR182655",
+        "PR702759",
       )) as {Ok: String; Err: String}
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
