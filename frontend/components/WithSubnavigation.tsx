@@ -52,7 +52,7 @@ interface Props {
   path: string
 }
 
-const Links = ["Home", "Launchpad", "Apply"]
+const Links = ["Discover", "Launchpad", "Apply"]
 //const { estado, setEstado } = useContext(EstadoContext);
 
 const initialStateFormData = {

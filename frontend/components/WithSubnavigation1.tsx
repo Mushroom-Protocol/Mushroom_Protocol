@@ -51,7 +51,7 @@ interface Props {
   children: React.ReactNode
 }
 
-const Links = ["Home", "Launchpad", "Apply"]
+const Links = ["Explore", "Launchpad", "Apply"]
 //const { estado, setEstado } = useContext(EstadoContext);
 
 const NavLink = (props: Props) => {

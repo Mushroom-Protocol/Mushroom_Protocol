@@ -1,561 +1,213 @@
-import React, { useEffect, useState } from "react"
-import { Box, Text, Image, Badge, Button, Center, Flex } from "@chakra-ui/react"
-import { useNavigate } from "react-router-dom"
-import Natheralogo from "../../assets/Natheralogo.png"
-import Landoppicon from "../../assets/Landopp_icon.png"
-import EONlogo from "../../assets/EONlogo.png"
-import NatheraNFTBoceto from "../../assets/NatheraNFTBoceto.png"
-import MushroomFoundersBoceto from "../../assets/MushroomFoundersBoceto.png"
-import EONNFTboceto from "../../assets/EONNFTboceto.png"
-import favicon from "../../assets/favicon.ico"
-import MpFavicon from "../../assets/MpFavicon.png"
-import DashboardSidebar from "../DashboardSidebar"
-import { useCanister } from "@connect2ic/react"
+import React, { useEffect, useState } from "react";
+import { Box, Text, Image, Button, Center, Flex, HStack } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import Mushroomfounders from "../../assets/Mushroomfounders.gif";
+import faviconico from "../../assets/Faviconico.png";
+import GreenTech from "../../assets/GreenTech.png";
+import FoodTech from "../../assets/FoodTech.png";
+import HealthTech from "../../assets/HealthTech.png";
+import SyntheticTech from "../../assets/SyntheticTech.png";
+import Natheralogo from "../../assets/Natheralogo.png";
+import CityFounders from "../../assets/CityFounders.jpg";
+import Silkongv1 from "../../assets/SilkongV1.jpg";
+import EONNFTV1 from "../../assets/EONNFTV1.jpg";
+import Landoppicon from "../../assets/Landopp_icon.png";
+import Landoppnft01 from "../../assets/Landoppnft01.mp4"; // Importar el video aquí
+import NatheraNFTv1 from "../../assets/NatheraNFTv1.jpg";
+import ReciqloLogo from "../../assets/ReciqloLogo.jpg";
+import EONlogo from "../../assets/EONlogo.png";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-const LaunchpadNFT = () => {
-  const navigate = useNavigate()
-  const [backend] = useCanister("backend")
-  const [incomingCollectionsRequests, setIncomingCollectionsRequests] = useState<any[]>([])
+const LaunchpadNFT: React.FC = () => {
+  const navigate = useNavigate();
+  const [incomingCollectionsRequests, setIncomingCollectionsRequests] = useState<any[]>([]);
 
   useEffect(() => {
-    const getIncomingCollectionsRequests = async () => {
-      try {
-        const resIncomingCollectionsRequests: string[] = await backend.getIncomingCollectionsRequests() as string[]
-        setIncomingCollectionsRequests(resIncomingCollectionsRequests)
-        return resIncomingCollectionsRequests
-      } catch (error) {
-        console.error("Error on backend.getIncomingCollectionsRequests() call:", error)
-      }
-    }
+    // Datos hardcodeados para prueba
+    const hardcodedData = [
+      {
+        imgSrc: Mushroomfounders,
+        logoSrc: faviconico,
+        startUpName: "Mushroom Founders",
+        shortDes: "Mushroom Founders",
+        story: "Alien race of mushrooms traveling the universe, founding civilizations and decentralizing science and technology.",
+        status: "Active",
+        opendate: "12.06.24",
+        closedate: "12.08.24",
+        badgeSrc: [SyntheticTech], // Array de insignias
+        owner: "Owner1",
+        url: "/founders" // Ruta específica para este startup
+      },
+      {
+        imgSrc: Landoppnft01, // Utilizando el video Landoppnft01 directamente
+        logoSrc: Landoppicon,
+        startUpName: "Landopp",
+        shortDes: "NoPlas",
+        story: "Mysterious Organic Gems from sacred plants, can fuse with elements, regenerate, and create strong, flexible matter in harmony with nature.",
+        status: "Coming Soon",
+        opendate: "31.07.24",
+        closedate: "31.09.24",
+        badgeSrc: [GreenTech, FoodTech], // Array de insignias
+        owner: "Owner2",
+        url: "/landopp" // Ruta específica para este startup
+      },
+      {
+        imgSrc: Silkongv1,
+        logoSrc: ReciqloLogo,
+        startUpName: "Reciqlo",
+        shortDes: "Reciqlo",
+        story: "Stellar gorillas who guard the healing power of silicon. These extraordinary beings act as powerful regenerators of planets throughout the universe.",
+        status: "Coming Soon",
+        opendate: "31.09.24",
+        closedate: "31.11.24",
+        badgeSrc: [GreenTech, SyntheticTech], // Array de insignias
+        owner: "Owner3",
+        url: "/reciqlo" // Ruta específica para este startup
+      },
+      {
+        imgSrc: NatheraNFTv1,
+        logoSrc: Natheralogo,
+        startUpName: "Nathera",
+        shortDes: "Warriors Cells",
+        story: "A powerful army of fibroblasts uses its potent nanofilaments to accelerate tissue regeneration, a medical breakthrough pioneered in the galaxy.",
+        status: "Coming Soon",
+        opendate: "17.10.24",
+        closedate: "17.11.24",
+        badgeSrc: [HealthTech], // Array de insignias
+        owner: "Owner4",
+        url: "/nathera" // Ruta específica para este startup
+      },
+      {
+        imgSrc: EONNFTV1,
+        logoSrc: EONlogo,
+        startUpName: "EON",
+        shortDes: "Broccoli Pickers",
+        story: "Plant creatures genetically created in the laboratory to collect garbage and clean the city, symbols of hope.",
+        status: "Coming Soon",
+        opendate: "17.11.24",
+        closedate: "17.12.24",
+        badgeSrc: [FoodTech], // Array de insignias
+        owner: "Owner5",
+        url: "/eon" // Ruta específica para este startup
+      },
+    ];
 
-    getIncomingCollectionsRequests().then(incomingCollectionsRequest => incomingCollectionsRequest).catch(error => console.error(error))
-  }, [])
+    setIncomingCollectionsRequests(hardcodedData);
+  }, []);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 1000,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 50000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  if (incomingCollectionsRequests.length === 0) {
+    return (
+      <Center>
+        <Text>No collections available at the moment.</Text>
+      </Center>
+    );
+  }
 
   return (
     <Center>
-      <Box
-        color="#FFFFFF"
-        // w="1024px"
-        // h="550px"
-        display={{ md: "flex" }}
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Text fontSize="16px" textAlign="center" my="20px">
-          Mint your own Bio-NFT and accelerate the progress of science. Be part
-          of scientific innovation!
-        </Text>
-        <Box
-          borderWidth="0.5px"
-          borderRadius="15px"
-          borderColor="#FFFFFFF"
-          backgroundColor="#000000"
-          w="1024px"
-          overflowX="scroll"
-          display={{ md: "flex" }}
-          alignItems="center"
-          // px="150px"
-          py="20px"
-          marginBottom={100}
-        >
-          {incomingCollectionsRequests.map((collection) => (
-            <Box w="320px" h="460px" borderRadius="25px">
+      <Flex color="#FFFFFF" flexDirection="column" alignItems="center" position="relative" marginLeft="0px" marginTop="0px" width="100%">
+        <Slider {...settings} style={{ width: '100%' }}>
+          {incomingCollectionsRequests.map((collection, index) => (
+            <Box
+              key={index}
+              border="1px solid #1E1E1E"
+              borderRadius="8px"
+              minWidth="340px"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              p="25px"
+              textAlign="center"
+              m="0px"
+              backgroundColor="#000000"
+              color="#FFFFFF"
+            >
               <Center>
-                <Image
-                  src={MpFavicon}
-                  alt={collection.startUpName}
-                  w="500px"
-                  h="290px"
-                  mt="0px"
-                />
-              </Center>
-              <Box mt="5px" ml="58px" display="flex" alignItems="center">
-                <Image
-                  src={MpFavicon}
-                  alt={collection.startUpName + " logo"}
-                  w="40px"
-                  h="40px"
-                  mr="10px"
-                />
-                <Text fontSize="22px">{collection.shortDes}</Text>
-              </Box>
-              <Text
-                fontSize="14px"
-                color="#737373"
-                mt="5px"
-                mb="10px"
-                textAlign="center"
-              >
-                Minted: 0 / 600
-                <br />
-                Raised: 0 / 3,000 ICP
-              </Text>
-              <Flex justifyContent="space-between" alignItems="center">
-                <Badge
-                  ml="50px"
-                  bg="#000000"
-                  borderColor="#1FAFC8"
-                  borderWidth="0.5px"
-                  color="#FFFFFF"
-                  fontSize="20px"
-                  p="5px"
-                  borderRadius="0.5rem"
-                  textTransform="capitalize"
-                  display="flex"
-                  alignItems="center"
-                >
-                  5
-                  <Image
-                    src={favicon}
-                    alt="ICP logo"
-                    w="25px"
-                    h="25px"
-                    ml="5px"
+                {collection.startUpName === "Landopp" ? (
+                  <video
+                    src={collection.imgSrc} // Utilizando imgSrc para el video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      borderRadius: "10px",
+                      objectFit: "cover",
+                      width: "250px",
+                      height: "300px",
+                    }}
                   />
-                </Badge>
+                ) : (
+                  <Image src={collection.imgSrc} alt={collection.startUpName} w="250px" h="300px" borderRadius="10px" />
+                )}
+              </Center>
+              <Box display="flex" alignItems="center" mt="20px">
+                <Image src={collection.logoSrc} alt={collection.startUpName + " logo"} borderRadius="10px" w="50px" h="50px" mr="10px" />
+                <Text fontSize="25px">{collection.shortDes}</Text>
+              </Box>
+              <Text fontSize="18px" my="10px" textAlign="justify">
+                {collection.story}
+              </Text>
+              <Text fontSize="16px" color="gray.500" my="10px" textAlign="justify">
+                Status: {collection.status}
+                <br />
+                Date: {collection.opendate} / {collection.closedate}
+              </Text>
+              <Flex justifyContent="space-between" alignItems="center" mt="20px" width="100%">
+                <HStack spacing="10px">
+                  {collection.badgeSrc.map((badge, badgeIndex) => (
+                    <Image key={badgeIndex} src={badge} alt={`Badge ${badgeIndex}`} w="50px" h="50px" />
+                  ))}
+                </HStack>
                 <Button
-                  mr="50px"
                   colorScheme="teal"
                   backgroundColor="#1FAFC8"
                   variant="solid"
                   color="#000000"
                   fontSize="xl"
                   borderRadius="5px"
-                  _hover={{
-                    bg: "#01B994",
-                  }}
-                  onClick={() =>
-                    navigate("/StartupInfo", {
-                      state: { owner: collection.owner },
-                    })
-                  }
+                  _hover={{ bg: "#01B994" }}
+                  onClick={() => navigate(collection.url)}
                 >
-                  Details
+                  Explore Collection
                 </Button>
               </Flex>
             </Box>
           ))}
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={NatheraNFTBoceto}
-                alt="Nathera NFT"
-                w="500px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="58px" display="flex" alignItems="center">
-              <Image
-                src={Natheralogo}
-                alt="Nathera Logo"
-                w="40px"
-                h="40px"
-                mr="10px"
-              />
-              <Text fontSize="22px">Warrior Cells</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 600
-              <br />
-              Raised: 0 / 3,000 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1FAFC8"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#01B994",
-                }}
-                onClick={() => navigate("/Nathera")}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={MushroomFoundersBoceto}
-                alt="Founders NFT"
-                w="350px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="20px" display="flex" alignItems="center">
-              <Image
-                src={MpFavicon}
-                alt="Mushroom Logo"
-                w="40px"
-                h="40px"
-                mr="5px"
-              />
-              <Text fontSize="22px">Mushroom Founders</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 250
-              <br />
-              Raised: 0 / 1250 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1FAFC8"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#01B994",
-                }}
-                onClick={() => navigate("/Founders")}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={EONNFTboceto}
-                alt="EON NFT"
-                w="350px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="48px" display="flex" alignItems="center">
-              <Image src={EONlogo} alt="EON Logo" w="40px" h="40px" mr="10px" />
-              <Text fontSize="22px">Brocoli Pickers</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 600
-              <br />
-              Raised: 0 / 3,000 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1e1e1e"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#1e1e1e",
-                  //bg: '#01B994',
-                }}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-
-
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={NatheraNFTBoceto}
-                alt="Nathera NFT"
-                w="500px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="58px" display="flex" alignItems="center">
-              <Image
-                src={Natheralogo}
-                alt="Nathera Logo"
-                w="40px"
-                h="40px"
-                mr="10px"
-              />
-              <Text fontSize="22px">Warrior Cells</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 600
-              <br />
-              Raised: 0 / 3,000 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1FAFC8"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#01B994",
-                }}
-                onClick={() => navigate("/Nathera")}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={MushroomFoundersBoceto}
-                alt="Founders NFT"
-                w="350px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="20px" display="flex" alignItems="center">
-              <Image
-                src={MpFavicon}
-                alt="Mushroom Logo"
-                w="40px"
-                h="40px"
-                mr="5px"
-              />
-              <Text fontSize="22px">Mushroom Founders</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 250
-              <br />
-              Raised: 0 / 1250 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1FAFC8"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#01B994",
-                }}
-                onClick={() => navigate("/Founders")}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-          <Box w="320px" h="460px" borderRadius="25px">
-            <Center>
-              <Image
-                src={EONNFTboceto}
-                alt="EON NFT"
-                w="350px"
-                h="290px"
-                mt="0px"
-              />
-            </Center>
-            <Box mt="5px" ml="48px" display="flex" alignItems="center">
-              <Image src={EONlogo} alt="EON Logo" w="40px" h="40px" mr="10px" />
-              <Text fontSize="22px">Brocoli Pickers</Text>
-            </Box>
-            <Text
-              fontSize="14px"
-              color="#737373"
-              mt="5px"
-              mb="10px"
-              textAlign="center"
-            >
-              Minted: 0 / 600
-              <br />
-              Raised: 0 / 3,000 ICP
-            </Text>
-            <Flex justifyContent="space-between" alignItems="center">
-              <Badge
-                ml="50px"
-                bg="#000000"
-                borderColor="#1FAFC8"
-                borderWidth="0.5px"
-                color="#FFFFFF"
-                fontSize="20px"
-                p="5px"
-                borderRadius="0.5rem"
-                textTransform="capitalize"
-                display="flex"
-                alignItems="center"
-              >
-                5
-                <Image
-                  src={favicon}
-                  alt="ICP logo"
-                  w="25px"
-                  h="25px"
-                  ml="5px"
-                />
-              </Badge>
-              <Button
-                mr="50px"
-                colorScheme="teal"
-                backgroundColor="#1e1e1e"
-                variant="solid"
-                color="#000000"
-                fontSize="xl"
-                borderRadius="5px"
-                _hover={{
-                  bg: "#1e1e1e",
-                  //bg: '#01B994',
-                }}
-              >
-                Details
-              </Button>
-            </Flex>
-          </Box>
-        </Box>
-      </Box>
+        </Slider>
+      </Flex>
     </Center>
-  )
-}
+  );
+};
 
-export default LaunchpadNFT
+export default LaunchpadNFT;

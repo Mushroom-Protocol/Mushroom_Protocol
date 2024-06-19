@@ -102,7 +102,7 @@ const CollectionsReqs: React.FC = () => {
         maxLimit: 10,
       }
       const cfgMushroom: DeployConfig = {
-        proyectId: "PR182655",
+        projectId: "PR507005",
         baseUrl: "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/",
         assetsNames: [
           "m49y4-e209u-1vca2-k0xqi-3rv.jpg",
@@ -119,11 +119,13 @@ const CollectionsReqs: React.FC = () => {
         custodian: "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe",
       }
       const feeDeploy: number = 50692307692
+      console.log(cfgMushroom)
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
         feeDeploy,
       )) as any
+      console.log(resDeployCollection)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -306,7 +308,7 @@ const CollectionsReqs: React.FC = () => {
                       onChange={handleChangeForm}
                     />
                   </FormControl>
-                  <FormControl>
+                  {/* <FormControl>
                     <Input
                       placeholder="Canister Id assets..."
                       id="nftCanisterIdAssets"
@@ -314,7 +316,7 @@ const CollectionsReqs: React.FC = () => {
                       value={formDataDeploy.nftBaseUrl}
                       onChange={handleChangeForm}
                     />
-                  </FormControl>
+                  </FormControl> */}
                   <FormControl>
                     <Input
                       placeholder="Assets names..."
