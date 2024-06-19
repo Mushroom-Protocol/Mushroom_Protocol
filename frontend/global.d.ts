@@ -3,6 +3,10 @@ interface Window {
     plug: {
       requestConnect: (params?: RequestConnectParams) => Promise<string>;
       isConnected: () => Promise<boolean>;
+      requestTransfer: ({
+        to: string,
+        amount: number
+      }) => Promise<{ height: Number }>;
       sessionManager: {
         sessionData: {
           agent: HttpAgent;
@@ -13,6 +17,7 @@ interface Window {
       principalId: string;
       accountId: string;
       agent: HttpAgent;
+
     };
   };
 }
