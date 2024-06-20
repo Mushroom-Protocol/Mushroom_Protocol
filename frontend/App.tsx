@@ -63,7 +63,7 @@ const client = createClient({
       dev: true,
       providerUrl: internetIdentityUrl,
     }),
-    new PlugWallet(),
+    // new PlugWallet(),
     new NFID(),
   ],
   globalProviderConfig: {
