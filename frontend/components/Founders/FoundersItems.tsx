@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useContext } from "react"
 import {
   Flex,
   Image,
@@ -23,7 +23,8 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa6"
-import { useCanister } from "@connect2ic/react"
+import { useCanister } from "@connect2ic/react";
+import {EstadoContext} from "../utils/estadoContex"
 import faviconico from "../../assets/Faviconico.png";
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
@@ -46,7 +47,7 @@ const FoundersItems = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
-
+  let {currentUser, setCurrentUser} = useContext(EstadoContext)
   const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
     // event.preventDefault()
     let loadingToastId;
@@ -288,20 +289,22 @@ const FoundersItems = () => {
             <Button size="sm" marginLeft="10px" onClick={handleIncrease}>
               +
             </Button>
-            <Button
+            {(currentUser.name !== "") &&  <Button
               backgroundColor="#1FAFC8"
               textColor="#000000"
               variant="solid"
               ml="10px"
               borderRadius="10px"
-              onClick={onOpen} // Abre modal de confirmación de minted
+              onClick={handleSubmitMint} // Abre modal de confirmación de minted
               _hover={{
                 backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
                 textColor: "#000000", // Mantener el mismo color de texto
               }}
             >
               Mint
-            </Button>
+            </Button>}
+            
+
           </Box>
           <Text
             fontSize="16px"
