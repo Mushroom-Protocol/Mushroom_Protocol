@@ -7,6 +7,7 @@ interface Window {
         to: string,
         amount: number
       }) => Promise<{ height: Number }>;
+      requestBalance: () => Promise<Number>;
       sessionManager: {
         sessionData: {
           agent: HttpAgent;

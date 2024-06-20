@@ -13,7 +13,7 @@ import { router } from "./router/AppRouter"
 import { Text } from "@chakra-ui/react"
 
 function App() {
-  const { isConnected, principal } = useConnect()
+  const { isConnected, principal, activeProvider  } = useConnect()
 
   return (
     <>
@@ -32,6 +32,7 @@ function App() {
           ? " " + principal
           : ", connect with Internet Identity to continue"}
         !
+  
       </Text>
       <RouterProvider router={router} />
     </>
@@ -62,7 +63,7 @@ const client = createClient({
       dev: true,
       providerUrl: internetIdentityUrl,
     }),
-    // new PlugWallet(),
+    new PlugWallet(),
     new NFID(),
   ],
   globalProviderConfig: {

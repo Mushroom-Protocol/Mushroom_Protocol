@@ -49,52 +49,97 @@ const FoundersItems = () => {
 
   const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
     // event.preventDefault()
-    let loadingToastId: string | number | undefined
-
+    let loadingToastId;
+    let transferStatus;
+  
+    try {
+      const e = await window.ic.plug.requestConnect();
+      console.log(e);
+      
+      if (await window.ic.plug.isConnected()) {
+        const params = {
+          to: '827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682',
+          amount: 4e7
+        };
+  
+        try {
+          transferStatus = await window.ic.plug.requestTransfer(params);
+        } catch (transferError) {
+          console.error('Error en la transferencia:', transferError);
+          transferStatus = undefined;
+        }
+      }
+    } catch (connectError) {
+      console.error('Error al conectar a Plug Wallet:', connectError);
+      window.open('https://plugwallet.ooo/', '_blank');
+      return; // Termina la función si hay un error de conexión
+    }
+  
+    if (transferStatus === undefined) {
+      toast({
+        title: "Transaction Rejected",
+        description: "The transaction was rejected. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      });
+      return; // Termina la función si la transferencia falló
+    }
+  
     try {
       loadingToastId = toast({
         title: "Submitting Form",
-        status: "loading", // 'loading' es el status para el estilo de carga
+        status: "loading",
         duration: null,
         isClosable: false,
         variant: "solid",
-      })
-      const resMintNFT: any = (await backend.mintNFT(
-        "PR702759",
-      )) as {Ok: String; Err: String}
+      });
+  
+      const resMintNFT = (await backend.mintNFT("PR492415")) as { Ok: any; Err: String };
+  
       if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      };
-      if (resMintNFT.Err !== undefined){
-        toast.close("loadingToastId");
+        toast.close(loadingToastId);
       }
-      toast({
-        title: "Successful Submission",
-        description: 'Token ID:  ' + String(resMintNFT?.Ok.token_id),
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-
-      onClose()
+  
+      if (resMintNFT.Err !== undefined) {
+        toast({
+          title: "Minting Error",
+          description: resMintNFT.Err,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        });
+      } else {
+        toast({
+          title: "Successful Submission",
+          description: 'Token ID: ' + String(resMintNFT?.Ok.token_id),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        });
+      }
+  
+      onClose();
     } catch (error) {
       if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
+        toast.close(loadingToastId);
       }
-
+  
       toast({
         title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
-        status: "error", // 'error' es el status para el estilo de error
+        description: "There was an error submitting the form. Please try again.",
+        status: "error",
         duration: 5000,
         isClosable: true,
         variant: "solid",
-      })
-      console.error("Error on backend.mintNFT() call:", error)
+      });
+      console.error("Error on backend.mintNFT() call:", error);
     }
-  }
+  };
+  
 
   return (
     <Center>
