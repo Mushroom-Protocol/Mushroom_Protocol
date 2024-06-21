@@ -315,9 +315,10 @@ export default function WithSubnavigation() {
         {isOpen ? (
           <Box pb={40} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
-              {Links.map((link) => (
-                <NavLink path={link}>{link}</NavLink>
-              ))}
+              {Links.map((link) => {
+                if (link === "Apply" && currentUser?.verified.Success !== true) return;
+                return <NavLink path={link}>{link}</NavLink>
+              })}
             </Stack>
           </Box>
         ) : null}
