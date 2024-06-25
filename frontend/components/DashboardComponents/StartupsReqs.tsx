@@ -37,9 +37,7 @@ const StartupsReqs: React.FC = () => {
   const [startups, setStartups] = useState<Startup[] | null>()
   const [incomingStartupDetails, setIncomingStartupDetails] =
     useState<Startup>()
-  const [formApprove, setFormApprove] = useState({
-    startupValoration: 0,
-  })
+  const [forms, setForms] = useState([]);
   const [responseBackend, setResponseBackend] = useState<string | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
@@ -49,6 +47,12 @@ const StartupsReqs: React.FC = () => {
       try {
         const response: Startup[] = await backend.getIncomingStartUps() as Startup[]
         setStartups(response)
+        const initials = response.map((resStartup, index) => {
+          return forms[index] ?
+            {startupValoration: forms[index]?.startupValoration} :
+            {startupValoration: 0}
+        })
+        setForms(initials)
         return response
       } catch (error) {
         console.error("Error on backend.getIncomingStartUps() call:", error)
@@ -69,15 +73,16 @@ const StartupsReqs: React.FC = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormApprove((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
+  const handleInputChange = (index, e) => {
+    const { name, value } = e.target;
+    const formsDuplicate = [...forms]
+    formsDuplicate[index][name] = parseInt(value)
+    setForms(formsDuplicate)
   }
 
-  const handleApprove = async (owner, valoration) => {
+  const handleFormSubmit = async (owner, index, e) => {
+    e.preventDefault();
+    const {value} = e.target[0]
     let loadingToastId: string | number | undefined
 
     try {
@@ -94,7 +99,7 @@ const StartupsReqs: React.FC = () => {
       const resGetIncomingStartupByOwnerOk = resGetIncomingStartupByOwner["ok"]
       const resApproveStartUp = (await backend.approveStartUp(
         resGetIncomingStartupByOwnerOk,
-        parseInt(valoration),
+        parseInt(value),
         owner,
         // )) as {ok: string} | {err: string}
       )) as object
@@ -192,9 +197,9 @@ const StartupsReqs: React.FC = () => {
     <>
       <Heading fontSize="4xl">Startup registration requests</Heading>
       <List spacing={3}>
-        {startups?.map((startup) => {
+        {startups?.map((startup, index) => {
           return (
-            <ListItem>
+            <ListItem key={index}>
               <Card maxW="sm">
                 <CardBody>
                   <Center>
@@ -219,34 +224,31 @@ const StartupsReqs: React.FC = () => {
                 <Divider />
                 <CardFooter flexDirection="column">
                   <Flex>
-                    <Input
-                      id="startupValoration"
-                      name="startupValoration"
-                      value={formApprove.startupValoration}
-                      onChange={handleChange}
-                      placeholder="Enter valoration..."
-                      type="number"
-                    />
-                    <ButtonGroup spacing="2">
-                      <Button
-                        colorScheme="blue"
-                        onClick={() =>
-                          handleApprove(
-                            startup.owner,
-                            formApprove.startupValoration,
-                          )
-                        }
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        colorScheme="blue"
-                        onClick={() => handleReject(startup.owner)}
-                      >
-                        Reject
-                      </Button>
-                    </ButtonGroup>
+                    <form key={index} onSubmit={(e) => handleFormSubmit(startup.owner, index, e)}>
+                      <Input
+                        id="startupValoration"
+                        name="startupValoration"
+                        value={forms[index]?.startupValoration}
+                        onChange={(e) => handleInputChange(index, e)}
+                        placeholder="Enter valoration..."
+                        type="number"
+                      />
+                      <ButtonGroup spacing="2">
+                        <Button
+                          colorScheme="blue"
+                          type="submit"
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          colorScheme="blue"
+                          onClick={() => handleReject(startup.owner)}
+                        >
+                          Reject
+                        </Button>
+                      </ButtonGroup>
+                    </form>
                   </Flex>
                   <Box>
                     <Button
