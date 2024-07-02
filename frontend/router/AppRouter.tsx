@@ -33,6 +33,7 @@ import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
 import UsersPendingVerification from "../components/DashboardComponents/UsersPendingVerification"
 import ConnectionsRecords from "../components/DashboardComponents/ConnectionsRecords"
 import CollectionsReqs from "../components/DashboardComponents/CollectionsReqs"
+import StartupPage from "../pages/StartupPage"
 
 
 function Layout() {
@@ -109,6 +110,7 @@ export const router = createBrowserRouter([
       { path: "FungiDAO", element: <FungiDAOPage /> },
       { path: "Staking", element: <StakingPage /> },
       { path: "Vault", element: <VaultPage /> },
+      { path: "/StartUp/:startupId", element: <StartupPage /> }
     ],
   },
 ])
