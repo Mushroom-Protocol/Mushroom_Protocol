@@ -108,7 +108,9 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             <HStack spacing={4}>
               {["lg"].map((size) => (
                 <Tag
-                  size="lg" // Tamaño del tag (puedes ajustarlo según tus necesidades)
+                  // size="lg" // Tamaño del tag (puedes ajustarlo según tus necesidades)
+                  size={size} // Tamaño del tag (puedes ajustarlo según tus necesidades)
+                  key={size} // Tamaño del tag (puedes ajustarlo según tus necesidades)
                   variant="subtle"
                   colorScheme="orange" // Cambia a naranja
                   backgroundColor="#000000"

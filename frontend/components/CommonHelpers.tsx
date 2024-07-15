@@ -1,3 +1,14 @@
+//--------------------- funciones para codificar y decodificar imagenes entre base64 y Blob -----------------
+export function base64ToBlob(dataUrl: String) {
+  var base64Content = dataUrl.split(',')[1];  // Extraer el contenido codificado en base64 de la URL de datos
+  var byteCharacters = atob(base64Content);   // Convertir el contenido base64 a un array de bytes (Uint8Array)
+  var byteArray = new Uint8Array(byteCharacters.length);
+  for (var i = 0; i < byteCharacters.length; i++) {
+    byteArray[i] = byteCharacters.charCodeAt(i);
+  }
+  return byteArray;
+}
+
 export function blobToBase64(buffer: Uint8Array) {
   var binary = ""
   var bytes = new Uint8Array(buffer)
@@ -8,14 +19,27 @@ export function blobToBase64(buffer: Uint8Array) {
   return btoa(binary)
 }
 
-export function base64ToBlob(dataUrl: String) {
-  var base64Content = dataUrl.split(',')[1];  // Extraer el contenido codificado en base64 de la URL de datos
-  var byteCharacters = atob(base64Content);   // Convertir el contenido base64 a un array de bytes (Uint8Array)
-  var byteArray = new Uint8Array(byteCharacters.length);
-  for (var i = 0; i < byteCharacters.length; i++) {
-    byteArray[i] = byteCharacters.charCodeAt(i);
-  }
-  return byteArray;
+export const convertFileToBase64 = (file?: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      return resolve(reader.result as string)
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+// -----------------------------------------------------------------------------------------------------------
+
+export const readFileLines = (file: File): Promise<string[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function(progressEvent) {
+      return resolve((reader.result as string).split('\n') as string[]);
+    };
+    reader.onerror = reject;
+    reader.readAsText(file);
+  })
 }
 
 export const getUserRoles = (userRoles: any[]): string[] => {
@@ -49,17 +73,6 @@ export const isUserRoleAdmin = (roles: any[]): boolean => {
     }
   })
   return isUserRoleAdminFlag
-}
-
-export const convertFileToBase64 = (file?: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      return resolve(reader.result as string)
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
 
 export const getTRL = (idLevel: number): string => {
