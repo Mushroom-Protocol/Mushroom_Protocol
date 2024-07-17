@@ -11,6 +11,14 @@ export default function StartupPage() {
   const {startupId} = useParams()
 
   useEffect(() => {
+    async function getStartUpByID(
+      startupId: string,
+    ): Promise<Startup | undefined> {
+      const resStartUpByID: Startup | undefined | null =
+        (await backend.getStartUpByID(startupId)) as Startup | undefined | null
+      return resStartUpByID
+    }
+    
     const resStartUpByID = getStartUpByID(startupId)
       .then((startup) => {
         setStartup(startup[0])
@@ -18,14 +26,6 @@ export default function StartupPage() {
       })
       .catch((error) => console.error(error))
   }, [])
-
-  async function getStartUpByID(
-    startupId: string,
-  ): Promise<Startup | undefined> {
-    const resStartUpByID: Startup | undefined | null =
-      (await backend.getStartUpByID(startupId)) as Startup | undefined | null
-    return resStartUpByID
-  }
 
   return (
     <>

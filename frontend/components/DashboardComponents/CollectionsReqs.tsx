@@ -48,7 +48,7 @@ const CollectionsReqs: React.FC = () => {
     nftAssetsNamesFile: null as File | null,
     // nftAssetsNames: [],
     nftCustodian: "",
-    nftFee: 100000000000,
+    nftFee: 0,
   })
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -357,6 +357,13 @@ const CollectionsReqs: React.FC = () => {
                   <legend>Sección Fee</legend>
                   <FormControl>
                     <Text>Total: {formDataDeploy.nftFee}</Text>
+                    <Input
+                      id="nftFee"
+                      name="nftFee"
+                      placeholder="Total fee..."
+                      value={formDataDeploy.nftFee}
+                      onChange={handleChangeForm}
+                    />
                   </FormControl>
                 </fieldset>
                 {/* <FormControl> */}

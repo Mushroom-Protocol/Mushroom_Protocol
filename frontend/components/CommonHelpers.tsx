@@ -1,3 +1,5 @@
+import { Startup, StartupCard } from "./CommonTypes";
+
 //--------------------- funciones para codificar y decodificar imagenes entre base64 y Blob -----------------
 export function base64ToBlob(dataUrl: String) {
   var base64Content = dataUrl.split(',')[1];  // Extraer el contenido codificado en base64 de la URL de datos
@@ -93,4 +95,22 @@ export const getTRL = (idLevel: number): string => {
     default:
       return ""
   }
+}
+
+export const getStartUpsPreview = async (backend: any): Promise<StartupCard[]> => {
+  try {
+    const resGetStartUpsPreview = (await backend.getStartUpsPreview()) as StartupCard[]
+    return resGetStartUpsPreview
+  } catch (error) {
+    console.error("Error on backend.getStartUpsPreview() call:", error)
+  }
+}
+
+export const getStartUpByID = async (
+  startupId: string,
+  backend: any,
+): Promise<Startup | undefined | null> => {
+  const resStartUpByID: Startup | undefined | null =
+  backend.getStartUpByID(startupId) as Startup | undefined | null
+  return resStartUpByID
 }

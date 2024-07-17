@@ -19,12 +19,24 @@ import EONlogo from "../../assets/EONlogo.png";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Startup, StartupCard } from "../CommonTypes";
+import { useCanister } from "@connect2ic/react";
+import { getStartUpByID, getStartUpsPreview } from "../CommonHelpers";
 
 const LaunchpadNFT: React.FC = () => {
   const navigate = useNavigate();
   const [incomingCollectionsRequests, setIncomingCollectionsRequests] = useState<any[]>([]);
+  const [backend] = useCanister("backend")
 
   useEffect(() => {
+    const getStartUpsInfo = async (backend: any): Promise<Startup[]> => {
+      const startupCards: StartupCard[] = await getStartUpsPreview(backend)
+      const startupsByID: Promise<Startup>[] = startupCards.map(startupCard => {
+        return getStartUpByID(startupCard.startupId, backend)
+      })
+      return Promise.all(startupsByID)
+    }
+    
     // Datos hardcodeados para prueba
     const hardcodedData = [
       {
@@ -94,7 +106,27 @@ const LaunchpadNFT: React.FC = () => {
       },
     ];
 
-    setIncomingCollectionsRequests(hardcodedData);
+    // setIncomingCollectionsRequests(hardcodedData);
+    getStartUpsInfo(backend).then(resStartUpsInfo => {
+      const buildedStartups = resStartUpsInfo.map(startUpInfo => {
+        return {
+          imgSrc: Mushroomfounders,
+          logoSrc: Mushroomfounders,
+          startUpName: startUpInfo[0].startUpName,
+          shortDes: startUpInfo[0].shortDes,
+          story: startUpInfo[0].startUpSlogan,
+          status: startUpInfo[0].startupStatus,
+          opendate: "17.11.24",
+          closedate: "17.12.24",
+          badgeSrc: [Mushroomfounders], // Array de insignias
+          owner: String(startUpInfo[0].owner),
+          // url: startUpInfo[0].website // Ruta específica para este startup
+          url: "/StartUp/" + startUpInfo[0].startupId
+        }
+      })
+      const concatenatedData = hardcodedData.concat(buildedStartups)
+      setIncomingCollectionsRequests(concatenatedData);
+    }).catch(error => console.error(error))
   }, []);
 
   const settings = {

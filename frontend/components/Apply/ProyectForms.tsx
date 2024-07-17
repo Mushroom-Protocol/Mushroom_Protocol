@@ -230,7 +230,7 @@ const ProyectForms = () => {
                     onChange={handleSelectChange}
                     placeholder="Select status..."
                   >
-                    <option value="ResearchPhase" selected>
+                    <option value="ResearchPhase">
                       Research Phase
                     </option>
                     <option value="ProductPrototype">Product Prototype</option>

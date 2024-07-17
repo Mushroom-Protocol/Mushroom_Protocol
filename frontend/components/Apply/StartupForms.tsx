@@ -126,8 +126,6 @@ const StartupForms = () => {
         isClosable: true,
         variant: 'solid',
       });
-
-      console.log(response);
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {
@@ -236,7 +234,7 @@ const StartupForms = () => {
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
                   <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status...">
-                    <option value="ResearchStage" selected>Research stage</option>
+                    <option value="ResearchStage">Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>
                     <option value="Seed">Seed</option>

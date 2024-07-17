@@ -22,22 +22,18 @@ export default function ApplyPage() {
         startupId,
       )) as string[][]
       setHasStartupProject(resProjectsByStartup.flat().length > 0)
-      return resProjectsByStartup.length > 0
+      return resProjectsByStartup.flat().length > 0
     }
 
     let loadingToastId: string | number | undefined = toast({
       title: "Loading forms...",
       status: "loading", // 'loading' es el status para el estilo de carga
-      duration: null,
+      duration: 2000,
       isClosable: false,
       variant: "solid",
     })
     hasRoleStartupProject(getRoleStartup(currentUser?.roles)[0])
-      .then((resHasRoleStartupProject) => {
-        if (loadingToastId !== undefined) {
-          toast.close(loadingToastId)
-        }
-      })
+      .then((resHasRoleStartupProject) => console.log("hasRoleStartupProject"))
       .catch((error) => console.error(error))
     // setHasStartupProject(await hasRoleStartupProject(getRoleStartup(currentUser.roles)[0]))
   }, [currentUser])
@@ -47,25 +43,18 @@ export default function ApplyPage() {
       {window.location.pathname.startsWith("/Dashboard") &&
       isUserRoleStartup(currentUser?.roles) ? (
         <>
-          <br />
-          {hasStartupProject ? (
-            <div
-              style={{ visibility: hasStartupProject ? "visible" : "hidden" }}
-            >
-              <ColecctionForm />
-            </div>
-          ) : (
-            <div
-              style={{ visibility: hasStartupProject ? "visible" : "hidden" }}
-            >
-              <ProyectForms />
-            </div>
-          )}
+          <div style={{ display: hasStartupProject ? "block" : "none" }}>
+            <ColecctionForm />
+          </div>
+          <div style={{ display: !hasStartupProject ? "block" : "none" }}>
+            <ProyectForms />
+          </div>
         </>
       ) : (
         <>
           <BannerApply />
-          {currentUser?.verified["Success"] === true && <StartupForms />}
+          {currentUser?.verified["Success"] === true &&
+            !isUserRoleStartup(currentUser?.roles) && <StartupForms />}
           <br />
         </>
       )}

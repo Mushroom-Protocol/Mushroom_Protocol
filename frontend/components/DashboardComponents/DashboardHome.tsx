@@ -75,9 +75,9 @@ const DashboardHome: React.FC = () => {
     const userStartUpsPreview: StartupCard[] = startUpsPreview?.filter(
       (startUpPreview) => startupIDs.includes(startUpPreview.startupId),
     ) as StartupCard[]
-    return userStartUpsPreview?.map((userStartUpPreview) => {
+    return userStartUpsPreview?.map((userStartUpPreview, idx) => {
       return (
-        <Card maxW="sm">
+        <Card maxW="sm" key={idx}>
           <CardBody>
             <Heading color="blue.600" fontSize="2xl" marginBottom="15px">
               {userStartUpPreview.startUpName}
