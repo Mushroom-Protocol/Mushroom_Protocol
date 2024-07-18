@@ -79,7 +79,7 @@ const StartupDetails = ({ startup: startupFetched }) => {
             <TabPanels>
               <TabPanel>
                 {/* Contenido para la pestaña "Collection" */}
-                <p>
+                <>
                   <Text fontSize="12px" color="#737373" textAlign="justify">
                     Mushroom Founders is a collection of 500 NFTs, unique
                     digital collectibles living on the Internet Computer
@@ -96,41 +96,46 @@ const StartupDetails = ({ startup: startupFetched }) => {
                     us revolutionize biotech development
                     <br />
                     <br />
-                    <Text fontSize="15px" color="#FFFFFF">
+                    <span style={{fontSize: "15px", color: "#FFFFFF"}}>
                       Utilities
-                    </Text>
+                    </span>
                     <br />
-                    <Text fontSize="12px" color="#FFFFFF">
+                    <br />
+                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       AIRDROPS:
-                    </Text>
+                    </span>
+                    <br />
                     You will receive 25 $FUNGI tokens before listing on the
                     market. and IP-NFTs of the first research batch.
                     <br />
                     <br />
-                    <Text fontSize="12px" color="#FFFFFF">
+                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       IP-NFT:
-                    </Text>
+                    </span>
+                    <br />
                     Stake Mushroom Founders NFT and get $FUNGI token rewards.
                     <br />
                     <br />
-                    <Text fontSize="12px" color="#FFFFFF">
+                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       MEMBERSHIP:
-                    </Text>
+                    </span>
+                    <br />
                     Early access to the Mushroom Protocol DeFi services and
                     Metaverse.
                     <br />
                     <br />
-                    <Text fontSize="12px" color="#FFFFFF">
+                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       GOVERNANCE:
-                    </Text>
+                    </span>
+                    <br />
                     Vote and monitor the development of project progress on the
                     FungiDAO.
                   </Text>
-                </p>
+                </>
               </TabPanel>
               <TabPanel>
                 {/* Contenido para la pestaña "Tokenomics" */}
-                <p>
+                <>
                   <Text fontSize="16px" color="#737373" textAlign="justify">
                     The «Mushroom Founders» NFT collection is available on the
                     Internet Computer Protocol (ICP) network, which offers
@@ -149,11 +154,11 @@ const StartupDetails = ({ startup: startupFetched }) => {
                     25 Founders are excluded from the sale. These will be used
                     for giveaways, rewards, and creator memberships.
                   </Text>
-                </p>
+                </>
               </TabPanel>
               <TabPanel>
                 {/* Contenido para la pestaña "R&D Project" */}
-                <p>
+                <>
                   {" "}
                   <Text fontSize="16px" color="#737373" textAlign="justify">
                     «Mushroom Founders» NFT collection tells the story of 500
@@ -170,11 +175,11 @@ const StartupDetails = ({ startup: startupFetched }) => {
                     As they travel the universe in their ships, they become the
                     disseminators of transcendental knowledge.
                   </Text>
-                </p>
+                </>
               </TabPanel>
               <TabPanel>
                 {/* Contenido para la pestaña "Team" */}
-                <p>
+                <>
                   {" "}
                   <Link href="https://mushroomprotocol.io/founders/" isExternal>
                     Collection Website <ExternalLinkIcon mx="2px" />
@@ -184,7 +189,7 @@ const StartupDetails = ({ startup: startupFetched }) => {
                   <Link href="https://mushroomprotocol.io/" isExternal>
                     Protocol Website <ExternalLinkIcon mx="2px" />
                   </Link>
-                </p>
+                </>
               </TabPanel>
             </TabPanels>
           </Tabs>

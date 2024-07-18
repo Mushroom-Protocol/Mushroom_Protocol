@@ -25,8 +25,8 @@ const UsersPendingVerification: React.FC = () => {
       <Heading fontSize="4xl" marginBottom="20px">
         Users with pending verification
       </Heading>
-      {users?.map((userPending: [string, string, string]) => (
-        <Text fontSize="xl">{`${userPending[1]} - ${userPending[0]} - ${userPending[2]}`}</Text>
+      {users?.map((userPending: [string, string, string], idx: number) => (
+        <Text key={idx} fontSize="xl">{`${userPending[1]} - ${userPending[0]} - ${userPending[2]}`}</Text>
       ))}
     </>
   )

@@ -43,6 +43,7 @@ export default function ApplyPage() {
       {window.location.pathname.startsWith("/Dashboard") &&
       isUserRoleStartup(currentUser?.roles) ? (
         <>
+          <br />
           <div style={{ display: hasStartupProject ? "block" : "none" }}>
             <ColecctionForm />
           </div>

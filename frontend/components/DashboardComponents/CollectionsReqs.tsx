@@ -34,9 +34,7 @@ const CollectionsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
   const [incomingCollectionsRequests, setIncomingCollectionsRequests] =
     useState<string[]>()
-  const [responseBackend, setResponseBackend] = useState<
-    string | null | DataProject
-  >()
+  const [responseBackend, setResponseBackend] = useState<any>(null)
   const [formDataDeploy, setFormDataDeploy] = useState({
     toPrincipal: "",
     nftName: "",
@@ -85,6 +83,13 @@ const CollectionsReqs: React.FC = () => {
   }
 
   const handleOpenModal = async (currStartup: string) => {
+    toast({
+      title: "Loading forms...",
+      status: "loading", // 'loading' es el status para el estilo de carga
+      duration: 2000,
+      isClosable: false,
+      variant: "solid",
+    })
     const resProjectsByStartup: string[] | null | undefined = await backend.getProjectsByStartup(currStartup) as string[] | null | undefined
     formDataDeploy.nftProyectId = resProjectsByStartup[0]
     onOpen()
@@ -108,7 +113,7 @@ const CollectionsReqs: React.FC = () => {
         logo: {logo_type: "png", data: formDataDeploy.nftLogo},
         name: formDataDeploy.nftName,
         symbol: formDataDeploy.nftSymbol,
-        maxLimit: formDataDeploy.nftMaxLimit,
+        maxLimit: Number(formDataDeploy.nftMaxLimit),
       }
       const cfgMushroom: DeployConfig = {
         projectId: formDataDeploy.nftProyectId[0],
@@ -120,8 +125,9 @@ const CollectionsReqs: React.FC = () => {
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
-        formDataDeploy.nftFee,
+        Number(formDataDeploy.nftFee),
       )) as any
+      setResponseBackend(resDeployCollection)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -140,12 +146,13 @@ const CollectionsReqs: React.FC = () => {
       } else {
         toast({
           title: "Error deploying collection",
-          description: `Error on backend.deployCollection().`,
+          description: resDeployCollection["err"],
           status: "error", // 'error' es el status para el estilo de error
           duration: 5000,
           isClosable: true,
           variant: "solid",
         })
+        console.error(resDeployCollection)
       }
     } catch (error) {
       if (loadingToastId !== undefined) {
@@ -166,63 +173,13 @@ const CollectionsReqs: React.FC = () => {
     }
   }
 
-  const handleReject = async (owner) => {
-    let loadingToastId: string | number | undefined
-
-    try {
-      loadingToastId = toast({
-        title: "Submitting Form",
-        status: "loading", // 'loading' es el status para el estilo de carga
-        duration: null,
-        isClosable: false,
-        variant: "solid",
-      })
-
-      // const resRejectProject = await backend.rejectProject(owner) as DataProject | null
-      const resRejectProject = (await backend.rejectProject(owner)) as
-        | DataProject
-        | null
-        | string
-      setResponseBackend(resRejectProject)
-
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Successful Submission",
-        description: `Project rejected successfully.`,
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-    } catch (error) {
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
-        status: "error", // 'error' es el status para el estilo de error
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-
-      console.error("Error approving startup:", error)
-    }
-  }
-
   return (
     <>
       <Heading fontSize="4xl">Collection registration requests</Heading>
       <List spacing={3}>
-        {incomingCollectionsRequests?.map((incomingCollectionsRequest) => {
+        {incomingCollectionsRequests?.map((incomingCollectionsRequest, idx) => {
           return (
-            <ListItem>
+            <ListItem key={idx}>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">
@@ -356,7 +313,6 @@ const CollectionsReqs: React.FC = () => {
                 <fieldset>
                   <legend>Sección Fee</legend>
                   <FormControl>
-                    <Text>Total: {formDataDeploy.nftFee}</Text>
                     <Input
                       id="nftFee"
                       name="nftFee"
