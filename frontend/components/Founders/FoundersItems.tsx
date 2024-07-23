@@ -97,7 +97,7 @@ const FoundersItems = () => {
         variant: "solid",
       });
   
-      const resMintNFT = (await backend.mintNFT("PR492415")) as { Ok: any; Err: String };
+      const resMintNFT = (await backend.mintNFT("PR785282")) as { Ok: any; Err: String };
   
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId);

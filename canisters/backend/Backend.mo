@@ -74,6 +74,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         }
     };
 
+    public shared ({ caller }) func removeUser(p: Principal ): async () {
+        assert(authorizedCaller(caller));
+        ignore HashMap.remove(users, phash, p);
+    };
+
     let randomStore = Random.Rand();
 
     func generateId(prefix : Text) : async Text {
@@ -909,7 +914,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
-        ExperimentalCycles.add(fee);
+        ExperimentalCycles.add<system>(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
