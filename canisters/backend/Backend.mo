@@ -118,7 +118,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
     type CollectionAddress = Text; //Canister ID of the collection nft
     stable let nftCollections = HashMap.new<ProjectID, CollectionAddress>(); //Value is the Principal ID of canister Collection in Text format
-
+    
+    public shared ({ caller }) func removeCollection(p: ProjectID ): async () {
+        assert(authorizedCaller(caller));
+        ignore HashMap.remove(nftCollections, thash, p);
+    };
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
     stable let newslettersEmailSubs = Set.new<Text>();
