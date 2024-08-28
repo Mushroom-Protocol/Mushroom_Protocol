@@ -223,7 +223,7 @@ module {
         };
 
         public type DeployConfig = {
-            proyectId : Text;
+            projectId : Text;
             baseUrl : Text;
             assetsNames : [Text];
             custodian : Text;

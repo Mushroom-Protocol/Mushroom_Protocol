@@ -22,42 +22,8 @@ import { Tooltip } from '@chakra-ui/react';
 import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useCanister } from "@connect2ic/react";
+import { base64ToBlob, convertFileToBase64 } from "../CommonHelpers";
 // import {Industry} from "../../declarations/backend";
-
-
-//--------------------- funciones para codificar y decodificar imagenes entre base64 y Blob -----------------
-function base64ToBlob(dataUrl: String) {
-  var base64Content = dataUrl.split(',')[1];  // Extraer el contenido codificado en base64 de la URL de datos
-  var byteCharacters = atob(base64Content);   // Convertir el contenido base64 a un array de bytes (Uint8Array)
-  var byteArray = new Uint8Array(byteCharacters.length);
-  for (var i = 0; i < byteCharacters.length; i++) {
-    byteArray[i] = byteCharacters.charCodeAt(i);
-  }
-  return byteArray;
-};
-
-function blobToBase64(buffer: Uint8Array) {
-  var binary = '';
-  var bytes = new Uint8Array(buffer);
-  var len = bytes.byteLength;
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-};
-
-const convertFileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
-// -----------------------------------------------------------------------------------------------------------
-
-
-
 
 const StartupForms = () => {
   const { isOpen, onToggle } = useDisclosure();
@@ -160,8 +126,6 @@ const StartupForms = () => {
         isClosable: true,
         variant: 'solid',
       });
-
-      console.log(response);
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {
@@ -270,7 +234,7 @@ const StartupForms = () => {
                 <FormControl isRequired mt={4}>
                   <FormLabel>Startup Status</FormLabel>
                   <Select id="startupStatus" name="startupStatus" value={formData.startupStatus} onChange={handleSelectChange} placeholder="Select status...">
-                    <option value="ResearchStage" selected>Research stage</option>
+                    <option value="ResearchStage">Research stage</option>
                     <option value="EarlyStartUp">Early Start-Up</option>
                     <option value="PreSeed" >Pre-seed</option>
                     <option value="Seed">Seed</option>

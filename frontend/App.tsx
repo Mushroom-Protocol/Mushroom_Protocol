@@ -3,7 +3,7 @@ import React, { useEffect } from "react"
  * Connect2ic provides essential utilities for IC app development
  */
 import { createClient } from "@connect2ic/core"
-import { InternetIdentity, NFID } from "@connect2ic/core/providers"
+import { InternetIdentity, PlugWallet, NFID } from "@connect2ic/core/providers"
 import { Connect2ICProvider, useConnect } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
 import { RouterProvider } from "react-router-dom"
@@ -13,7 +13,7 @@ import { router } from "./router/AppRouter"
 import { Text } from "@chakra-ui/react"
 
 function App() {
-  const { isConnected, principal } = useConnect()
+  const { isConnected, principal, activeProvider  } = useConnect()
 
   return (
     <>
@@ -32,6 +32,7 @@ function App() {
           ? " " + principal
           : ", connect with Internet Identity to continue"}
         !
+  
       </Text>
       <RouterProvider router={router} />
     </>

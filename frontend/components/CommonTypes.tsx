@@ -144,7 +144,7 @@ export interface Dip721NonFungibleToken {
 }
 
 export interface DeployConfig {
-  proyectId: string;
+  projectId: string;
   baseUrl: string;
   assetsNames: string[];
   custodian: string;

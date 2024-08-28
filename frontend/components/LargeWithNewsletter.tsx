@@ -96,7 +96,7 @@ export default function LargeWithNewsletter() {
               alt='Logo Mushhroom'
               />
             </Box>
-            <Text fontSize={'sm'}>© 2023 MushRoom Protocol. All rights reserved</Text>
+            <Text fontSize={'sm'}>© 2024 MushRoom Protocol. All rights reserved</Text>
             <Stack direction={'row'} spacing={6}>
               <SocialButton label={'Twitter'} href={'https://twitter.com/MushromProtocol'}>
               <FaTwitter />

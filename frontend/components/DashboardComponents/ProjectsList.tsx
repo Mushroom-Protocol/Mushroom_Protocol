@@ -85,9 +85,9 @@ const ProjectsList: React.FC = () => {
     <>
       <Heading fontSize="4xl">Projects list</Heading>
       <List spacing={3}>
-        {projectsPreview?.map((project) => {
+        {projectsPreview?.map((project, idx) => {
           return (
-            <ListItem>
+            <ListItem key={idx}>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">

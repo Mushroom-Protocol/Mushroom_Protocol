@@ -13,8 +13,11 @@ import MarketPlacePage from "../pages/MarketPlacePage"
 import StakingPage from "../pages/StakinPage"
 import VaultPage from "../pages/VaultPage"
 import NatheraPage from "../pages/NatheraPage"
+import LandoppPage from "../pages/LandoppPage"
 import FoundersPage from "../pages/FoundersPage"
 import ApplyPage from "../pages/ApplyPage"
+import EONPage from "../pages/EONPage"
+import ReciqloPage from "../pages/ReciqloPage"
 import DashboardSidebar from "../components/DashboardSidebar"
 import AdminPage from "../pages/AdminPage"
 import { EstadoProvider } from "../components/utils/estadoContex"
@@ -30,6 +33,8 @@ import ProjectsReqs from "../components/DashboardComponents/ProjectsReqs"
 import UsersPendingVerification from "../components/DashboardComponents/UsersPendingVerification"
 import ConnectionsRecords from "../components/DashboardComponents/ConnectionsRecords"
 import CollectionsReqs from "../components/DashboardComponents/CollectionsReqs"
+import StartupPage from "../pages/StartupPage"
+
 
 function Layout() {
   const navigate = useNavigate()
@@ -64,11 +69,14 @@ export const router = createBrowserRouter([
     element: <Layout />,
     errorElement: <ErrorPage />,
     children: [
-      { path: "/", element: <Navigate to="Home" /> },
-      { path: "Home", element: <HomePage /> },
+      { path: "/", element: <Navigate to="Discover" /> },
+      { path: "Discover", element: <HomePage /> },
       { path: "LaunchPad", element: <LaunchPadPage /> },
       { path: "StartupInfo", element: <FoundersPage /> },
       { path: "Nathera", element: <NatheraPage /> },
+      { path: "Landopp", element: <LandoppPage /> },
+      { path: "EON", element: <EONPage /> },
+      { path: "Reciqlo", element: <ReciqloPage /> },
       { path: "Founders", element: <FoundersPage /> },
       { path: "Apply", element: <ApplyPage /> },
       {
@@ -102,6 +110,7 @@ export const router = createBrowserRouter([
       { path: "FungiDAO", element: <FungiDAOPage /> },
       { path: "Staking", element: <StakingPage /> },
       { path: "Vault", element: <VaultPage /> },
+      { path: "/StartUp/:startupId", element: <StartupPage /> }
     ],
   },
 ])

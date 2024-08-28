@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { useCanister, useConnect } from "@connect2ic/react"
 import { StartupCard, UserType } from "../CommonTypes"
-import { blobToBase64, getRoleStartup } from "../CommonHelpers"
+import { blobToBase64, getRoleStartup, getUserRoles } from "../CommonHelpers"
 import { EstadoContext, EstadoProvider } from "../utils/estadoContex"
 
 const DashboardHome: React.FC = () => {
@@ -35,7 +35,6 @@ const DashboardHome: React.FC = () => {
         const resGetStartUpsPreview: StartupCard[] =
           (await backend.getStartUpsPreview()) as StartupCard[]
         setStartUpsPreview(resGetStartUpsPreview)
-        // return startUpsPreview
 
         if (loadingToastId2 !== undefined) {
           toast.close(loadingToastId2)
@@ -72,21 +71,13 @@ const DashboardHome: React.FC = () => {
     getStartUpsPreview()
   }, [currentUser])
 
-  const getRolesKeys = (roles: object[] | undefined) => {
-    return roles
-      ?.map((role) => {
-        return Object.keys(role)
-      })
-      .join()
-  }
-
   const displayStartupCards = (startupIDs: string[]) => {
     const userStartUpsPreview: StartupCard[] = startUpsPreview?.filter(
       (startUpPreview) => startupIDs.includes(startUpPreview.startupId),
     ) as StartupCard[]
-    return userStartUpsPreview.map((userStartUpPreview) => {
+    return userStartUpsPreview?.map((userStartUpPreview, idx) => {
       return (
-        <Card maxW="sm">
+        <Card maxW="sm" key={idx}>
           <CardBody>
             <Heading color="blue.600" fontSize="2xl" marginBottom="15px">
               {userStartUpPreview.startUpName}
@@ -114,7 +105,7 @@ const DashboardHome: React.FC = () => {
   return (
     <>
       <Heading fontSize="35px">User: {currentUser?.name}</Heading>
-      <Text fontSize="2xl">Roles: {getRolesKeys(currentUser?.roles)}</Text>
+      <Text fontSize="2xl">Roles: {getUserRoles(currentUser?.roles)}</Text>
       <Text fontSize="2xl">Startups:</Text>
       {!extractedRolesStartup?.length || extractedRolesStartup?.length <= 0 ? (
         <p>The user does not have approved startups yet.</p>
