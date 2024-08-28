@@ -149,9 +149,10 @@ module {
     };
 
     public module NFT {
-        public type Tokenomic = {
 
+        public type Tokenomic = {
         };
+
         public type Category = {
             #Airdrop;
             #Liquidity;
@@ -162,8 +163,10 @@ module {
         };
 
         public type Holder = {
+            principal: Principal;
             category : Category;
-            percentage : Float
+            percentage : Float;
+            isVesting: Bool;
         };
 
         public type Utilities = {
@@ -227,6 +230,7 @@ module {
             baseUrl : Text;
             assetsNames : [Text];
             custodian : Text;
+            distribution : [Holder];
             // initialStaking: ?StakingParams;
 
         };

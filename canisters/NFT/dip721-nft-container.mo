@@ -12,13 +12,49 @@ import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 
 shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, _baseUrl : Text, _fileNames : [Text]) = Self {
-
-    stable var fileNames = _fileNames;
-
+    
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
     type Trx = Types.Trx;
+
+    stable var fileNames = _fileNames;
+
+
+    //////////////////////////// Initial distribution ///////////////////////
+    stable let holders: [Types.Holder] = init.distribution;
+    stable var initialDistributionEnded = false;
+
+    func initialDistribution():async  (){
+        for(holder in holders.vals()){ 
+            let qtyNfts = Prim.nat64ToNat(Prim.int64ToNat64(Prim.floatToInt64(Prim.int64ToFloat(Prim.nat64ToInt64(maxLimit)) * holder.percentage / 100.0)));
+            var index =  Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts));
+            
+            while (index > 0){
+                let tokenId = await generateRandomID();
+                let metadata : Types.MetadataDesc = [{
+                    purpose = #Rendered;
+                    key_val_data = [
+                        { key = "url"; val = #TextContent(baseUrl # fileNames[index])},
+                        // More elements
+                    ];
+                    data : Blob = "/00/00"
+                }];
+                let nft = { owner = holder.principal; id = tokenId; metadata };
+                ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
+                index -= 1;
+            };
+            fileNames := Array.subArray<Text>(fileNames, Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts)), fileNames.size());
+        };
+        initialDistributionEnded := true;
+    };
+
+    public shared ({caller}) func startInitialDistribution(): async () {
+        assert (Set.has(custodians, phash, caller));
+        assert (not initialDistributionEnded);
+        await initialDistribution();
+    };
+    /////////////////////////////////////////////////////////////////////////////
 
     stable var transactionId : TransactionId = 0;
     stable let nfts = Map.new<TokenId, Nft>();
@@ -30,7 +66,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     stable let logo : Types.LogoResult = init.logo;
     stable let name : Text = init.name;
     stable let symbol : Text = init.symbol;
-    stable let maxLimit : Nat16 = init.maxLimit;
+    stable let maxLimit : Nat64 = init.maxLimit;
     stable var totalSupply : Nat64 = 0;
 
     let rand = Rand.Rand(); // get random Nat value with rand.next()
@@ -179,7 +215,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         }
     };
 
-    public query func getMaxLimitDip721() : async Nat16 {
+    public query func getMaxLimitDip721() : async Nat64 {
         return maxLimit
     };
 
