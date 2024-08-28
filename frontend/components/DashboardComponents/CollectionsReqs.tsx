@@ -27,26 +27,26 @@ import {
   DataProject,
   DeployConfig,
   Dip721NonFungibleToken,
-  ProjectCard,
 } from "../CommonTypes"
+import { readFileLines } from "../CommonHelpers"
 
 const CollectionsReqs: React.FC = () => {
   const [backend] = useCanister("backend")
   const [incomingCollectionsRequests, setIncomingCollectionsRequests] =
     useState<string[]>()
-  const [responseBackend, setResponseBackend] = useState<
-    string | null | DataProject
-  >()
+  const [responseBackend, setResponseBackend] = useState<any>(null)
   const [formDataDeploy, setFormDataDeploy] = useState({
     toPrincipal: "",
     nftName: "",
+    nftLogo: "",
     nftSymbol: "",
     nftMaxLimit: 0,
     nftProyectId: "",
     nftBaseUrl: "",
-    nftAssetsNames: [],
+    nftAssetsNamesFile: null as File | null,
+    // nftAssetsNames: [],
     nftCustodian: "",
-    nftFee: "",
+    nftFee: 0,
   })
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -68,7 +68,7 @@ const CollectionsReqs: React.FC = () => {
 
     getIncomingCollectionsRequests()
       .then((incomingCollectionsRequests) =>
-        console.log(incomingCollectionsRequests),
+        console.log("getIncomingCollectionsRequests"),
       )
       .catch((error) => console.error(error))
   }, [responseBackend])
@@ -82,7 +82,22 @@ const CollectionsReqs: React.FC = () => {
     }))
   }
 
-  const handleDeploy = async (startupID: string) => {
+  const handleOpenModal = async (currStartup: string) => {
+    toast({
+      title: "Loading forms...",
+      status: "loading", // 'loading' es el status para el estilo de carga
+      duration: 2000,
+      isClosable: false,
+      variant: "solid",
+    })
+    const resProjectsByStartup: string[] | null | undefined = await backend.getProjectsByStartup(currStartup) as string[] | null | undefined
+    formDataDeploy.nftProyectId = resProjectsByStartup[0]
+    onOpen()
+  }
+
+  const handleDeploy = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const targetForm = event.target
     let loadingToastId: string | number | undefined
 
     try {
@@ -94,38 +109,25 @@ const CollectionsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      
       const initDip721: Dip721NonFungibleToken = {
-        logo: {logo_type: "png", data: "https://nys2z-xaaaa-aaaak-qddoq-cai.icp0.io/assets/MpFavicon.c07f4d7e.png"},
-        name: "Founders",
-        symbol: "MRPF",
-        maxLimit: 10,
+        logo: {logo_type: "png", data: formDataDeploy.nftLogo},
+        name: formDataDeploy.nftName,
+        symbol: formDataDeploy.nftSymbol,
+        maxLimit: Number(formDataDeploy.nftMaxLimit),
       }
       const cfgMushroom: DeployConfig = {
-        projectId: "PR507005",
-        baseUrl: "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/",
-        assetsNames: [
-          "m49y4-e209u-1vca2-k0xqi-3rv.jpg",
-          "md14e-yz64m-zovii-2a5io-cpe.jpg",
-          "jajcd-s1ndi-gsomc-9vn7w-ean.jpg",
-          "kz4fs-mv9y7-5dobw-e842k-mc6.jpg",
-          "y1l9l-5vn4t-5wmpu-vcrms-zpq.jpg",
-          "rktq0-sypbn-uco8c-ttcjk-oot.jpg",
-          "m4uax-mdpfl-3q8c3-gy9k7-sh1.jpg",
-          "k00jl-65v0g-obsc2-itlt9-87n.jpg",
-          "36ns1-jrwym-ps933-hw2ht-c27.jpg",
-          "y7njg-kpxay-j32ip-ybzu2-0j1.jpg"
-        ],
-        custodian: "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe",
+        projectId: formDataDeploy.nftProyectId[0],
+        baseUrl: formDataDeploy.nftBaseUrl,
+        assetsNames: await readFileLines(targetForm[8].files[0]),
+        custodian: formDataDeploy.nftCustodian,
       }
-      const feeDeploy: number = 50692307692
-      console.log(cfgMushroom)
+      
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
-        feeDeploy,
+        Number(formDataDeploy.nftFee),
       )) as any
-      console.log(resDeployCollection)
+      setResponseBackend(resDeployCollection)
 
       if (loadingToastId !== undefined) {
         toast.close(loadingToastId)
@@ -140,15 +142,17 @@ const CollectionsReqs: React.FC = () => {
           isClosable: true,
           variant: "solid",
         })
+        onClose()
       } else {
         toast({
           title: "Error deploying collection",
-          description: `Error on backend.deployCollection() .`,
+          description: resDeployCollection["err"],
           status: "error", // 'error' es el status para el estilo de error
           duration: 5000,
           isClosable: true,
           variant: "solid",
         })
+        console.error(resDeployCollection)
       }
     } catch (error) {
       if (loadingToastId !== undefined) {
@@ -165,57 +169,7 @@ const CollectionsReqs: React.FC = () => {
         variant: "solid",
       })
 
-      console.error("Error approving project:", error)
-    }
-  }
-
-  const handleReject = async (owner) => {
-    let loadingToastId: string | number | undefined
-
-    try {
-      loadingToastId = toast({
-        title: "Submitting Form",
-        status: "loading", // 'loading' es el status para el estilo de carga
-        duration: null,
-        isClosable: false,
-        variant: "solid",
-      })
-
-      // const resRejectProject = await backend.rejectProject(owner) as DataProject | null
-      const resRejectProject = (await backend.rejectProject(owner)) as
-        | DataProject
-        | null
-        | string
-      setResponseBackend(resRejectProject)
-
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Successful Submission",
-        description: `Project rejected successfully.`,
-        status: "success", // 'success' es el status para el estilo de éxito
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-    } catch (error) {
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId)
-      }
-
-      toast({
-        title: "Submission Error",
-        description:
-          "There was an error submitting the form. Please try again.",
-        status: "error", // 'error' es el status para el estilo de error
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-
-      console.error("Error approving startup:", error)
+      console.error("Error deploying collection:", error)
     }
   }
 
@@ -223,9 +177,9 @@ const CollectionsReqs: React.FC = () => {
     <>
       <Heading fontSize="4xl">Collection registration requests</Heading>
       <List spacing={3}>
-        {incomingCollectionsRequests?.map((incomingCollectionsRequest) => {
+        {incomingCollectionsRequests?.map((incomingCollectionsRequest, idx) => {
           return (
-            <ListItem>
+            <ListItem key={idx}>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">
@@ -239,7 +193,7 @@ const CollectionsReqs: React.FC = () => {
                     <Button
                       variant="solid"
                       colorScheme="blue"
-                      onClick={onOpen}
+                      onClick={() => handleOpenModal(incomingCollectionsRequest)}
                     >
                       Deploy
                     </Button>
@@ -266,9 +220,18 @@ const CollectionsReqs: React.FC = () => {
             <ModalHeader>Deploy collection</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <form>
+              <form onSubmit={handleDeploy}>
                 <fieldset>
                   <legend>Sección DIP-721</legend>
+                  <FormControl isRequired>
+                    <Input
+                      placeholder="Logo..."
+                      id="nftLogo"
+                      name="nftLogo"
+                      value={formDataDeploy.nftLogo}
+                      onChange={handleChangeForm}
+                    />
+                  </FormControl>
                   <FormControl isRequired>
                     <Input
                       placeholder="Name..."
@@ -301,36 +264,47 @@ const CollectionsReqs: React.FC = () => {
                   <legend>Sección Mushroom</legend>
                   <FormControl>
                     <Input
-                      placeholder="Project Id..."
                       id="nftProyectId"
                       name="nftProyectId"
+                      placeholder="Project Id..."
+                      disabled
                       value={formDataDeploy.nftProyectId}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      id="nftBaseUrl"
+                      name="nftBaseUrl"
+                      type="url"
+                      placeholder="Base URL..."
+                      value={formDataDeploy.nftBaseUrl}
                       onChange={handleChangeForm}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      id="nftAssetsNamesFile"
+                      name="nftAssetsNamesFile"
+                      placeholder="Assets names..."
+                      type="file"
+                      onChange={handleChangeForm}
+                      accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
                     />
                   </FormControl>
                   {/* <FormControl>
                     <Input
-                      placeholder="Canister Id assets..."
-                      id="nftCanisterIdAssets"
-                      name="nftCanisterIdAssets"
-                      value={formDataDeploy.nftBaseUrl}
+                      id="nftAssetsNames"
+                      name="nftAssetsNames"
+                      placeholder="Assets names..."
+                      value={formDataDeploy.nftAssetsNames}
                       onChange={handleChangeForm}
                     />
                   </FormControl> */}
                   <FormControl>
                     <Input
-                      placeholder="Assets names..."
-                      id="nftAssetsNames"
-                      name="nftAssetsNames"
-                      value={formDataDeploy.nftAssetsNames}
-                      onChange={handleChangeForm}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <Input
-                      placeholder="Custodian..."
                       id="nftCustodian"
                       name="nftCustodian"
+                      placeholder="Custodian..."
                       value={formDataDeploy.nftCustodian}
                       onChange={handleChangeForm}
                     />
@@ -339,17 +313,22 @@ const CollectionsReqs: React.FC = () => {
                 <fieldset>
                   <legend>Sección Fee</legend>
                   <FormControl>
-                    <Text>Total:</Text>
+                    <Input
+                      id="nftFee"
+                      name="nftFee"
+                      placeholder="Total fee..."
+                      value={formDataDeploy.nftFee}
+                      onChange={handleChangeForm}
+                    />
                   </FormControl>
                 </fieldset>
                 {/* <FormControl> */}
                   <Button
-                    type="button"
+                    type="submit"
                     mt={4}
                     colorScheme="teal"
                     variant="solid"
                     borderRadius="10px"
-                    onClick={() => handleDeploy("abcd0123")}
                   >
                     Do deploy
                   </Button>

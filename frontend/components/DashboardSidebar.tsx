@@ -122,21 +122,21 @@ const SidebarContent = ({
       {LinkItems.map((link) => {
         if (link.to !== "Admin" && link.to !== "ForResearcher") {
           return (
-            <NavItem
-              key={link.name}
-              icon={link.icon}
-              to={link.to}
-              onClick={() => handleItemClick(link.to)}
-            >
-              {link.name}
-            </NavItem>
+            <div key={link.name}>
+              <NavItem
+                icon={link.icon}
+                to={link.to}
+                onClick={() => handleItemClick(link.to)}
+              >
+                {link.name}
+              </NavItem>
+            </div>
           )
         } else {
           return (
-            <>
+            <div key={link.name}>
               {link.to === "Admin" && isUserRoleAdmin(currentUser?.roles) && (
                 <NavItem
-                  key={link.name}
                   icon={link.icon}
                   to={link.to}
                   onClick={() => handleItemClick(link.to)}
@@ -146,7 +146,6 @@ const SidebarContent = ({
               )}
               {link.to === "ForResearcher" && (isUserRoleAdmin(currentUser?.roles) || isUserRoleStartup(currentUser?.roles)) && (
                 <NavItem
-                  key={link.name}
                   icon={link.icon}
                   to={link.to}
                   onClick={() => handleItemClick(link.to)}
@@ -154,7 +153,7 @@ const SidebarContent = ({
                   {link.name}
                 </NavItem>
               )}
-            </>
+            </div>
           )
         }
       })}
