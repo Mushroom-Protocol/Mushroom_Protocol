@@ -1,3 +1,5 @@
+import TypesNFT "../../NFT/Types";
+
 module {
 
     public type UserId = Text;
@@ -153,21 +155,9 @@ module {
         public type Tokenomic = {
         };
 
-        public type Category = {
-            #Airdrop;
-            #Liquidity;
-            #InventorTeam;
-            #ReserveFund;
-            #PublicSale;
-            #AdvisorNCollaborators
-        };
+        public type Category = TypesNFT.Category;
 
-        public type Holder = {
-            principal: Principal;
-            category : Category;
-            percentage : Float;
-            isVesting: Bool;
-        };
+        public type Holder = TypesNFT.Holder;
 
         public type Utilities = {
             #Governance;

@@ -12,6 +12,8 @@ module {
         name : Text;
         symbol : Text;
         maxLimit : Nat64;
+    };
+    public type Dip721NonFungibleTokenExtended = Dip721NonFungibleToken and {
         distribution: [Holder];
     };
 
@@ -27,8 +29,8 @@ module {
     public type Holder = {
         principal: Principal;
         category : Category;
-        percentage : Float;
-        isVesting : Bool
+        percentage : Nat;
+        isVesting : Bool // Espera a que termine el proyecto para vander
     };
 
     public type ApiError = {

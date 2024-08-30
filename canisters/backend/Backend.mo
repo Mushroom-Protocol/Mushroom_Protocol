@@ -36,9 +36,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type NftID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
+    type Holder = TypesNft.Holder;
     type CollectionPreInit = Types.NFT.CollectionPreInit;
     type ErrorCode = Types.ErrorCode;
     type Dip721NonFungibleToken = TypesNft.Dip721NonFungibleToken;
+    type Dip721NonFungibleTokenExtended = TypesNft.Dip721NonFungibleTokenExtended;
     type DeployConfig = Types.NFT.DeployConfig;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
@@ -920,7 +922,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         // ExperimentalCycles.add<system>(fee);
         ExperimentalCycles.add<system>(fee);
         try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, init, cfg.baseUrl, cfg.assetsNames);
+            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
             ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.projectId, Principal.toText(canisterId));
             ignore addControllers([Principal.fromActor(Mushroom), deployer], ?canisterId); //Para eventuales actualizaciones del standard Dip721

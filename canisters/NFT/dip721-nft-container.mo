@@ -11,7 +11,7 @@ import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, _baseUrl : Text, _fileNames : [Text]) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _fileNames : [Text]) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
@@ -27,7 +27,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     func initialDistribution():async  (){
         for(holder in holders.vals()){ 
-            let qtyNfts = Prim.nat64ToNat(Prim.int64ToNat64(Prim.floatToInt64(Prim.int64ToFloat(Prim.nat64ToInt64(maxLimit)) * holder.percentage / 100.0)));
+            let qtyNfts = holder.percentage;
             var index =  Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts));
             
             while (index > 0){
