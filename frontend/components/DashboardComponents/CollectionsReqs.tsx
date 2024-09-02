@@ -95,6 +95,10 @@ const CollectionsReqs: React.FC = () => {
     onOpen()
   }
 
+  const handleReject = async (currStartup: string) => {
+    await backend.rejectCollection(currStartup)
+  }
+
   const handleDeploy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const targetForm = event.target
@@ -196,6 +200,14 @@ const CollectionsReqs: React.FC = () => {
                       onClick={() => handleOpenModal(incomingCollectionsRequest)}
                     >
                       Deploy
+                    </Button>
+                    <Button
+                      type="button"
+                      mt={4}
+                      variant="ghost"
+                      onClick={() => handleReject(incomingCollectionsRequest)}
+                    >
+                      Reject
                     </Button>
                   </ButtonGroup>
                 </CardFooter>

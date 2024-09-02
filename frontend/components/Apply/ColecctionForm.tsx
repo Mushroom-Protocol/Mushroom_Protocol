@@ -27,6 +27,7 @@ import {
   initialStateCollectionPreInit,
 } from "../CommonTypes"
 import { EstadoContext } from "../utils/estadoContex"
+import { useNavigate } from "react-router-dom"
 
 interface DistributionType {
   Airdrop: number
@@ -53,6 +54,7 @@ const ColecctionForm = () => {
   const [projectsByStartup, setProjectsByStartup] = useState<string[]>()
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState<CollectionPreInit>(initialStateCollectionPreInit)
   const [formDistribution, setFormDistribution] = useState<DistributionType>(formDataDistribution)
 
@@ -165,6 +167,7 @@ const ColecctionForm = () => {
           isClosable: true,
           variant: "solid",
         })
+        navigate('/Dashboard')
       }
       if (resCreateCollection.err) {
         toast({

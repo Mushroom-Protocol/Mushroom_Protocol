@@ -12,6 +12,8 @@ import * as backend from "../src/declarations/backend/"
 import { router } from "./router/AppRouter"
 import { Text } from "@chakra-ui/react"
 
+import { idlFactory as BackendNFT_idl } from '../src/declarations/backendNFT'
+
 function App() {
   const { isConnected, principal, activeProvider  } = useConnect()
 
@@ -57,6 +59,11 @@ const internetIdentityUrl =
 const client = createClient({
   canisters: {
     backend,
+    backendNFT: {
+      idlFactory: BackendNFT_idl,
+      // Canister ID will be dynamically generated upon instantiation
+      canisterId: ''
+    }
   },
   providers: [
     new InternetIdentity({

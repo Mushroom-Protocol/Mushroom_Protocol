@@ -8,6 +8,10 @@
       "main": "./canisters/backend/Backend.mo",
       "type": "motoko"
     },
+    "backendNFT": {
+      "main": "./canisters/NFT/dip721-nft-container.mo",
+      "type": "motoko"
+    },
     "assets": {
       "dependencies":[
       ],

@@ -21,6 +21,7 @@ import { IoInformationCircleOutline } from "react-icons/io5"
 import { useCanister } from "@connect2ic/react"
 import { EstadoContext } from "../utils/estadoContex"
 import { getRoleStartup } from "../CommonHelpers"
+import { useNavigate } from "react-router-dom"
 
 const ProyectForms = () => {
   const [backend] = useCanister("backend")
@@ -28,6 +29,7 @@ const ProyectForms = () => {
   const [extractedRolesStartup, setExtractedRolesStartup] = useState<string[]>()
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     projectTitle: "",
@@ -101,6 +103,7 @@ const ProyectForms = () => {
           isClosable: true,
           variant: "solid",
         })
+        navigate('/Dashboard')
       } else {
         toast({
           title: "Submission Error",

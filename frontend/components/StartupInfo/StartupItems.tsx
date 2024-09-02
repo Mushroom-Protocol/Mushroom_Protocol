@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Flex,
   Image,
@@ -23,12 +23,16 @@ import {
   ModalFooter,
   useDisclosure,
   HStack,
+  useToast,
 } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa6"
 import MpFavicon from "../../assets/MpFavicon.png"
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
 import { Startup } from "../CommonTypes"
+import { useCanister } from "@connect2ic/react"
+
+import { idlFactory as Counter_idl } from '../../../src/declarations/backendNFT'
 
 interface PropsType {
   startup: Startup
@@ -36,6 +40,118 @@ interface PropsType {
 
 const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [quantity, setQuantity] = useState(1)
+  const toast = useToast()
+  const [backend] = useCanister("backend")
+  const [backendNFT] = useCanister("backendNFT")
+  const [totalSupply, setTotalSupply] = useState(0)
+
+  let null_address: string = "aaaaa-aa"
+
+  useEffect(() => {
+    getTotalSupply().then(resTotalSupply => {
+      console.log(resTotalSupply)
+      setTotalSupply(Number(resTotalSupply))
+    }).catch(error => console.error(error))
+  }, [])
+
+  const getTotalSupply = async (): Promise<BigInt> => {
+    const resTotalSupplyDip721: BigInt =
+      (await backendNFT.totalSupplyDip721()) as BigInt
+    return resTotalSupplyDip721
+  }
+
+  const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
+    // event.preventDefault()
+    let loadingToastId;
+    let transferStatus;
+  
+    try {
+      const e = await window.ic.plug.requestConnect();
+      console.log(e);
+      
+      if (await window.ic.plug.isConnected()) {
+        const params = {
+          to: '827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682',
+          amount: 4e7
+        };
+  
+        try {
+          transferStatus = await window.ic.plug.requestTransfer(params);
+        } catch (transferError) {
+          console.error('Error en la transferencia:', transferError);
+          transferStatus = undefined;
+        }
+      }
+    } catch (connectError) {
+      console.error('Error al conectar a Plug Wallet:', connectError);
+      window.open('https://plugwallet.ooo/', '_blank');
+      return; // Termina la función si hay un error de conexión
+    }
+  
+    if (transferStatus === undefined) {
+      toast({
+        title: "Transaction Rejected",
+        description: "The transaction was rejected. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      });
+      return; // Termina la función si la transferencia falló
+    }
+  
+    try {
+      loadingToastId = toast({
+        title: "Submitting Form",
+        status: "loading",
+        duration: null,
+        isClosable: false,
+        variant: "solid",
+      });
+  
+      const resMintNFT = (await backend.mintNFT("PR492415")) as { Ok: any; Err: String };
+  
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId);
+      }
+  
+      if (resMintNFT.Err !== undefined) {
+        toast({
+          title: "Minting Error",
+          description: resMintNFT.Err,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        });
+      } else {
+        toast({
+          title: "Successful Submission",
+          description: 'Token ID: ' + String(resMintNFT?.Ok.token_id),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        });
+      }
+  
+      onClose();
+    } catch (error) {
+      if (loadingToastId !== undefined) {
+        toast.close(loadingToastId);
+      }
+  
+      toast({
+        title: "Submission Error",
+        description: "There was an error submitting the form. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      });
+      console.error("Error on backend.mintNFT() call:", error);
+    }
+  }
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -203,7 +319,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             </Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
-            Minted: 0 / 250
+            Minted: 0 / {totalSupply}
           </Text>
           <Box display="flex" alignItems="center" marginTop="20px">
             <Button size="sm" marginRight="10px" onClick={handleDecrease}>
