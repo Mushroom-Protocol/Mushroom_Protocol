@@ -1,5 +1,5 @@
 import Prim "mo:⛔";
-import Nat16 "mo:base/Nat16";
+// import Nat16 "mo:base/Nat16";
 import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
 import Nat64 "mo:base/Nat64";
@@ -19,6 +19,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     type Trx = Types.Trx;
 
     stable var fileNames = _fileNames;
+    stable let DEPLOYER = caller;
 
 
     //////////////////////////// Initial distribution ///////////////////////
@@ -27,7 +28,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     func initialDistribution():async  (){
         for(holder in holders.vals()){ 
-            let qtyNfts = holder.percentage;
+            let qtyNfts = holder.qty;
             var index =  Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts));
             
             while (index > 0){
@@ -50,7 +51,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({caller}) func startInitialDistribution(): async () {
-        assert (Set.has(custodians, phash, caller));
+        assert (caller == DEPLOYER);
         assert (not initialDistributionEnded);
         await initialDistribution();
     };
@@ -61,7 +62,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     stable let baseUrl = _baseUrl;
 
     stable var custodians = Set.new<Principal>();
-    ignore Set.put<Principal>(custodians, phash, caller);
+    ignore Set.put<Principal>(custodians, phash, DEPLOYER);
     ignore Set.put<Principal>(custodians, phash, Principal.fromText(custodian));
     stable let logo : Types.LogoResult = init.logo;
     stable let name : Text = init.name;
@@ -130,6 +131,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({ caller }) func safeTransferFromDip721(from : Principal, to : Principal, token_id : TokenId) : async Types.TxReceipt {
+        //TODO validar que from no sea vesting y ademas no haya termindo el periodo de vesting
         transferFrom(from, to, token_id, caller)
     };
 

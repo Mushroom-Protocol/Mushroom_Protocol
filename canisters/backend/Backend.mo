@@ -23,7 +23,7 @@ import Interface "./interfaces/ic-management-interface";
 
 shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////*////////
     public type User = Types.User;
     type Role = Types.Role;
     type IncomingStartUp = Types.IncomingStartUp;
@@ -119,6 +119,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
     type CollectionAddress = Text; //Canister ID of the collection nft
+    // TO-DO Cambiar almacenamieto de collecciones por referencias al actor class en lugar de su canisterID
+    // linea 928 put
     stable let nftCollections = HashMap.new<ProjectID, CollectionAddress>(); //Value is the Principal ID of canister Collection in Text format
     
     public shared ({ caller }) func removeCollection(p: ProjectID ): async () {

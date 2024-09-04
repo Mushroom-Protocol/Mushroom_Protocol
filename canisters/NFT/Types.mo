@@ -29,7 +29,7 @@ module {
     public type Holder = {
         principal: Principal;
         category : Category;
-        percentage : Nat;
+        qty : Nat;
         isVesting : Bool // Espera a que termine el proyecto para vander
     };
 
