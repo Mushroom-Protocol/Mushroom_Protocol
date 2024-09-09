@@ -7,99 +7,118 @@ import Blob "mo:base/Blob";
 import Principal "mo:base/Principal";
 
 module {
-  public type Dip721NonFungibleToken = {
-    logo : LogoResult;
-    name : Text;
-    symbol : Text;
-    maxLimit : Nat16
-  };
+    public type Dip721NonFungibleToken = {
+        logo : LogoResult;
+        name : Text;
+        symbol : Text;
+        maxLimit : Nat64;
+    };
+    public type Dip721NonFungibleTokenExtended = Dip721NonFungibleToken and {
+        distribution: [Holder];
+    };
 
-  public type ApiError = {
-    #Unauthorized;
-    #InvalidTokenId;
-    #ZeroAddress;
-    #InvalidCollection;
-    #SenderIsNotOwner;
-    #Other
-  };
+    public type Category = {
+        #Airdrop;
+        #Liquidity;
+        #InventorTeam;
+        #ReserveFund;
+        #PublicSale;
+        #AdvisorNCollaborators
+    };
 
-  public type Result<S, E> = {
-    #Ok : S;
-    #Err : E
-  };
+    public type Holder = {
+        principal: Principal;
+        category : Category;
+        qty : Nat;
+        isVesting : Bool // Espera a que termine el proyecto para vander
+    };
 
-  public type OwnerResult = Result<Principal, ApiError>;
-  public type TxReceipt = Result<Nat, ApiError>;
+    public type ApiError = {
+        #Unauthorized;
+        #InvalidTokenId;
+        #ZeroAddress;
+        #InvalidCollection;
+        #SenderIsNotOwner;
+        #Other
+    };
 
-  public type TransactionId = Nat;
-  public type TokenId = Nat64;
+    public type Result<S, E> = {
+        #Ok : S;
+        #Err : E
+    };
 
-  public type InterfaceId = {
-    #Approval;
-    #TransactionHistory;
-    #Mint;
-    #Burn;
-    #TransferNotification
-  };
+    public type OwnerResult = Result<Principal, ApiError>;
+    public type TxReceipt = Result<Nat, ApiError>;
 
-  public type LogoResult = {
-    logo_type : Text;
-    data : Text
-  };
+    public type TransactionId = Nat;
+    public type TokenId = Nat64;
 
-  public type Nft = {
-    owner : Principal;
-    id : TokenId;
-    metadata : MetadataDesc
-  };
+    public type InterfaceId = {
+        #Approval;
+        #TransactionHistory;
+        #Mint;
+        #Burn;
+        #TransferNotification
+    };
 
-  public type ExtendedMetadataResult = Result<{ metadata_desc : MetadataDesc; token_id : TokenId }, ApiError>;
+    public type LogoResult = {
+        logo_type : Text;
+        data : Text
+    };
 
-  public type MetadataResult = Result<MetadataDesc, ApiError>;
+    public type Nft = {
+        owner : Principal;
+        id : TokenId;
+        metadata : MetadataDesc
+    };
 
-  public type MetadataDesc = [MetadataPart];
+    public type ExtendedMetadataResult = Result<{ metadata_desc : MetadataDesc; token_id : TokenId }, ApiError>;
 
-  public type MetadataPart = {
-    purpose : MetadataPurpose;
-    key_val_data : [MetadataKeyVal];
-    data : Blob
-  };
+    public type MetadataResult = Result<MetadataDesc, ApiError>;
 
-  public type MetadataPurpose = {
-    #Preview;
-    #Rendered
-  };
+    public type MetadataDesc = [MetadataPart];
 
-  public type MetadataKeyVal = {
-    key : Text;
-    val : MetadataVal
-  };
+    public type MetadataPart = {
+        purpose : MetadataPurpose;
+        key_val_data : [MetadataKeyVal];
+        data : Blob
+    };
 
-  public type MetadataVal = {
-    #TextContent : Text;
-    #BlobContent : Blob;
-    #NatContent : Nat;
-    #Nat8Content : Nat8;
-    #Nat16Content : Nat16;
-    #Nat32Content : Nat32;
-    #Nat64Content : Nat64
-  };
+    public type MetadataPurpose = {
+        #Preview;
+        #Rendered
+    };
 
-  public type MintReceipt = Result<MintReceiptPart, ApiError>;
+    public type MetadataKeyVal = {
+        key : Text;
+        val : MetadataVal
+    };
 
-  public type MintReceiptPart = {
-    token_id : TokenId;
-    id : Nat
-  };
+    public type MetadataVal = {
+        #TextContent : Text;
+        #BlobContent : Blob;
+        #NatContent : Nat;
+        #Nat8Content : Nat8;
+        #Nat16Content : Nat16;
+        #Nat32Content : Nat32;
+        #Nat64Content : Nat64
+    };
 
-  public type Trx = {
-    nftId : Nat64;
-    date : Int;
-    trxType : {
-      #Mint : Principal;
-      #Transfer : { from : Principal; to : Principal };
-      #Burn;
-      #Stacking
+    public type MintReceipt = Result<MintReceiptPart, ApiError>;
+
+    public type MintReceiptPart = {
+        token_id : TokenId;
+        id : Nat
+    };
+
+    public type Trx = {
+        nftId : Nat64;
+        date : Int;
+        trxType : {
+            #Mint : Principal;
+            #Transfer : { from : Principal; to : Principal };
+            #Burn;
+            #Stacking
+        }
     }
-  }
 }

@@ -1,5 +1,5 @@
 import Prim "mo:⛔";
-import Nat16 "mo:base/Nat16";
+// import Nat16 "mo:base/Nat16";
 import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
 import Nat64 "mo:base/Nat64";
@@ -11,26 +11,63 @@ import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleToken, _baseUrl : Text, _fileNames : [Text]) = Self {
-
-    stable var fileNames = _fileNames;
-
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _fileNames : [Text]) = Self {
+    
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
     type Trx = Types.Trx;
+
+    stable var fileNames = _fileNames;
+    stable let DEPLOYER = caller;
+
+
+    //////////////////////////// Initial distribution ///////////////////////
+    stable let holders: [Types.Holder] = init.distribution;
+    stable var initialDistributionEnded = false;
+
+    func initialDistribution():async  (){
+        for(holder in holders.vals()){ 
+            let qtyNfts = holder.qty;
+            var index =  Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts));
+            
+            while (index > 0){
+                let tokenId = await generateRandomID();
+                let metadata : Types.MetadataDesc = [{
+                    purpose = #Rendered;
+                    key_val_data = [
+                        { key = "url"; val = #TextContent(baseUrl # fileNames[index])},
+                        // More elements
+                    ];
+                    data : Blob = "/00/00"
+                }];
+                let nft = { owner = holder.principal; id = tokenId; metadata };
+                ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
+                index -= 1;
+            };
+            fileNames := Array.subArray<Text>(fileNames, Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts)), fileNames.size());
+        };
+        initialDistributionEnded := true;
+    };
+
+    public shared ({caller}) func startInitialDistribution(): async () {
+        assert (caller == DEPLOYER);
+        assert (not initialDistributionEnded);
+        await initialDistribution();
+    };
+    /////////////////////////////////////////////////////////////////////////////
 
     stable var transactionId : TransactionId = 0;
     stable let nfts = Map.new<TokenId, Nft>();
     stable let baseUrl = _baseUrl;
 
     stable var custodians = Set.new<Principal>();
-    ignore Set.put<Principal>(custodians, phash, caller);
+    ignore Set.put<Principal>(custodians, phash, DEPLOYER);
     ignore Set.put<Principal>(custodians, phash, Principal.fromText(custodian));
     stable let logo : Types.LogoResult = init.logo;
     stable let name : Text = init.name;
     stable let symbol : Text = init.symbol;
-    stable let maxLimit : Nat16 = init.maxLimit;
+    stable let maxLimit : Nat64 = init.maxLimit;
     stable var totalSupply : Nat64 = 0;
 
     let rand = Rand.Rand(); // get random Nat value with rand.next()
@@ -94,6 +131,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({ caller }) func safeTransferFromDip721(from : Principal, to : Principal, token_id : TokenId) : async Types.TxReceipt {
+        //TODO validar que from no sea vesting y ademas no haya termindo el periodo de vesting
         transferFrom(from, to, token_id, caller)
     };
 
@@ -179,7 +217,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         }
     };
 
-    public query func getMaxLimitDip721() : async Nat16 {
+    public query func getMaxLimitDip721() : async Nat64 {
         return maxLimit
     };
 

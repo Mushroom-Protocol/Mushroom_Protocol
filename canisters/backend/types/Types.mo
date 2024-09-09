@@ -1,3 +1,5 @@
+import TypesNFT "../../NFT/Types";
+
 module {
 
     public type UserId = Text;
@@ -149,22 +151,13 @@ module {
     };
 
     public module NFT {
+
         public type Tokenomic = {
-
-        };
-        public type Category = {
-            #Airdrop;
-            #Liquidity;
-            #InventorTeam;
-            #ReserveFund;
-            #PublicSale;
-            #AdvisorNCollaborators
         };
 
-        public type Holder = {
-            category : Category;
-            percentage : Float
-        };
+        public type Category = TypesNFT.Category;
+
+        public type Holder = TypesNFT.Holder;
 
         public type Utilities = {
             #Governance;
@@ -227,6 +220,7 @@ module {
             baseUrl : Text;
             assetsNames : [Text];
             custodian : Text;
+            distribution : [Holder];
             // initialStaking: ?StakingParams;
 
         };
