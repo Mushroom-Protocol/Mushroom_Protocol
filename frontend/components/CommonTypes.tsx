@@ -106,7 +106,7 @@ export interface CollectionPreInit {
   shortStorytelling: string
   storytellingCollection: string
   totalSupply: number
-  distribution: string[]
+  distribution: any[]
   utilities: string[]
   tokenPrice: number
   documentsFolderUrl: string

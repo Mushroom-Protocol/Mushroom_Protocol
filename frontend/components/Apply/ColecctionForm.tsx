@@ -30,21 +30,61 @@ import { EstadoContext } from "../utils/estadoContex"
 import { useNavigate } from "react-router-dom"
 
 interface DistributionType {
-  Airdrop: number
-  Liquidity: number
-  InventorTeam: number
-  ReserveFund: number
-  PublicSale: number
-  AdvisorNCollaborators: number
+  Airdrop: {
+    principal: string,
+    category: string,
+    qty: number,
+    isVesting: boolean
+  }
+  // Liquidity: number
+  InventorTeam: {
+    principal: string,
+    category: string,
+    qty: number,
+    isVesting: boolean
+  }
+  ReserveFund: {
+    principal: string,
+    category: string,
+    qty: number,
+    isVesting: boolean
+  }
+  PublicSale: {
+    principal: string,
+    category: string,
+    qty: number,
+    isVesting: boolean
+  }
+  // AdvisorNCollaborators: number
 }
 
 const formDataDistribution: DistributionType = {
-  Airdrop: 0,
-  Liquidity: 0,
-  InventorTeam: 0,
-  ReserveFund: 0,
-  PublicSale: 0,
-  AdvisorNCollaborators: 0,
+  Airdrop: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false
+  },
+  // Liquidity: 0,
+  InventorTeam: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false
+  },
+  ReserveFund: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false
+  },
+  PublicSale: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false
+  },
+  // AdvisorNCollaborators: 0,
 }
 
 const ColecctionForm = () => {
@@ -57,6 +97,10 @@ const ColecctionForm = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState<CollectionPreInit>(initialStateCollectionPreInit)
   const [formDistribution, setFormDistribution] = useState<DistributionType>(formDataDistribution)
+  const [isCheckedReserveFund, setIsCheckedReserveFund] = useState(false)
+  const [isCheckedInventorTeam, setIsCheckedInventorTeam] = useState(false)
+  const [isCheckedAirdrop, setIsCheckedAirdrop] = useState(false)
+  const [isCheckedPublicSale, setIsCheckedPublicSale] = useState(false)
 
   useEffect(() => {
     const extractedRoleStartups: string[] = getRoleStartup(currentUser.roles)
@@ -71,6 +115,13 @@ const ColecctionForm = () => {
       resGetProjectsByStartup.flat()
     setProjectsByStartup(resGetProjectsByStartupFlatted)
     return resGetProjectsByStartupFlatted
+  }
+
+  const getFormVesting = elm => {
+    if (elm.indexOf("ReserveFund") !== -1) return isCheckedReserveFund
+    if (elm.indexOf("InventorTeam") !== -1) return isCheckedInventorTeam
+    if (elm.indexOf("Airdrop") !== -1) return isCheckedAirdrop
+    if (elm.indexOf("PublicSale") !== -1) return isCheckedPublicSale
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +139,19 @@ const ColecctionForm = () => {
     })
   }
 
+  const handleChangeReserveFund = (event) => {
+    setIsCheckedReserveFund(event.target.checked);
+  }
+  const handleChangeInventorTeam = (event) => {
+    setIsCheckedInventorTeam(event.target.checked);
+  }
+  const handleChangeAirdrop = (event) => {
+    setIsCheckedAirdrop(event.target.checked);
+  }
+  const handleChangePublicSale = (event) => {
+    setIsCheckedPublicSale(event.target.checked);
+  }
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prevData) => ({
@@ -100,14 +164,28 @@ const ColecctionForm = () => {
     const { name, value } = e.target
     setFormDistribution((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: {...prevData[name], qty: value},
     }))
+  }
+
+  const handleChangeDistributionHolder = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    const nameModified = name.substring(0, name.indexOf("Holder"))
+    setFormDistribution((prevData) => {
+      return {
+        ...prevData,
+        [nameModified]: {...prevData[nameModified], principal: value}
+      }
+    })
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (Object.keys(formDistribution).reduce((acc, curr) => acc + parseFloat(formDistribution[curr]), 0) !== 100) {
+    // if (Object.keys(formDistribution).reduce((acc, curr) => acc + parseFloat(formDistribution[curr]), 0) !== 100) {
+    if (Object.keys(formDistribution).reduce((acc, curr) => {
+        return acc + parseInt(formDistribution[curr].qty)
+    }, 0) !== 100) {
       toast({
         title: "Submission Error",
         description: "Tokenomics distribution out of range.",
@@ -135,16 +213,19 @@ const ColecctionForm = () => {
         ...formData,
         startupID: getRoleStartup(currentUser.roles)[0],
         pojectID: projectsByStartup[0],
-        typesImages: { [formData.typesImages]: null },
         totalSupply: BigInt(formData.totalSupply),
         tokenPrice: BigInt(formData.tokenPrice),
-        // distribution: [{ category: { PublicSale: null }, percentage: 30.25 }],
-        distribution: Object.keys(formDataDistribution).map((elm) => ({
-          category: { [elm]: null },
-          percentage: formDataDistribution[elm],
-        })),
-        utilities: formData.utilities.map((e) => ({ [e]: null })),
+        distribution: Object.keys(formDistribution).map((elm) => {
+          return {
+            principal: formDistribution[elm].principal,
+            category: elm,
+            qty: formDistribution[elm].qty,
+            isVesting: getFormVesting(elm)
+          }
+        }),
+        utilities: formData.utilities
       }
+
       const resCreateCollection = (await backend.createCollection(
         formDataToSend,
       )) as any
@@ -255,7 +336,7 @@ const ColecctionForm = () => {
                     name="collectionName"
                     value={formData.collectionName}
                     onChange={handleChange}
-                    placeholder="Collection fantasy name"
+                    placeholder="Collection fantasy name..."
                   />
                 </FormControl>
 
@@ -266,7 +347,7 @@ const ColecctionForm = () => {
                     name="shortStorytelling"
                     value={formData.shortStorytelling}
                     onChange={handleChange}
-                    placeholder="Short Storytelling Description"
+                    placeholder="Short storytelling description..."
                   />
                 </FormControl>
 
@@ -277,7 +358,7 @@ const ColecctionForm = () => {
                     name="storytellingCollection"
                     value={formData.storytellingCollection}
                     onChange={handleChange}
-                    placeholder="Detailed Story Collection"
+                    placeholder="Detailed story collection..."
                   />
                 </FormControl>
 
@@ -289,25 +370,13 @@ const ColecctionForm = () => {
                     type="number"
                     value={formData.totalSupply}
                     onChange={handleChange}
-                    placeholder="Tokenomics: Total number of tokens issued"
+                    placeholder="Tokenomics: Total number of tokens issued..."
                   />
                 </FormControl>
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Distribution</FormLabel>
-                  <Flex>
-                    <Text width="30%" justifyContent="right">Airdrop:</Text>
-                    <Input
-                      id="Airdrop"
-                      name="Airdrop"
-                      type="number"
-                      width="70%"
-                      value={formDistribution.Airdrop}
-                      onChange={handleChangeDistribution}
-                      placeholder="Airdrop percentage or amount of tokens"
-                    />
-                  </Flex>
-                  <Flex>
+                  {/* <Flex>
                     <Text width="30%" justifyItems="right">Liquidity:</Text>
                     <Input
                       id="Liquidity"
@@ -318,44 +387,124 @@ const ColecctionForm = () => {
                       onChange={handleChangeDistribution}
                       placeholder="Liquidity percentage or amount of tokens"
                     />
-                  </Flex>
+                  </Flex> */}
                   <Flex>
-                    <Text width="30%" alignContent="right">InventorTeam:</Text>
-                    <Input
-                      id="InventorTeam"
-                      name="InventorTeam"
-                      type="number"
-                      width="70%"
-                      value={formDistribution.InventorTeam}
-                      onChange={handleChangeDistribution}
-                      placeholder="Inventor Team percentage or amount of tokens"
-                    />
-                  </Flex>
-                  <Flex>
-                    <Text width="30%" alignItems="right">ReserveFund:</Text>
+                    <Text width="30%" alignItems="right">Reserve fund:</Text>
                     <Input
                       id="ReserveFund"
                       name="ReserveFund"
                       type="number"
                       width="70%"
-                      value={formDistribution.ReserveFund}
+                      value={formDistribution.ReserveFund.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Reserve Fund percentage or amount of tokens"
+                      placeholder="Reserve fund quantity of tokens..."
                     />
+                    <Input
+                      id="ReserveFundHolder"
+                      name="ReserveFundHolder"
+                      type="text"
+                      width="70%"
+                      value={formDistribution.ReserveFund.principal}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Reserve fund holder..."
+                    />
+                    <Checkbox
+                      id="ReserveFundVesting"
+                      name="ReserveFundVesting"
+                      onChange={handleChangeReserveFund}
+                      isChecked={isCheckedReserveFund}
+                      required={false}
+                    >Is vesting</Checkbox>
+                    {/* <Checkbox required={false} id="ReserveFundVesting" name="ReserveFundVesting" value="ReserveFundVesting">Is vesting</Checkbox> */}
                   </Flex>
                   <Flex>
-                    <Text width="30%" alignItems="right">PublicSale:</Text>
+                    <Text width="30%" alignContent="right">Inventor team:</Text>
+                    <Input
+                      id="InventorTeam"
+                      name="InventorTeam"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.InventorTeam.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Inventor Team quantity of tokens..."
+                    />
+                    <Input
+                      id="InventorTeamHolder"
+                      name="InventorTeamHolder"
+                      type="text"
+                      width="70%"
+                      value={formDistribution.InventorTeam.principal}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Inventor Team holder..."
+                    />
+                    <Checkbox
+                      id="InventorTeamVesting"
+                      name="InventorTeamVesting"
+                      onChange={handleChangeInventorTeam}
+                      isChecked={isCheckedInventorTeam}
+                      required={false}
+                    >Is vesting</Checkbox>
+                    {/* <Checkbox required={false} id="InventorTeamVesting" name="InventorTeamVesting" value="InventorTeamVesting">Is vesting</Checkbox> */}
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" justifyContent="right">Airdrop:</Text>
+                    <Input
+                      id="Airdrop"
+                      name="Airdrop"
+                      type="number"
+                      width="70%"
+                      value={formDistribution.Airdrop.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Airdrop quantity of tokens..."
+                    />
+                    <Input
+                      id="AirdropHolder"
+                      name="AirdropHolder"
+                      type="text"
+                      width="70%"
+                      value={formDistribution.Airdrop.principal}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Airdrop holder..."
+                    />
+                    <Checkbox
+                      id="AirdropVesting"
+                      name="AirdropVesting"
+                      onChange={handleChangeAirdrop}
+                      isChecked={isCheckedAirdrop}
+                      required={false}
+                    >Is vesting</Checkbox>
+                    {/* <Checkbox required={false} id="AirdropVesting" name="AirdropVesting" value="AirdropVesting">Is vesting</Checkbox> */}
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignItems="right">Public sale:</Text>
                     <Input
                       id="PublicSale"
                       name="PublicSale"
                       type="number"
                       width="70%"
-                      value={formDistribution.PublicSale}
+                      value={formDistribution.PublicSale.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Public Sale percentage or amount of tokens"
+                      placeholder="Public sale quantity of tokens..."
                     />
+                    <Input
+                      id="PublicSaleHolder"
+                      name="PublicSaleHolder"
+                      type="text"
+                      width="70%"
+                      value={formDistribution.PublicSale.principal}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Public sale holder..."
+                    />
+                    <Checkbox
+                      id="PublicSaleVesting"
+                      name="PublicSaleVesting"
+                      onChange={handleChangePublicSale}
+                      isChecked={isCheckedPublicSale}
+                      required={false}
+                      >Is vesting</Checkbox>
+                    {/* <Checkbox id="PublicSaleVesting" name="PublicSaleVesting" value="PublicSaleVesting">Is vesting</Checkbox> */}
                   </Flex>
-                  <Flex>
+                  {/* <Flex>
                     <Text width="30%" alignItems="right">AdvisorNCollaborators:</Text>
                     <Input
                       id="AdvisorNCollaborators"
@@ -366,7 +515,7 @@ const ColecctionForm = () => {
                       onChange={handleChangeDistribution}
                       placeholder="Advisor and Collaborators percentage or amount of tokens"
                     />
-                  </Flex>
+                  </Flex> */}
                 </FormControl>
 
                 <FormControl mt={4}>
@@ -396,7 +545,7 @@ const ColecctionForm = () => {
                     type="number"
                     value={formData.tokenPrice}
                     onChange={handleChange}
-                    placeholder="Amount in $USD"
+                    placeholder="Amount in $USD..."
                   />
                 </FormControl>
 
@@ -408,7 +557,7 @@ const ColecctionForm = () => {
                     name="documentsFolderUrl"
                     value={formData.documentsFolderUrl}
                     onChange={handleChange}
-                    placeholder="Upload documents"
+                    placeholder="Upload documents..."
                   />
                 </FormControl>
 
@@ -420,6 +569,7 @@ const ColecctionForm = () => {
                     name="typesImages"
                     value={formData.typesImages}
                     onChange={handleSelectChange}
+                    placeholder="Images type format..."
                   >
                     <option value="PNG">PNG</option>
                     <option value="GIF">GIF</option>
@@ -446,7 +596,7 @@ const ColecctionForm = () => {
                     name="nftImagesUrl"
                     value={formData.nftImagesUrl}
                     onChange={handleChange}
-                    placeholder="Load full images or attributes."
+                    placeholder="Load full images or attributes..."
                   />
                 </FormControl>
 
@@ -457,7 +607,7 @@ const ColecctionForm = () => {
                     name="creator"
                     value={formData.creator}
                     onChange={handleChange}
-                    placeholder="Name, nickname or entity of the creator of the collection."
+                    placeholder="Name, nickname or entity of the creator of the collection..."
                   />
                 </FormControl>
 

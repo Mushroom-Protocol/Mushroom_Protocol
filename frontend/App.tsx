@@ -59,11 +59,6 @@ const internetIdentityUrl =
 const client = createClient({
   canisters: {
     backend,
-    backendNFT: {
-      idlFactory: BackendNFT_idl,
-      // Canister ID will be dynamically generated upon instantiation
-      canisterId: ''
-    }
   },
   providers: [
     new InternetIdentity({
