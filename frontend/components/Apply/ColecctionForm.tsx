@@ -28,6 +28,7 @@ import {
 } from "../CommonTypes"
 import { EstadoContext } from "../utils/estadoContex"
 import { useNavigate } from "react-router-dom"
+import { Principal } from '@dfinity/principal';
 
 interface DistributionType {
   Airdrop: {
@@ -215,15 +216,14 @@ const ColecctionForm = () => {
         pojectID: projectsByStartup[0],
         totalSupply: BigInt(formData.totalSupply),
         tokenPrice: BigInt(formData.tokenPrice),
-        distribution: Object.keys(formDistribution).map((elm) => {
-          return {
-            principal: formDistribution[elm].principal,
-            category: elm,
-            qty: formDistribution[elm].qty,
-            isVesting: getFormVesting(elm)
-          }
-        }),
-        utilities: formData.utilities
+        typesImages: {[formData.typesImages]: null},
+        distribution: Object.keys(formDistribution).map((elm) => ({
+          principal: Principal.fromText(formDistribution[elm].principal),
+          category: { [elm]: null },
+          qty: BigInt(formDistribution[elm].qty),
+          isVesting: getFormVesting(elm)
+        })),
+        utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
 
       const resCreateCollection = (await backend.createCollection(
