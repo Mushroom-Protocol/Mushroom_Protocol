@@ -148,6 +148,7 @@ export interface DeployConfig {
   baseUrl: string;
   assetsNames: string[];
   custodian: string;
+  distribution: any[];
 }
 
 export interface MetadataResultExtended {

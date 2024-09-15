@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
 import {
-  DataProject,
+  CollectionPreInit,
   DeployConfig,
   Dip721NonFungibleToken,
 } from "../CommonTypes"
@@ -46,6 +46,7 @@ const CollectionsReqs: React.FC = () => {
     nftAssetsNamesFile: null as File | null,
     // nftAssetsNames: [],
     nftCustodian: "",
+    nftDistribution: [],
     nftFee: 0,
   })
   const toast = useToast()
@@ -90,8 +91,13 @@ const CollectionsReqs: React.FC = () => {
       isClosable: false,
       variant: "solid",
     })
+
     const resProjectsByStartup: string[] | null | undefined = await backend.getProjectsByStartup(currStartup) as string[] | null | undefined
     formDataDeploy.nftProyectId = resProjectsByStartup[0]
+
+    const resCollectionRequestByStartUp: CollectionPreInit | null | undefined = await backend.getCollectionRequestByStartUp(currStartup) as CollectionPreInit | null | undefined
+    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution}))
+
     onOpen()
   }
 
@@ -124,8 +130,9 @@ const CollectionsReqs: React.FC = () => {
         baseUrl: formDataDeploy.nftBaseUrl,
         assetsNames: await readFileLines(targetForm[8].files[0]),
         custodian: formDataDeploy.nftCustodian,
+        distribution: formDataDeploy.nftDistribution
       }
-      
+
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
@@ -272,6 +279,7 @@ const CollectionsReqs: React.FC = () => {
                     />
                   </FormControl>
                 </fieldset>
+                <br />
                 <fieldset>
                   <legend>Sección Mushroom</legend>
                   <FormControl>
@@ -321,7 +329,21 @@ const CollectionsReqs: React.FC = () => {
                       onChange={handleChangeForm}
                     />
                   </FormControl>
+                  <FormControl>
+                    Distribution:
+                    <hr />
+                    {formDataDeploy.nftDistribution.map(elm => {
+                      return <>
+                        <Text><b>Principal:</b> {elm.principal.toText()}</Text>
+                        <Text><b>Category:</b> {Object.keys(elm.category)}</Text>
+                        <Text><b>Quantity:</b> {Number(elm.qty)}</Text>
+                        <Text><b>Is Vesting:</b> {elm.isVesting.toString()}</Text>
+                        <hr />
+                      </>
+                    })}
+                  </FormControl>
                 </fieldset>
+                <br />
                 <fieldset>
                   <legend>Sección Fee</legend>
                   <FormControl>
