@@ -42,6 +42,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type Dip721NonFungibleToken = TypesNft.Dip721NonFungibleToken;
     type Dip721NonFungibleTokenExtended = TypesNft.Dip721NonFungibleTokenExtended;
     type DeployConfig = Types.NFT.DeployConfig;
+    type CollectionActorClass = NFT.Dip721NFT;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -118,10 +119,8 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     stable let connectionsRecords = HashMap.new<Principal, [Int]>();
 
     ///////////////////////////////////  NFT Colections ID //////////////////////////////////////////////////////
-    type CollectionAddress = Text; //Canister ID of the collection nft
-    // TO-DO Cambiar almacenamieto de collecciones por referencias al actor class en lugar de su canisterID
-    // linea 928 put
-    stable let nftCollections = HashMap.new<ProjectID, CollectionAddress>(); //Value is the Principal ID of canister Collection in Text format
+    // type CollectionAddress = Text; //Canister ID of the collection nft
+    stable let nftCollections = HashMap.new<ProjectID, CollectionActorClass>(); //Value is the Principal ID of canister Collection in Text format
     
     public shared ({ caller }) func removeCollection(p: ProjectID ): async () {
         assert(authorizedCaller(caller));
@@ -912,21 +911,21 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
     };
 
-    public query func getNftsAddreses() : async [(ProjectID, Text)] {
-        HashMap.toArray<ProjectID, Text>(nftCollections)
-    };
+    // public query func getNftsAddreses() : async [(ProjectID, Text)] {
+    //     HashMap.toArray<ProjectID, Text>(nftCollections)
+    // };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
         assert (authorizedCaller(caller));
-        assert (HashMap.get<Text, Text>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
+        assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
         ExperimentalCycles.add<system>(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
-            ignore HashMap.put<ProjectID, Text>(nftCollections, thash, cfg.projectId, Principal.toText(canisterId));
+            ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
             ignore addControllers([Principal.fromActor(Mushroom), deployer], ?canisterId); //Para eventuales actualizaciones del standard Dip721
             ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
             let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
@@ -955,14 +954,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func mintNFT(project : ProjectID) : async TypesNft.MintReceipt {
         assert (isUser(caller));
-        let collectionPrincipal = HashMap.get<Text, Text>(nftCollections, thash, project);
-        switch collectionPrincipal {
+        let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
+        switch collection {
             case null { return #Err(#InvalidTokenId) };
-            case (?principalText) {
-                let remoteCollection = actor (principalText) : actor {
-                    mintDip721 : shared (Principal) -> async TypesNft.MintReceipt
-                };
-                await remoteCollection.mintDip721(caller)
+            case (?collection) {
+                await collection.mintDip721(caller)
             }
         }
     };
@@ -971,14 +967,11 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func transferNFT(to : Principal, projectID : ProjectID, _tokenId : TokenId) : async TypesNft.TxReceipt {
         assert (isUser(caller));
-        let collection = HashMap.get<ProjectID, Text>(nftCollections, thash, projectID);
+        let collection = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch collection {
             case null { #Err(#InvalidCollection) };
             case (?collection) {
-                let remoteCollection = actor (collection) : actor {
-                    safeTransferFromDip721 : shared (Principal, Principal, TokenId) -> async TypesNft.TxReceipt
-                };
-                await remoteCollection.safeTransferFromDip721(caller, to, _tokenId)
+                await collection.safeTransferFromDip721(caller, to, _tokenId)
             }
         }
     };
@@ -996,14 +989,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
 
     func nftsOwnedBy(userPrincipal : Principal) : async [MetadataResultExtended] {
         let tempBuffer = Buffer.fromArray<MetadataResultExtended>([]);
-        for ((projectId, canisterId) in HashMap.entries<ProjectID, CollectionAddress>(nftCollections)) {
-            let remoteCollection = actor (canisterId) : actor {
-                getTokenIdsForUserDip721 : shared (Principal) -> async [TokenId];
-                getMetadataDip721 : shared (TokenId) -> async MetadataResult
-            };
-            let tokensInCurrentCollection = await remoteCollection.getTokenIdsForUserDip721(userPrincipal);
+        for ((projectId, collection) in HashMap.entries<ProjectID, CollectionActorClass>(nftCollections)) {
+            let tokensInCurrentCollection = await collection.getTokenIdsForUserDip721(userPrincipal);
             for (tokenId in tokensInCurrentCollection.vals()) {
-                let metadata = await remoteCollection.getMetadataDip721(tokenId);
+                let metadata = await collection.getMetadataDip721(tokenId);
                 tempBuffer.add({ projectId; tokenId; metadata })
             }
         };
@@ -1011,14 +1000,10 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     };
 
     public func getNftHistory(colId : ProjectID, tokenId : TypesNft.TokenId) : async ?[?TypesNft.Trx] {
-        let collection = HashMap.get<ProjectID, CollectionAddress>(nftCollections, thash, colId);
+        let collection = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, colId);
         switch collection {
             case (?collection) {
-                print(collection);
-                let remoteCollection = actor (collection) : actor {
-                    getNftHistory : shared (TokenId) -> async [?TypesNft.Trx]
-                };
-                ?(await remoteCollection.getNftHistory(tokenId))
+                ?(await collection.getNftHistory(tokenId))
             };
             case null { null }
         }
