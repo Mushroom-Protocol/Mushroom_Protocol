@@ -42,7 +42,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
     type Dip721NonFungibleToken = TypesNft.Dip721NonFungibleToken;
     type Dip721NonFungibleTokenExtended = TypesNft.Dip721NonFungibleTokenExtended;
     type DeployConfig = Types.NFT.DeployConfig;
-    type CollectionActorClass = NFT.Dip721NFT;
+    public type CollectionActorClass = NFT.Dip721NFT;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -921,7 +921,7 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
-        ExperimentalCycles.add<system>(fee);
+        ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.assetsNames);
             let canisterId = Principal.fromActor(newCanister);
@@ -938,6 +938,25 @@ shared ({ caller = deployer }) actor class Mushroom() = Mushroom {
         } catch (e) {
             return #err(Error.message(e))
         }
+    };
+
+    public shared query func getActorRefByProject(projectID : Text) : async ?Text {
+        // HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        ?"br5f7-7uaaa-aaaaa-qaaca-cai"
+        // return switch (actorRef) {
+        //     case null { false };
+        //     case (?actorRef) { actorRef };
+        // }
+    };
+
+    public shared ({ caller }) func getTotalSupply(canisterId : Text) : async Nat64 {
+        let remoteNFT = actor (canisterId) : actor {
+            totalSupplyDip721 : shared () -> async Nat64;
+            getMaxLimitDip721 : shared () -> async Nat64;
+        };
+        // await remotePet.totalSupplyDip721();
+        await remoteNFT.getMaxLimitDip721();
+        // success;
     };
 
     ///////////////////////// Comunicacion con canisters de NFTs ///////////////////////////

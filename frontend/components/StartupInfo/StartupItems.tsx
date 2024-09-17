@@ -32,7 +32,12 @@ import favicon from "../../assets/favicon.ico"
 import { Startup } from "../CommonTypes"
 import { useCanister } from "@connect2ic/react"
 
-import { idlFactory as Counter_idl } from '../../../src/declarations/backendNFT'
+// import { CollectionActorClass } from "../../../src/declarations/backend/backend.did"
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { AuthClient } from "@dfinity/auth-client";
+import { idlFactory as CollectionActorClass } from "../../../src/declarations/backend/backend.did"; // Assuming you have an IDL file for the canister.
+import { Principal } from "@dfinity/principal";
+import { error } from "console"
 
 interface PropsType {
   startup: Startup
@@ -42,116 +47,202 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [quantity, setQuantity] = useState(1)
   const toast = useToast()
   const [backend] = useCanister("backend")
-  const [backendNFT] = useCanister("backendNFT")
+  // const [backendNFT] = useCanister("backendNFT")
   const [totalSupply, setTotalSupply] = useState(0)
+  const [projectsByStartup, setProjectsByStartup] = useState([])
+  // const [externalNFTCanister, setexternalNFTCanister] = useState<typeof CollectionActorClass>(null)
+  const [externalNFTCanisterId, setexternalNFTCanisterId] = useState<string>(null)
 
   let null_address: string = "aaaaa-aa"
 
   useEffect(() => {
-    getTotalSupply().then(resTotalSupply => {
-      console.log(resTotalSupply)
-      setTotalSupply(Number(resTotalSupply))
-    }).catch(error => console.error(error))
+    // Set the canister ID (replace with your actual canister ID)
+    // const canisterId = "your-canister-id";
+
+    const getProjectsByStartup = async (currentStartup: string) => {
+      try {
+        const resProjectsByStartup: string[] | null | undefined =
+          (await backend.getProjectsByStartup(currentStartup)) as
+            | string[]
+            | null
+            | undefined
+        // setProjectsByStartup(resProjectsByStartup)
+        return resProjectsByStartup
+      } catch (error) {
+        console.error("Error on backend.getProjectsByStartup() call:", error)
+      }
+    }
+
+    const getActorRefByProject = async (projectID: string): Promise<any> => {
+      try {
+        const resCanisterId: string | null | undefined =
+          (await backend.getActorRefByProject(projectID)) as string | null | undefined
+        // Create the actor reference using the canister ID and IDL factory
+        // const myCanisterActor = Actor.createActor(CollectionActorClass, {
+        //   agent,
+        //   canisterId: Principal.fromText(resCanisterId),
+        // });
+        setexternalNFTCanisterId(resCanisterId)
+        return resCanisterId
+      } catch (error) {
+        console.error("Error on backend.getActorRefByProject() call:", error)
+      }
+    }
+
+    // const buildAuthClient = async () => {
+    //   const authClient = await AuthClient.create();
+
+    //   authClient.login({
+    //     // 7 days in nanoseconds
+    //     maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
+    //     onSuccess: async () => {
+    //       console.log(authClient);
+    //     },
+    //   });
+
+    //   const identity = await authClient.getIdentity();
+    //   const actor = Actor.createActor(CollectionActorClass, {
+    //     agent: new HttpAgent({
+    //       identity,
+    //     }),
+    //     canisterId: Principal.fromText("br5f7-7uaaa-aaaaa-qaaca-cai"),
+    //   });
+
+    //   return actor
+    // }
+
+    getProjectsByStartup(startupFetched.startupId)
+      .then((dataProjectsByStartup) => {
+        setProjectsByStartup(dataProjectsByStartup)
+        return getActorRefByProject(dataProjectsByStartup[0][0])
+          .then((resActorRefByProject) => {
+            backend.getTotalSupply("br5f7-7uaaa-aaaaa-qaaca-cai").then(resTotalSupply => {
+              console.log(resTotalSupply)
+            }).catch(error => console.error(error))
+            // Create an HTTP agent to communicate with the Internet Computer
+            // const agent = new HttpAgent({
+            //   host: "https://icp0.io" // or "https://ic0.app" for the mainnet
+            // });
+
+            // Optionally, if you're using the local replica, you may need to disable fetch root key
+            // agent.fetchRootKey();
+            // const myCanisterActor = Actor.createActor(CollectionActorClass, {
+            //   agent,
+            //   // canisterId: Principal.fromText(resActorRefByProject[0]),
+            //   canisterId: Principal.fromText("br5f7-7uaaa-aaaaa-qaaca-cai"),
+            // });
+            // myCanisterActor.totalSupplyDip721().then(restotalSupply => {
+            //   console.log("restotalSupply")
+            //   console.log(restotalSupply)
+            // }).catch(error => console.error(error))
+            // buildAuthClient().then(resAuthClient => {
+            //   console.log("resAuthClient")
+            //   console.log(resAuthClient)
+            // }).catch(error => console.error(error))
+            return resActorRefByProject
+          })
+          .catch((error) => console.error(error))
+      })
+      .catch((error) => console.error(error))
   }, [])
 
-  const getTotalSupply = async (): Promise<BigInt> => {
-    const resTotalSupplyDip721: BigInt =
-      (await backendNFT.totalSupplyDip721()) as BigInt
-    return resTotalSupplyDip721
-  }
+  const handleSubmitMint =
+    async (/*event: React.FormEvent<HTMLFormElement>*/) => {
+      // event.preventDefault()
+      let loadingToastId
+      let transferStatus
 
-  const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
-    // event.preventDefault()
-    let loadingToastId;
-    let transferStatus;
-  
-    try {
-      const e = await window.ic.plug.requestConnect();
-      console.log(e);
-      
-      if (await window.ic.plug.isConnected()) {
-        const params = {
-          to: '827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682',
-          amount: 4e7
-        };
-  
-        try {
-          transferStatus = await window.ic.plug.requestTransfer(params);
-        } catch (transferError) {
-          console.error('Error en la transferencia:', transferError);
-          transferStatus = undefined;
+      try {
+        const e = await window.ic.plug.requestConnect()
+        console.log(e)
+
+        if (await window.ic.plug.isConnected()) {
+          const params = {
+            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+            amount: 4e7,
+          }
+
+          try {
+            transferStatus = await window.ic.plug.requestTransfer(params)
+          } catch (transferError) {
+            console.error("Error en la transferencia:", transferError)
+            transferStatus = undefined
+          }
         }
+      } catch (connectError) {
+        console.error("Error al conectar a Plug Wallet:", connectError)
+        window.open("https://plugwallet.ooo/", "_blank")
+        return // Termina la función si hay un error de conexión
       }
-    } catch (connectError) {
-      console.error('Error al conectar a Plug Wallet:', connectError);
-      window.open('https://plugwallet.ooo/', '_blank');
-      return; // Termina la función si hay un error de conexión
-    }
-  
-    if (transferStatus === undefined) {
-      toast({
-        title: "Transaction Rejected",
-        description: "The transaction was rejected. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      });
-      return; // Termina la función si la transferencia falló
-    }
-  
-    try {
-      loadingToastId = toast({
-        title: "Submitting Form",
-        status: "loading",
-        duration: null,
-        isClosable: false,
-        variant: "solid",
-      });
-  
-      const resMintNFT = (await backend.mintNFT("PR492415")) as { Ok: any; Err: String };
-  
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
-      }
-  
-      if (resMintNFT.Err !== undefined) {
+
+      if (transferStatus === undefined) {
         toast({
-          title: "Minting Error",
-          description: resMintNFT.Err,
+          title: "Transaction Rejected",
+          description: "The transaction was rejected. Please try again.",
           status: "error",
           duration: 5000,
           isClosable: true,
           variant: "solid",
-        });
-      } else {
+        })
+        return // Termina la función si la transferencia falló
+      }
+
+      try {
+        loadingToastId = toast({
+          title: "Submitting Form",
+          status: "loading",
+          duration: null,
+          isClosable: false,
+          variant: "solid",
+        })
+
+        const resMintNFT = (await backend.mintNFT("PR492415")) as {
+          Ok: any
+          Err: String
+        }
+
+        if (loadingToastId !== undefined) {
+          toast.close(loadingToastId)
+        }
+
+        if (resMintNFT.Err !== undefined) {
+          toast({
+            title: "Minting Error",
+            description: resMintNFT.Err,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            variant: "solid",
+          })
+        } else {
+          toast({
+            title: "Successful Submission",
+            description: "Token ID: " + String(resMintNFT?.Ok.token_id),
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            variant: "solid",
+          })
+        }
+
+        onClose()
+      } catch (error) {
+        if (loadingToastId !== undefined) {
+          toast.close(loadingToastId)
+        }
+
         toast({
-          title: "Successful Submission",
-          description: 'Token ID: ' + String(resMintNFT?.Ok.token_id),
-          status: "success",
+          title: "Submission Error",
+          description:
+            "There was an error submitting the form. Please try again.",
+          status: "error",
           duration: 5000,
           isClosable: true,
           variant: "solid",
-        });
+        })
+        console.error("Error on backend.mintNFT() call:", error)
       }
-  
-      onClose();
-    } catch (error) {
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
-      }
-  
-      toast({
-        title: "Submission Error",
-        description: "There was an error submitting the form. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      });
-      console.error("Error on backend.mintNFT() call:", error);
     }
-  }
 
   const handleDecrease = () => {
     if (quantity > 1) {
