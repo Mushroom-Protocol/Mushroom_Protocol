@@ -30,62 +30,72 @@ import { EstadoContext } from "../utils/estadoContex"
 import { useNavigate } from "react-router-dom"
 import { Principal } from '@dfinity/principal';
 
+interface TierFields {
+  tierA: {
+    principal: string
+    category: string
+    qty: number
+    isVesting: boolean
+    price: number
+  },
+  tierB: {
+    principal: string
+    category: string
+    qty: number
+    isVesting: boolean
+    price: number
+  },
+  tierC: {
+    principal: string
+    category: string
+    qty: number
+    isVesting: boolean
+    price: number
+  }
+}
+
+const TierFieldsInit = {
+  tierA: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false,
+    price: 0
+  },
+  tierB: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false,
+    price: 0
+  },
+  tierC: {
+    principal: '',
+    category: '',
+    qty: 0,
+    isVesting: false,
+    price: 0
+  }
+}
+
+const tiersPrices = {
+  tierA: 0,
+  tierB: 0,
+  tierC: 0,
+}
+
 interface DistributionType {
-  Airdrop: {
-    principal: string,
-    category: string,
-    qty: number,
-    isVesting: boolean
-  }
-  // Liquidity: number
-  InventorTeam: {
-    principal: string,
-    category: string,
-    qty: number,
-    isVesting: boolean
-  }
-  ReserveFund: {
-    principal: string,
-    category: string,
-    qty: number,
-    isVesting: boolean
-  }
-  PublicSale: {
-    principal: string,
-    category: string,
-    qty: number,
-    isVesting: boolean
-  }
-  // AdvisorNCollaborators: number
+  Airdrop: {tiers: TierFields, holder: string, isVesting: boolean}
+  InventorTeam: {tiers: TierFields, holder: string, isVesting: boolean}
+  ReserveFund: {tiers: TierFields, holder: string, isVesting: boolean}
+  PublicSale: {tiers: TierFields, holder: string, isVesting: boolean}
 }
 
 const formDataDistribution: DistributionType = {
-  Airdrop: {
-    principal: '',
-    category: '',
-    qty: 0,
-    isVesting: false
-  },
-  // Liquidity: 0,
-  InventorTeam: {
-    principal: '',
-    category: '',
-    qty: 0,
-    isVesting: false
-  },
-  ReserveFund: {
-    principal: '',
-    category: '',
-    qty: 0,
-    isVesting: false
-  },
-  PublicSale: {
-    principal: '',
-    category: '',
-    qty: 0,
-    isVesting: false
-  },
-  // AdvisorNCollaborators: 0,
+  Airdrop: {tiers: TierFieldsInit, holder: "", isVesting: false},
+  InventorTeam: {tiers: TierFieldsInit, holder: "", isVesting: true},
+  ReserveFund: {tiers: TierFieldsInit, holder: "", isVesting: true},
+  PublicSale: {tiers: TierFieldsInit, holder: "", isVesting: true}
 }
 
 const ColecctionForm = () => {
@@ -389,133 +399,215 @@ const ColecctionForm = () => {
                     />
                   </Flex> */}
                   <Flex>
-                    <Text width="30%" alignItems="right">Reserve fund:</Text>
-                    <Input
-                      id="ReserveFund"
-                      name="ReserveFund"
-                      type="number"
-                      width="70%"
-                      value={formDistribution.ReserveFund.qty}
-                      onChange={handleChangeDistribution}
-                      placeholder="Reserve fund quantity of tokens..."
-                    />
-                    <Input
-                      id="ReserveFundHolder"
-                      name="ReserveFundHolder"
-                      type="text"
-                      width="70%"
-                      value={formDistribution.ReserveFund.principal}
-                      onChange={handleChangeDistributionHolder}
-                      placeholder="Reserve fund holder..."
-                    />
-                    <Checkbox
+                    <Text width="30%" alignItems="right">Category</Text>
+                    <Text width="10%" alignItems="right">Tier A</Text>
+                    <Text width="10%" alignItems="right">Tier B</Text>
+                    <Text width="10%" alignItems="right">Tier C</Text>
+                    <Text width="40%" alignItems="right">Holder</Text>
+                    {/* <Checkbox
                       id="ReserveFundVesting"
                       name="ReserveFundVesting"
                       onChange={handleChangeReserveFund}
                       isChecked={isCheckedReserveFund}
                       required={false}
-                    >Is vesting</Checkbox>
-                    {/* <Checkbox required={false} id="ReserveFundVesting" name="ReserveFundVesting" value="ReserveFundVesting">Is vesting</Checkbox> */}
+                    >Is vesting</Checkbox> */}
                   </Flex>
                   <Flex>
-                    <Text width="30%" alignContent="right">Inventor team:</Text>
+                    <Text width="30%" alignContent="right">Public Sale</Text>
                     <Input
-                      id="InventorTeam"
-                      name="InventorTeam"
+                      id="PublicSaleA"
+                      name="PublicSaleA"
                       type="number"
-                      width="70%"
-                      value={formDistribution.InventorTeam.qty}
+                      width="10%"
+                      value={formDistribution.PublicSale.tiers.tierA.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Inventor Team quantity of tokens..."
+                      placeholder="Public Sale, Tier A quantity of tokens..."
                     />
                     <Input
-                      id="InventorTeamHolder"
-                      name="InventorTeamHolder"
-                      type="text"
-                      width="70%"
-                      value={formDistribution.InventorTeam.principal}
-                      onChange={handleChangeDistributionHolder}
-                      placeholder="Inventor Team holder..."
-                    />
-                    <Checkbox
-                      id="InventorTeamVesting"
-                      name="InventorTeamVesting"
-                      onChange={handleChangeInventorTeam}
-                      isChecked={isCheckedInventorTeam}
-                      required={false}
-                    >Is vesting</Checkbox>
-                    {/* <Checkbox required={false} id="InventorTeamVesting" name="InventorTeamVesting" value="InventorTeamVesting">Is vesting</Checkbox> */}
-                  </Flex>
-                  <Flex>
-                    <Text width="30%" justifyContent="right">Airdrop:</Text>
-                    <Input
-                      id="Airdrop"
-                      name="Airdrop"
+                      id="PublicSaleB"
+                      name="PublicSaleB"
                       type="number"
-                      width="70%"
-                      value={formDistribution.Airdrop.qty}
+                      width="10%"
+                      value={formDistribution.PublicSale.tiers.tierB.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Airdrop quantity of tokens..."
+                      placeholder="Public Sale, Tier B quantity of tokens..."
                     />
                     <Input
-                      id="AirdropHolder"
-                      name="AirdropHolder"
-                      type="text"
-                      width="70%"
-                      value={formDistribution.Airdrop.principal}
-                      onChange={handleChangeDistributionHolder}
-                      placeholder="Airdrop holder..."
-                    />
-                    <Checkbox
-                      id="AirdropVesting"
-                      name="AirdropVesting"
-                      onChange={handleChangeAirdrop}
-                      isChecked={isCheckedAirdrop}
-                      required={false}
-                    >Is vesting</Checkbox>
-                    {/* <Checkbox required={false} id="AirdropVesting" name="AirdropVesting" value="AirdropVesting">Is vesting</Checkbox> */}
-                  </Flex>
-                  <Flex>
-                    <Text width="30%" alignItems="right">Public sale:</Text>
-                    <Input
-                      id="PublicSale"
-                      name="PublicSale"
+                      id="PublicSaleC"
+                      name="PublicSaleC"
                       type="number"
-                      width="70%"
-                      value={formDistribution.PublicSale.qty}
+                      width="10%"
+                      value={formDistribution.PublicSale.tiers.tierC.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Public sale quantity of tokens..."
+                      placeholder="Public Sale, Tier C quantity of tokens..."
                     />
                     <Input
                       id="PublicSaleHolder"
                       name="PublicSaleHolder"
                       type="text"
-                      width="70%"
-                      value={formDistribution.PublicSale.principal}
+                      width="40%"
+                      value={formDistribution.PublicSale.holder}
                       onChange={handleChangeDistributionHolder}
-                      placeholder="Public sale holder..."
+                      placeholder="Public Sale holder..."
                     />
-                    <Checkbox
-                      id="PublicSaleVesting"
-                      name="PublicSaleVesting"
-                      onChange={handleChangePublicSale}
-                      isChecked={isCheckedPublicSale}
-                      required={false}
-                      >Is vesting</Checkbox>
-                    {/* <Checkbox id="PublicSaleVesting" name="PublicSaleVesting" value="PublicSaleVesting">Is vesting</Checkbox> */}
                   </Flex>
-                  {/* <Flex>
-                    <Text width="30%" alignItems="right">AdvisorNCollaborators:</Text>
+                  <Flex>
+                    <Text width="30%" alignContent="right">Inventor Team</Text>
                     <Input
-                      id="AdvisorNCollaborators"
-                      name="AdvisorNCollaborators"
+                      id="InventorTeamA"
+                      name="InventorTeamA"
                       type="number"
-                      width="70%"
-                      value={formDistribution.AdvisorNCollaborators}
+                      width="10%"
+                      value={formDistribution.InventorTeam.tiers.tierA.qty}
                       onChange={handleChangeDistribution}
-                      placeholder="Advisor and Collaborators percentage or amount of tokens"
+                      placeholder="Inventor Team, Tier A quantity of tokens..."
                     />
-                  </Flex> */}
+                    <Input
+                      id="InventorTeamB"
+                      name="InventorTeamB"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.InventorTeam.tiers.tierB.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Inventor Team, Tier B quantity of tokens..."
+                    />
+                    <Input
+                      id="InventorTeamC"
+                      name="InventorTeamC"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.InventorTeam.tiers.tierC.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Inventor Team, Tier C quantity of tokens..."
+                    />
+                    <Input
+                      id="InventorTeamHolder"
+                      name="InventorTeamHolder"
+                      type="text"
+                      width="40%"
+                      value={formDistribution.InventorTeam.holder}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Inventor Team holder..."
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignContent="right">Reserve Fund</Text>
+                    <Input
+                      id="ReserveFundA"
+                      name="ReserveFundA"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.ReserveFund.tiers.tierA.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Reserve Fund, Tier A quantity of tokens..."
+                    />
+                    <Input
+                      id="ReserveFundB"
+                      name="ReserveFundB"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.ReserveFund.tiers.tierB.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Reserve Fund, Tier B quantity of tokens..."
+                    />
+                    <Input
+                      id="ReserveFundC"
+                      name="ReserveFundC"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.ReserveFund.tiers.tierC.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Reserve Fund, Tier C quantity of tokens..."
+                    />
+                    <Input
+                      id="ReserveFundHolder"
+                      name="ReserveFundHolder"
+                      type="text"
+                      width="40%"
+                      value={formDistribution.ReserveFund.holder}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Reserve Fund holder..."
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="30%" alignContent="right">Airdrop</Text>
+                    <Input
+                      id="AirdropA"
+                      name="AirdropA"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.Airdrop.tiers.tierA.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Airdrop, Tier A quantity of tokens..."
+                    />
+                    <Input
+                      id="AirdropB"
+                      name="AirdropB"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.Airdrop.tiers.tierB.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Airdrop, Tier B quantity of tokens..."
+                    />
+                    <Input
+                      id="AirdropC"
+                      name="AirdropC"
+                      type="number"
+                      width="10%"
+                      value={formDistribution.Airdrop.tiers.tierC.qty}
+                      onChange={handleChangeDistribution}
+                      placeholder="Airdrop, Tier C quantity of tokens..."
+                    />
+                    <Input
+                      id="AirdropHolder"
+                      name="AirdropHolder"
+                      type="text"
+                      width="40%"
+                      value={formDistribution.Airdrop.holder}
+                      onChange={handleChangeDistributionHolder}
+                      placeholder="Airdrop holder..."
+                    />
+                  </Flex>
+                </FormControl>
+
+                <FormControl isRequired mt={4}>
+                  <FormLabel>Token Prices</FormLabel>
+                  <Flex>
+                    <Text width="20%" alignItems="right">Tier A price:</Text>
+                    <Input
+                      id="TierAPrice"
+                      name="TierAPrice"
+                      type="number"
+                      width="10%"
+                      value={tiersPrices.tierA}
+                      onChange={handleChangeDistribution}
+                      placeholder="Tier A price..."
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="20%" alignItems="right">Tier B price:</Text>
+                    <Input
+                      id="TierBPrice"
+                      name="TierBPrice"
+                      type="number"
+                      width="10%"
+                      value={tiersPrices.tierB}
+                      onChange={handleChangeDistribution}
+                      placeholder="Tier B price..."
+                    />
+                  </Flex>
+                  <Flex>
+                    <Text width="20%" alignItems="right">Tier C price:</Text>
+                    <Input
+                      id="TierCPrice"
+                      name="TierCPrice"
+                      type="number"
+                      width="10%"
+                      value={tiersPrices.tierC}
+                      onChange={handleChangeDistribution}
+                      placeholder="Tier C price..."
+                    />
+                  </Flex>
                 </FormControl>
 
                 <FormControl mt={4}>
@@ -532,24 +624,9 @@ const ColecctionForm = () => {
                     <Checkbox value="Membership">Membership</Checkbox>
                     <br />
                     <Checkbox value="DeFiServices">DeFi Services</Checkbox>
-                    {/* Agrega más opciones según sea necesario */}
                   </CheckboxGroup>
                 </FormControl>
 
-                {/* Campo para Nombre del representante o team leader */}
-                <FormControl isRequired mt={4}>
-                  <FormLabel>Token Price</FormLabel>
-                  <Input
-                    id="tokenPrice"
-                    name="tokenPrice"
-                    type="number"
-                    value={formData.tokenPrice}
-                    onChange={handleChange}
-                    placeholder="Amount in $USD..."
-                  />
-                </FormControl>
-
-                {/* Campo para Detalles del representante o team leader */}
                 <FormControl isRequired mt={4}>
                   <FormLabel>Documents to be tokenized</FormLabel>
                   <Input
@@ -560,34 +637,6 @@ const ColecctionForm = () => {
                     placeholder="Upload documents..."
                   />
                 </FormControl>
-
-                {/* Campo para formato de imágenes */}
-                <FormControl isRequired mt={4}>
-                  <FormLabel>Type of images</FormLabel>
-                  <Select
-                    id="typesImages"
-                    name="typesImages"
-                    value={formData.typesImages}
-                    onChange={handleSelectChange}
-                    placeholder="Images type format..."
-                  >
-                    <option value="PNG">PNG</option>
-                    <option value="GIF">GIF</option>
-                    <option value="JPG">JPG</option>
-                    <option value="SVG">SVG</option>
-                  </Select>
-                </FormControl>
-
-                {/* <FormControl isRequired mt={4}>
-                  <FormLabel>Type of images</FormLabel>
-                  <Input
-                    id="typesImages"
-                    name="typesImages"
-                    value={formData.typesImages}
-                    onChange={handleChange}
-                    placeholder="Full images o Generated programmatically"
-                  />
-                </FormControl> */}
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Upload images</FormLabel>
