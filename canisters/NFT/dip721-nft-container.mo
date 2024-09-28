@@ -11,50 +11,79 @@ import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _fileNames : [Text]) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier]) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
+    type Tier = Types.Tier;
     type Trx = Types.Trx;
 
-    stable var fileNames = _fileNames;
+    var i: Nat = 0;
+
+    private func makeMut(tierArray: [Tier]): [var Tier]{
+        let result: [var Tier] = Prim.Array_init<Tier>(tierArray.size(), {tierName = ""; price = 0; qty = 0; assetsNames: [Text] = []});
+        for(c in _composition.vals()) {
+            result[i] := tierArray[i];
+            i += 1;
+        };
+        result;
+    };
+
+    var tiersComposition: [var Tier] = [var ];
+
+    
     stable let DEPLOYER = caller;
 
 
-    //////////////////////////// Initial distribution ///////////////////////
+    //////////////////////////// Initial distribution  and load fileNames///////////////////////
     stable let holders: [Types.Holder] = init.distribution;
-    stable var initialDistributionEnded = false;
+    stable var isInitializedCollection = false;
+    stable var loadedNames = false;
 
     func initialDistribution():async  (){
-        for(holder in holders.vals()){ 
-            let qtyNfts = holder.qty;
-            var index =  Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts));
-            
-            while (index > 0){
-                let tokenId = await generateRandomID();
-                let metadata : Types.MetadataDesc = [{
-                    purpose = #Rendered;
-                    key_val_data = [
-                        { key = "url"; val = #TextContent(baseUrl # fileNames[index])},
-                        // More elements
-                    ];
-                    data : Blob = "/00/00"
-                }];
-                let nft = { owner = holder.principal; id = tokenId; metadata };
-                ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
-                index -= 1;
-            };
-            fileNames := Array.subArray<Text>(fileNames, Prim.nat64ToNat(Prim.intToNat64Wrap(qtyNfts)), fileNames.size());
+        for(holder in holders.vals()){
+            for({tierName: Text; qty: Nat} in holder.qtyPerTier.vals()){
+                // let tierIndex: ?Nat = null;
+                var i = 0;
+                while(tiersComposition[i].tierName != tierName){ i += 1 };
+                if(tiersComposition[i].tierName == tierName) {
+                    var toMint = qty;
+
+                    while (toMint > 0){
+                        let tokenId = await generateRandomID();
+                        let metadata : Types.MetadataDesc = [{
+                            purpose = #Rendered;
+                            key_val_data = [
+                                { key = "url"; val = #TextContent(baseUrl # tiersComposition[i].assetsNames[toMint])},
+                            ];
+                            data : Blob = "/00/00"
+                        }];
+                        let nft = { owner = holder.principal; id = tokenId; metadata };
+                        ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
+                        let assetsNames = Array.subArray<Text>(
+                            tiersComposition[i].assetsNames, 
+                            Prim.nat64ToNat(Prim.intToNat64Wrap(toMint)), 
+                            tiersComposition[i].assetsNames.size()
+                        );
+                        let tierUpdate = {tiersComposition[i] with assetsNames};
+                        tiersComposition[i] := tierUpdate;
+                        toMint -= 1;
+                    };            
+                }                
+            };   
         };
-        initialDistributionEnded := true;
     };
 
-    public shared ({caller}) func startInitialDistribution(): async () {
+    public shared ({caller}) func initializeCollection(): async () {
         assert (caller == DEPLOYER);
-        assert (not initialDistributionEnded);
+        tiersComposition := makeMut(_composition);
+        assert (not isInitializedCollection);
         await initialDistribution();
+        isInitializedCollection := true;
     };
+
+
     /////////////////////////////////////////////////////////////////////////////
 
     stable var transactionId : TransactionId = 0;
@@ -108,7 +137,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         id
     };
 
-    let null_address : Principal = Principal.fromText("aaaaa-aa");
+    let NULL_ADDRESS : Principal = Principal.fromText("aaaaa-aa");
 
     public query func balanceOfDip721(user : Principal) : async Nat64 {
         var count : Nat64 = 0;
@@ -140,7 +169,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     func transferFrom(from : Principal, to : Principal, token_id : TokenId, caller : Principal) : Types.TxReceipt {
-        if (to == null_address) { return #Err(#ZeroAddress) };
+        if (to == NULL_ADDRESS) { return #Err(#ZeroAddress) };
 
         let item = Map.get<Nat64, Nft>(nfts, n64hash, token_id);
         switch (item) {
@@ -244,47 +273,63 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return Buffer.toArray<TokenId>(tempBuffer)
     };
 
-    public shared ({ caller }) func mintDip721(to : Principal, /* metadata : Types.MetadataDesc */) : async Types.MintReceipt {
+    public shared ({ caller }) func mintDip721(to : Principal, /* metadata : Types.MetadataDesc */ _tierName: Text) : async Types.MintReceipt {
         if (not Set.has<Principal>(custodians, phash, caller)) {
             return #Err(#Unauthorized)
         };
-        let available = fileNames.size();
+        var index = 0;
+        while(index < tiersComposition.size()) {
+            if(tiersComposition[index].tierName == _tierName){
+                var available = tiersComposition[index].assetsNames.size();
+                switch available {
+                    case 0 {
+                        return #Err(#Other)
+                    };
+                    case _ {
+                        let tokenId = await generateRandomID();
+                        let indexImgsArray = Nat64.toNat(tokenId) % available;
+                        let metadata : Types.MetadataDesc = [{
+                            purpose = #Rendered;
+                            key_val_data = [
+                                { key = "url"; val = #TextContent(baseUrl # tiersComposition[index].assetsNames[indexImgsArray])},
+                                // More elements
+                            ];
+                            data : Blob = "/00/00"
+                        }];
 
-        switch available {
-            case 0 {
-                return #Err(#Other)
+                        let assetsNames = Prim.Array_tabulate<Text>(
+                            tiersComposition[index].assetsNames.size() - 1,
+                            func (i: Nat): Text {
+                                if(i < indexImgsArray ) {tiersComposition[index].assetsNames[indexImgsArray]}
+                                else {tiersComposition[index].assetsNames[indexImgsArray]}
+                            }
+                        );
+
+                        let tierUpdate = {tiersComposition[index] with  assetsNames};
+                        tiersComposition[index] := tierUpdate;
+
+                        let result = #Ok({ token_id = tokenId; id = transactionId });
+                        let nft = { owner = to; id = tokenId; metadata };
+                        ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
+                        ///////////////// transactionsLedger and nftHistory update /////////////////////////
+                        let trx = {
+                            nftId = tokenId;
+                            date = Time.now();
+                            trxType = #Mint(to)
+                        };
+                        ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
+                        ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, tokenId, [transactionId]);
+                        ////////////////////////////////////////////////////////////////////////////////////
+
+                        totalSupply += 1;
+                        transactionId += 1;
+                        return result
+                    }
+                }  
             };
-            case _ {
-                let tokenId = await generateRandomID();
-                let indexImgsArray = Nat64.toNat(tokenId) % available;
-                let metadata : Types.MetadataDesc = [{
-                    purpose = #Rendered;
-                    key_val_data = [
-                        { key = "url"; val = #TextContent(baseUrl # fileNames[indexImgsArray])},
-                        // More elements
-                    ];
-                    data : Blob = "/00/00"
-                }];
-
-                fileNames := Array.filter<Text>(fileNames, func x = x != fileNames[indexImgsArray]);
-
-                let result = #Ok({ token_id = tokenId; id = transactionId });
-                let nft = { owner = to; id = tokenId; metadata };
-                ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
-                ///////////////// transactionsLedger and nftHistory update /////////////////////////
-                let trx = {
-                    nftId = tokenId;
-                    date = Time.now();
-                    trxType = #Mint(to)
-                };
-                ignore Map.put<TransactionId, Trx>(transactionsLedger, nhash, transactionId, trx);
-                ignore Map.put<TokenId, [TransactionId]>(nftHistory, n64hash, tokenId, [transactionId]);
-                ////////////////////////////////////////////////////////////////////////////////////
-
-                totalSupply += 1;
-                transactionId += 1;
-                result
-            }
-        }
+            index += 1;
+        };
+        return #Err(#Other)
+        
     }
 }

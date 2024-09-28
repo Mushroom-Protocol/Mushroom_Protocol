@@ -11,10 +11,10 @@ module {
         logo : LogoResult;
         name : Text;
         symbol : Text;
-        maxLimit : Nat64;
+        maxLimit : Nat64
     };
     public type Dip721NonFungibleTokenExtended = Dip721NonFungibleToken and {
-        distribution: [Holder];
+        distribution : [Holder]
     };
 
     public type Category = {
@@ -26,10 +26,17 @@ module {
         #AdvisorNCollaborators
     };
 
-    public type Holder = {
-        principal: Principal;
-        category : Category;
+    public type Tier = {
+        tierName : Text;
+        price : Nat;
         qty : Nat;
+        assetsNames : [Text]
+    };
+
+    public type Holder = {
+        principal : Principal;
+        category : Category;
+        qtyPerTier : [{tierName: Text; qty: Nat}];
         isVesting : Bool // Espera a que termine el proyecto para vander
     };
 
