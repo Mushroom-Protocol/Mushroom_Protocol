@@ -20,7 +20,7 @@ dfx canister call backend getUsersPendingVerification
 #### 4 Enter code Verification (User)
 
 ```
-dfx canister call backend enterVerificationCode "560555"
+dfx canister call backend enterVerificationCode "822565"
 ```
 
 
@@ -50,7 +50,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe")'
+dfx canister call backend getIncomingStartupByOwner '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Approve Startup
 ```
@@ -63,7 +63,7 @@ dfx canister call backend approveStartUp '(
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "ST286791";
+        startupID = "ST715944";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -83,20 +83,40 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "ymgon-r53wh-becic-fsvsr-uajvf-5cpzw-pfk5m-phy5p-n5vhe-ihoz6-gqe")'
+dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Create NFT Collection Form (User)
 ```
 dfx canister call backend createCollection '(record {
-    startupID = "ST286791";
-    pojectID = "PR785282";
+    startupID = "ST715944";
+    pojectID = "PR497377";
     collectionName = "Mushroom Founders";
-    shortStorytelling= " NFT collection tells the story of 444 extraterrestrial mushrooms, who managed to escape the technological cataclysm that devastated their home 10 eons ago. Each NFT possesses a unique specialty, which is vital in their mission to spread knowledge and guide civilizations of the universe to a path of balance and harmony as a form of redemption. As they travel the universe in their ships, they become the disseminators of transcendental knowledge.";
+    shortStorytelling= " NFT collection ";
     storytellingCollection="stoasdjlajdoi";
     totalSupply=10;
     distribution=vec {record {
                         category = variant {Airdrop};
                         percentage = 100.0}};
+    composition=vec {
+        record {
+            tierName="basic";
+            price= 10;
+            qty= 2;
+            assetsNames=vec {"uno"; "do2"};
+        };
+        record {
+            tierName="medium";
+            price= 10;
+            qty= 2;
+            assetsNames=vec {"uno"; "do2"};
+        };
+        record {
+            tierName="advanced";
+            price= 10;
+            qty= 2;
+            assetsNames=vec {"uno"; "do2"};
+        };
+    };
     utilities= vec {variant {Governance}};
     tokenPrice=10000;
     documentsFolderUrl="drive.com";

@@ -182,12 +182,13 @@ module {
 
         public type CollectionPreInit = {
             startupID : Text;
-            pojectID : Text;
+            projectID : Text;
             collectionName : Text;
             shortStorytelling : Text;
             storytellingCollection : Text;
             totalSupply : Nat;
             distribution : [Holder];
+            composition: [Tier];
             utilities : [Utilities];
             //decimals: Nat;
             tokenPrice : Nat;
@@ -215,12 +216,20 @@ module {
 
         };
 
+        public type Tier = {
+            tierName: Text; 
+            price: Nat; 
+            qty: Nat; 
+            assetsNames: [Text]
+        };
+
         public type DeployConfig = {
             projectId : Text;
             baseUrl : Text;
-            assetsNames : [Text];
+            composition: [Tier];
             custodian : Text;
             distribution : [Holder];
+
             // initialStaking: ?StakingParams;
 
         };
