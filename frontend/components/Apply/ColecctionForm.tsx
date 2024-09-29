@@ -258,19 +258,19 @@ const ColecctionForm = () => {
     event.preventDefault()
 
     // if (Object.keys(formDistribution).reduce((acc, curr) => acc + parseFloat(formDistribution[curr]), 0) !== 100) {
-    if (Object.keys(formDistribution).reduce((acc, curr) => {
-        return acc + parseInt(formDistribution[curr].qty)
-    }, 0) !== 100) {
-      toast({
-        title: "Submission Error",
-        description: "Tokenomics distribution out of range.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      })
-      return false
-    }
+    // if (Object.keys(formDistribution).reduce((acc, curr) => {
+    //     return acc + parseInt(formDistribution[curr].qty)
+    // }, 0) !== 100) {
+    //   toast({
+    //     title: "Submission Error",
+    //     description: "Tokenomics distribution out of range.",
+    //     status: "error",
+    //     duration: 5000,
+    //     isClosable: true,
+    //     variant: "solid",
+    //   })
+    //   return false
+    // }
 
     let loadingToastId: string | number | undefined
 
@@ -291,22 +291,31 @@ const ColecctionForm = () => {
         totalSupply: BigInt(formData.totalSupply),
         tokenPrice: BigInt(formData.tokenPrice),
         typesImages: {PNG: null},
-        distribution: Object.keys(formDistribution).map((elm) => ({
-          principal: Principal.fromText(formDistribution[elm].principal),
-          category: { [elm]: null },
-          qty: BigInt(formDistribution[elm].qty),
-          isVesting: getFormVesting(elm)
-        })),
-        composition: formDataComposition.map(elm => {
+        distribution: Object.keys(formDistribution).map((elm) => {
           return {
-            tierName: elm.tierName,
-            price: formTiersPrices[elm.tierName].price,
-            qty: calculateTierQuantity(elm.tierName)
+            principal: Principal.fromText(formDistribution[elm].holder),
+            category: { [elm]: null },
+            qtyPerTier: Object.keys(formDistribution[elm].tiers).map(elmTier => {
+              return {
+                tierName: elmTier,
+                qty: BigInt(formDistribution[elm].tiers[elmTier].qty)
+              }
+            }),
+            isVesting: getFormVesting(elm)
           }
         }),
+        // distribution: [],
+        composition: Object.keys(tiersPrices).map(elm => {
+          return {
+            tierName: elm,
+            price: BigInt(formTiersPrices[elm]),
+            qty: BigInt(calculateTierQuantity(elm)),
+            assetsNames: []
+          }
+        }),
+        // composition: [],
         utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
-      console.log(formDataToSend)
 
       const resCreateCollection = (await backend.createCollection(
         formDataToSend,
