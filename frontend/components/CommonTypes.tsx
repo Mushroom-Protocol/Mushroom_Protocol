@@ -99,14 +99,29 @@ export interface DataProject {
   team: string[] //Miembros del equipo
 }
 
+export interface Holder {
+  principal: any
+  category: string
+  qtyPerTier: [{tierName: Text; qty: number}]
+  isVesting: boolean // Espera a que termine el proyecto para vander
+}
+
+export interface Tier {
+  tierName: string
+  price: number
+  qty: number
+  assetsNames: string[]
+}
+
 export interface CollectionPreInit {
   startupID: string
-  pojectID: string
+  projectID: string
   collectionName: string
   shortStorytelling: string
   storytellingCollection: string
   totalSupply: number
-  distribution: any[]
+  distribution: Holder[]
+  composition: Tier[];
   utilities: string[]
   tokenPrice: number
   documentsFolderUrl: string
@@ -117,12 +132,13 @@ export interface CollectionPreInit {
 
 export const initialStateCollectionPreInit: CollectionPreInit = {
   startupID: "",
-  pojectID: "",
+  projectID: "",
   collectionName: "",
   shortStorytelling: "",
   storytellingCollection: "",
   totalSupply: 0,
   distribution: [],
+  composition: [],
   utilities: [],
   tokenPrice: 0,
   documentsFolderUrl: "",
