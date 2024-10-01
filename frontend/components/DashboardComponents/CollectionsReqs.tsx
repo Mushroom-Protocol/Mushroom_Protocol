@@ -6,7 +6,9 @@ import {
   CardBody,
   CardFooter,
   Divider,
+  Flex,
   FormControl,
+  FormLabel,
   Heading,
   Input,
   List,
@@ -47,7 +49,13 @@ const CollectionsReqs: React.FC = () => {
     // nftAssetsNames: [],
     nftCustodian: "",
     nftDistribution: [],
+    nftComposition: [],
     nftFee: 0,
+  })
+  const [tierTotalColumns, setTierTotalColumns] = useState({
+    tierA: 0,
+    tierB: 0,
+    tierC: 0
   })
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -93,10 +101,15 @@ const CollectionsReqs: React.FC = () => {
     })
 
     const resProjectsByStartup: string[] | null | undefined = await backend.getProjectsByStartup(currStartup) as string[] | null | undefined
-    formDataDeploy.nftProyectId = resProjectsByStartup[0]
+    setFormDataDeploy(prevData => {
+      return {
+        ...prevData,
+        nftProyectId: resProjectsByStartup[0]
+      }
+    })
 
     const resCollectionRequestByStartUp: CollectionPreInit | null | undefined = await backend.getCollectionRequestByStartUp(currStartup) as CollectionPreInit | null | undefined
-    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution}))
+    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution, nftComposition: resCollectionRequestByStartUp[0].composition}))
 
     onOpen()
   }
@@ -130,7 +143,8 @@ const CollectionsReqs: React.FC = () => {
         baseUrl: formDataDeploy.nftBaseUrl,
         assetsNames: await readFileLines(targetForm[8].files[0]),
         custodian: formDataDeploy.nftCustodian,
-        distribution: formDataDeploy.nftDistribution
+        distribution: formDataDeploy.nftDistribution,
+        composition: formDataDeploy.nftComposition
       }
 
       const resDeployCollection: any = (await backend.deployCollection(
@@ -344,6 +358,46 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                 </fieldset>
                 <br />
+                <fieldset>
+                <FormControl isRequired mt={4}>
+                  <FormLabel>Distribution</FormLabel>
+                    <Flex>
+                      <Text width="30%" alignItems="right">Category</Text>
+                      <Text width="10%" alignItems="right">Tier A</Text>
+                      <Text width="10%" alignItems="right">Tier B</Text>
+                      <Text width="10%" alignItems="right">Tier C</Text>
+                      <Text width="10%">Total NFTs</Text>
+                      <Text width="30%" alignItems="right">Holder</Text>
+                    </Flex>
+                    {formDataDeploy.nftDistribution.map(distributionCategory => {
+                      let totalRow = 0
+                      return <Flex>
+                        <Text width="30%">{Object.keys(distributionCategory.category)[0]}</Text>
+                        {distributionCategory.qtyPerTier.map(tierInfo => {
+                          totalRow = totalRow + Number(tierInfo.qty)
+                          // setTierTotalColumns(prevData => {
+                          //   console.log(prevData)
+                          //   return {
+                          //     ...prevData,
+                          //     [tierInfo.tierName]: tierTotalColumns[tierInfo.tierName] + Number(tierInfo.qty)
+                          //   }
+                          // })
+                          return <Text width="10%">{Number(tierInfo.qty)}</Text>
+                        })}
+                        <Text width="10%">{totalRow}</Text>
+                        <Text width="30%">{distributionCategory.principal.toText()}</Text>
+                      </Flex>
+                    })}
+                    <Flex>
+                      <Text width="30%" alignItems="right"></Text>
+                      <Text width="10%" alignItems="right">{tierTotalColumns.tierA}</Text>
+                      <Text width="10%" alignItems="right">{tierTotalColumns.tierB}</Text>
+                      <Text width="10%" alignItems="right">{tierTotalColumns.tierC}</Text>
+                      <Text width="10%"></Text>
+                      <Text width="30%" alignItems="right"></Text>
+                    </Flex>
+                  </FormControl>
+                </fieldset>
                 <fieldset>
                   <legend>Sección Fee</legend>
                   <FormControl>

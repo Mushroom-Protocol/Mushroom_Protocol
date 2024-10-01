@@ -47,18 +47,12 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [quantity, setQuantity] = useState(1)
   const toast = useToast()
   const [backend] = useCanister("backend")
-  // const [backendNFT] = useCanister("backendNFT")
   const [totalSupply, setTotalSupply] = useState(0)
   const [projectsByStartup, setProjectsByStartup] = useState([])
-  // const [externalNFTCanister, setexternalNFTCanister] = useState<typeof CollectionActorClass>(null)
-  const [externalNFTCanisterId, setexternalNFTCanisterId] = useState<string>(null)
 
   let null_address: string = "aaaaa-aa"
 
   useEffect(() => {
-    // Set the canister ID (replace with your actual canister ID)
-    // const canisterId = "your-canister-id";
-
     const getProjectsByStartup = async (currentStartup: string) => {
       try {
         const resProjectsByStartup: string[] | null | undefined =
@@ -73,73 +67,26 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
-    const getActorRefByProject = async (projectID: string): Promise<any> => {
+    const getCanisterIdByProject = async (projectID: string): Promise<any> => {
       try {
         const resCanisterId: string | null | undefined =
-          (await backend.getActorRefByProject(projectID)) as string | null | undefined
-        // Create the actor reference using the canister ID and IDL factory
-        // const myCanisterActor = Actor.createActor(CollectionActorClass, {
-        //   agent,
-        //   canisterId: Principal.fromText(resCanisterId),
-        // });
-        setexternalNFTCanisterId(resCanisterId)
+          (await backend.getCanisterIdByProject(projectID)) as string | null | undefined
         return resCanisterId
       } catch (error) {
-        console.error("Error on backend.getActorRefByProject() call:", error)
+        console.error("Error on backend.getCanisterIdByProject() call:", error)
       }
     }
-
-    // const buildAuthClient = async () => {
-    //   const authClient = await AuthClient.create();
-
-    //   authClient.login({
-    //     // 7 days in nanoseconds
-    //     maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
-    //     onSuccess: async () => {
-    //       console.log(authClient);
-    //     },
-    //   });
-
-    //   const identity = await authClient.getIdentity();
-    //   const actor = Actor.createActor(CollectionActorClass, {
-    //     agent: new HttpAgent({
-    //       identity,
-    //     }),
-    //     canisterId: Principal.fromText("br5f7-7uaaa-aaaaa-qaaca-cai"),
-    //   });
-
-    //   return actor
-    // }
 
     getProjectsByStartup(startupFetched.startupId)
       .then((dataProjectsByStartup) => {
         setProjectsByStartup(dataProjectsByStartup)
-        return getActorRefByProject(dataProjectsByStartup[0][0])
-          .then((resActorRefByProject) => {
-            backend.getTotalSupply("br5f7-7uaaa-aaaaa-qaaca-cai").then(resTotalSupply => {
-              console.log(resTotalSupply)
+        return getCanisterIdByProject(dataProjectsByStartup[0][0])
+          .then((resCanisterIdByProject) => {
+            return backend.getTotalSupply(resCanisterIdByProject).then(resTotalSupply => {
+              const numTotalSupply = Number(resTotalSupply)
+              setTotalSupply(numTotalSupply)
+              return numTotalSupply
             }).catch(error => console.error(error))
-            // Create an HTTP agent to communicate with the Internet Computer
-            // const agent = new HttpAgent({
-            //   host: "https://icp0.io" // or "https://ic0.app" for the mainnet
-            // });
-
-            // Optionally, if you're using the local replica, you may need to disable fetch root key
-            // agent.fetchRootKey();
-            // const myCanisterActor = Actor.createActor(CollectionActorClass, {
-            //   agent,
-            //   // canisterId: Principal.fromText(resActorRefByProject[0]),
-            //   canisterId: Principal.fromText("br5f7-7uaaa-aaaaa-qaaca-cai"),
-            // });
-            // myCanisterActor.totalSupplyDip721().then(restotalSupply => {
-            //   console.log("restotalSupply")
-            //   console.log(restotalSupply)
-            // }).catch(error => console.error(error))
-            // buildAuthClient().then(resAuthClient => {
-            //   console.log("resAuthClient")
-            //   console.log(resAuthClient)
-            // }).catch(error => console.error(error))
-            return resActorRefByProject
           })
           .catch((error) => console.error(error))
       })
@@ -308,7 +255,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 fontSize="12px"
                 mr="20"
               >
-                Total Items: 500
+                Total Items: {totalSupply}
               </Tag>
             </Box>
             <Spacer />
@@ -366,6 +313,27 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           padding="30px"
         >
           <Box display="flex" alignItems="flex-start">
+            {}
+            <Box
+              backgroundColor="#000000"
+              color="#FFFFFF"
+              fontSize="18px"
+              display="flex"
+              alignItems="center"
+              p="8px"
+              borderRadius="15px"
+              border="1px"
+              borderColor="#1FAFC8"
+            >
+              Price: 5
+              <img
+                src={favicon}
+                alt="Icon"
+                width="22"
+                height="22"
+                style={{ marginLeft: "5px" }}
+              />
+            </Box>
             <Box
               backgroundColor="#000000"
               color="#FFFFFF"
