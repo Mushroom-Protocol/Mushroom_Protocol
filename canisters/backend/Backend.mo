@@ -920,6 +920,36 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     // public query func getNftsAddreses() : async [(ProjectID, Text)] {
     //     HashMap.toArray<ProjectID, Text>(nftCollections)
     // };
+
+    public shared query func getCanisterIdByProject(projectID : Text) : async Text {
+        let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch (actorRef) {
+            case (?value) Principal.toText(Principal.fromActor(value));
+            case null "";
+        };
+    };
+
+    public shared ({ caller }) func getMaxLimit(canisterId : Text) : async Nat64 {
+        let remoteNFT = actor (canisterId) : actor {
+            getMaxLimitDip721 : shared () -> async Nat64;
+        };
+        await remoteNFT.getMaxLimitDip721();
+    };
+
+    public shared ({ caller }) func getBaseUrl(canisterId : Text) : async Text {
+        let remoteNFT = actor (canisterId) : actor {
+            getBaseUrl : shared () -> async Text;
+        };
+        await remoteNFT.getBaseUrl();
+    };
+
+    public shared ({ caller }) func getHolders(canisterId : Text) : async [TypesNft.Holder] {
+        let remoteNFT = actor (canisterId) : actor {
+            holdersDip721 : shared () -> async [TypesNft.Holder];
+        };
+        let fetchedHolders = await remoteNFT.holdersDip721();
+        return fetchedHolders
+    };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
@@ -944,15 +974,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         } catch (e) {
             return #err(Error.message(e))
         }
-    };
-
-    public shared query func getActorRefByProject(projectID : Text) : async ?Text {
-        // HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
-        ?"br5f7-7uaaa-aaaaa-qaaca-cai"
-        // return switch (actorRef) {
-        //     case null { false };
-        //     case (?actorRef) { actorRef };
-        // }
     };
 
     public shared ({ caller }) func getTotalSupply(canisterId : Text) : async Nat64 {
