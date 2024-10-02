@@ -215,6 +215,20 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         )
     };
 
+    public shared ({ caller }) func setTierPrice(tierName: Text, newPrice: Nat): async Bool {
+        assert(Set.has<Principal>(custodians, phash, caller));
+        var i = 0;
+        while(i < tiersComposition.size()){
+            if(tiersComposition[i].tierName == tierName){
+                tiersComposition[i] := {tiersComposition[i] with prince = newPrice};
+                return true;
+            };
+            i += 1;
+        };
+        return false
+
+    };
+
     public query func supportedInterfacesDip721() : async [Types.InterfaceId] {
         return [#TransferNotification, #Burn, #Mint]
     };
