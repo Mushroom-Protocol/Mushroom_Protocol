@@ -220,13 +220,12 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         var i = 0;
         while(i < tiersComposition.size()){
             if(tiersComposition[i].tierName == tierName){
-                tiersComposition[i] := {tiersComposition[i] with prince = newPrice};
+                tiersComposition[i] := {tiersComposition[i] with price = newPrice};
                 return true;
             };
             i += 1;
         };
         return false
-
     };
 
     public query func supportedInterfacesDip721() : async [Types.InterfaceId] {
