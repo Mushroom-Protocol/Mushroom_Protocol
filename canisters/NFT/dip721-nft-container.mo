@@ -39,7 +39,6 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     //////////////////////////// Initial distribution  and load fileNames///////////////////////
     stable let holders: [Types.Holder] = init.distribution;
     stable var isInitializedCollection = false;
-    stable var loadedNames = false;
 
     func initialDistribution():async  (){
         for(holder in holders.vals()){
@@ -207,6 +206,13 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 }
             }
         }
+    };
+
+    public query func getPrices(): async [{tierName: Text; price: Nat}] {
+        Prim.Array_tabulate<{tierName: Text; price: Nat}>(
+            tiersComposition.size(),
+            func x = {tierName = tiersComposition[x].tierName; price = tiersComposition[x].price}
+        )
     };
 
     public query func supportedInterfacesDip721() : async [Types.InterfaceId] {

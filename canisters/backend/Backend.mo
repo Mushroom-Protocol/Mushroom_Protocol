@@ -946,6 +946,16 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         }
     };
 
+    public query func getCollectionCanisterId(projectID: Text): async ?Principal {
+        let actorColection = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch actorColection {
+            case null { null };
+            case (?a) {
+                ?Principal.fromActor(a);
+            }
+        }
+    };
+
     ///////////////////////// Comunicacion con canisters de NFTs ///////////////////////////
     ////////////////////////////////////////////  Mint ////////////////////////////////////
 
