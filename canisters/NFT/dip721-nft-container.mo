@@ -239,6 +239,13 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return holders
     };
 
+    public query func getPricesDip721(): async [{tierName: Text; price: Nat}] {
+        Prim.Array_tabulate<{tierName: Text; price: Nat}>(
+            tiersComposition.size(),
+            func x = {tierName = tiersComposition[x].tierName; price = tiersComposition[x].price}
+        )
+    };
+
     public query func getMetadataDip721(token_id : TokenId) : async Types.MetadataResult {
         let item = Map.get<Nat64, Nft>(nfts, n64hash, token_id);
         switch (item) {

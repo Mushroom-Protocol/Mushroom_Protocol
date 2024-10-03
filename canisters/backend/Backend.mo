@@ -1,4 +1,5 @@
 import Principal "mo:base/Principal";
+import Prim "mo:⛔";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
@@ -949,6 +950,14 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
         let fetchedHolders = await remoteNFT.holdersDip721();
         return fetchedHolders
+    };
+
+    public shared ({ caller }) func getPrices(projectID : Text) : async [{tierName: Text; price: Nat}] {
+        let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch (actorRef) {
+            case (?value) await value.getPricesDip721();
+            case null {[]};
+        };
     };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
