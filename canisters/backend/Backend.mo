@@ -1,4 +1,5 @@
 import Principal "mo:base/Principal";
+import Prim "mo:⛔";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
@@ -42,7 +43,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     type Dip721NonFungibleToken = TypesNft.Dip721NonFungibleToken;
     type Dip721NonFungibleTokenExtended = TypesNft.Dip721NonFungibleTokenExtended;
     type DeployConfig = Types.NFT.DeployConfig;
-    type CollectionActorClass = NFT.Dip721NFT;
+    public type CollectionActorClass = NFT.Dip721NFT;
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -920,6 +921,44 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     // public query func getNftsAddreses() : async [(ProjectID, Text)] {
     //     HashMap.toArray<ProjectID, Text>(nftCollections)
     // };
+
+    public shared query func getCanisterIdByProject(projectID : Text) : async Text {
+        let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch (actorRef) {
+            case (?value) Principal.toText(Principal.fromActor(value));
+            case null "";
+        };
+    };
+
+    public shared ({ caller }) func getMaxLimit(canisterId : Text) : async Nat64 {
+        let remoteNFT = actor (canisterId) : actor {
+            getMaxLimitDip721 : shared () -> async Nat64;
+        };
+        await remoteNFT.getMaxLimitDip721();
+    };
+
+    public shared ({ caller }) func getBaseUrl(canisterId : Text) : async Text {
+        let remoteNFT = actor (canisterId) : actor {
+            getBaseUrl : shared () -> async Text;
+        };
+        await remoteNFT.getBaseUrl();
+    };
+
+    public shared ({ caller }) func getHolders(canisterId : Text) : async [TypesNft.Holder] {
+        let remoteNFT = actor (canisterId) : actor {
+            holdersDip721 : shared () -> async [TypesNft.Holder];
+        };
+        let fetchedHolders = await remoteNFT.holdersDip721();
+        return fetchedHolders
+    };
+
+    public shared ({ caller }) func getPrices(projectID : Text) : async [{tierName: Text; price: Nat}] {
+        let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch (actorRef) {
+            case (?value) await value.getPricesDip721();
+            case null {[]};
+        };
+    };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
@@ -927,7 +966,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
-        ExperimentalCycles.add<system>(fee);
+        ExperimentalCycles.add(fee);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition);
             let canisterId = Principal.fromActor(newCanister);

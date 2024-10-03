@@ -18,6 +18,55 @@ import { useLocation, useParams } from "react-router-dom"
 import { Startup } from "../CommonTypes"
 
 const StartupDetails = ({ startup: startupFetched }) => {
+  const [backend] = useCanister("backend")
+  const [projectId, setProjectId] = useState<string>(null)
+  const [canisterId, setCanisterId] = useState<string>(null)
+  const [totalSupply, setTotalSupply] = useState<number>(0)
+  const [baseUrlCanister, setBaseUrlCanister] = useState<string>(null)
+
+  useEffect(() => {
+    const getProjectIdByStartup = async (currentStartup: string) => {
+      try {
+        const resProjectsByStartup: string[] | null | undefined =
+          (await backend.getProjectsByStartup(currentStartup)) as
+            | string[]
+            | null
+            | undefined
+        const resProjectId = resProjectsByStartup[0][0]
+        setProjectId(resProjectId)
+        return resProjectId
+      } catch (error) {
+        console.error("Error on backend.getProjectsByStartup() call:", error)
+      }
+    }
+
+    const getCanisterIdByProject = async (projectID: string): Promise<any> => {
+      try {
+        const resCanisterId: string | null | undefined =
+          (await backend.getCanisterIdByProject(projectID)) as string | null | undefined
+        setCanisterId(resCanisterId)
+        return resCanisterId
+      } catch (error) {
+        console.error("Error on backend.getCanisterIdByProject() call:", error)
+      }
+    }
+
+    getProjectIdByStartup(startupFetched.startupId)
+      .then((dataProjectIdByStartup) => {
+        // setProjectsByStartup(dataProjectsByStartup)
+        return getCanisterIdByProject(dataProjectIdByStartup)
+          .then((resCanisterIdByProject) => {
+            // return backend.getBaseUrl("br5f7-7uaaa-aaaaa-qaaca-cai").then(resBaseUrl => {
+            return backend.getBaseUrl(resCanisterIdByProject).then((resBaseUrl: string) => {
+              setBaseUrlCanister(resBaseUrl)
+              return resBaseUrl
+            }).catch(error => console.error(error))
+          })
+          .catch((error) => console.error(error))
+      })
+      .catch((error) => console.error(error))
+  }, [])
+
   return (
     <Center>
       <Grid
@@ -181,7 +230,7 @@ const StartupDetails = ({ startup: startupFetched }) => {
                 {/* Contenido para la pestaña "Team" */}
                 <>
                   {" "}
-                  <Link href="https://mushroomprotocol.io/founders/" isExternal>
+                  <Link href={baseUrlCanister} isExternal>
                     Collection Website <ExternalLinkIcon mx="2px" />
                   </Link>
                   <br />

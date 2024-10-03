@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom"
 
 export default function StartupPage() {
   const [backend] = useCanister("backend")
-  const [startup, setStartup] = useState<Startup | undefined | null>()
+  const [startup, setStartup] = useState<Startup | undefined | null>(null)
   const {startupId} = useParams()
 
   useEffect(() => {
@@ -26,6 +26,10 @@ export default function StartupPage() {
       })
       .catch((error) => console.error(error))
   }, [])
+
+  if (!startup) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>

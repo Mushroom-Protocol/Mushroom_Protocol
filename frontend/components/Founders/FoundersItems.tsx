@@ -23,9 +23,9 @@ import {
   useToast,
 } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa6"
-import { useCanister } from "@connect2ic/react";
-import {EstadoContext} from "../utils/estadoContex"
-import faviconico from "../../assets/Faviconico.png";
+import { useCanister } from "@connect2ic/react"
+import { EstadoContext } from "../utils/estadoContex"
+import faviconico from "../../assets/Faviconico.png"
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
 
@@ -47,100 +47,103 @@ const FoundersItems = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
-  let {currentUser, setCurrentUser} = useContext(EstadoContext)
+  let { currentUser, setCurrentUser } = useContext(EstadoContext)
   const handleSubmitMint = async (/*event: React.FormEvent<HTMLFormElement>*/) => {
-    // event.preventDefault()
-    let loadingToastId;
-    let transferStatus;
-  
-    try {
-      const e = await window.ic.plug.requestConnect();
-      console.log(e);
-      
-      if (await window.ic.plug.isConnected()) {
-        const params = {
-          to: '827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682',
-          amount: 4e7
-        };
-  
-        try {
-          transferStatus = await window.ic.plug.requestTransfer(params);
-        } catch (transferError) {
-          console.error('Error en la transferencia:', transferError);
-          transferStatus = undefined;
+      // event.preventDefault()
+      let loadingToastId
+      let transferStatus
+
+      try {
+        const e = await window.ic.plug.requestConnect()
+        console.log(e)
+
+        if (await window.ic.plug.isConnected()) {
+          const params = {
+            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+            amount: 4e7,
+          }
+
+          try {
+            transferStatus = await window.ic.plug.requestTransfer(params)
+          } catch (transferError) {
+            console.error("Error en la transferencia:", transferError)
+            transferStatus = undefined
+          }
         }
+      } catch (connectError) {
+        console.error("Error al conectar a Plug Wallet:", connectError)
+        window.open("https://plugwallet.ooo/", "_blank")
+        return // Termina la función si hay un error de conexión
       }
-    } catch (connectError) {
-      console.error('Error al conectar a Plug Wallet:', connectError);
-      window.open('https://plugwallet.ooo/', '_blank');
-      return; // Termina la función si hay un error de conexión
-    }
-  
-    if (transferStatus === undefined) {
-      toast({
-        title: "Transaction Rejected",
-        description: "The transaction was rejected. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      });
-      return; // Termina la función si la transferencia falló
-    }
-  
-    try {
-      loadingToastId = toast({
-        title: "Submitting Form",
-        status: "loading",
-        duration: null,
-        isClosable: false,
-        variant: "solid",
-      });
-  
-      const resMintNFT = (await backend.mintNFT("PR785282")) as { Ok: any; Err: String };
-  
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
-      }
-  
-      if (resMintNFT.Err !== undefined) {
+
+      if (transferStatus === undefined) {
         toast({
-          title: "Minting Error",
-          description: resMintNFT.Err,
+          title: "Transaction Rejected",
+          description: "The transaction was rejected. Please try again.",
           status: "error",
           duration: 5000,
           isClosable: true,
           variant: "solid",
-        });
-      } else {
+        })
+        return // Termina la función si la transferencia falló
+      }
+
+      try {
+        loadingToastId = toast({
+          title: "Submitting Form",
+          status: "loading",
+          duration: null,
+          isClosable: false,
+          variant: "solid",
+        })
+
+        const resMintNFT = (await backend.mintNFT("PR492415")) as {
+          Ok: any
+          Err: String
+        }
+
+        if (loadingToastId !== undefined) {
+          toast.close(loadingToastId)
+        }
+
+        if (resMintNFT.Err !== undefined) {
+          toast({
+            title: "Minting Error",
+            description: resMintNFT.Err,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            variant: "solid",
+          })
+        } else {
+          toast({
+            title: "Successful Submission",
+            description: "Token ID: " + String(resMintNFT?.Ok.token_id),
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            variant: "solid",
+          })
+        }
+
+        onClose()
+      } catch (error) {
+        if (loadingToastId !== undefined) {
+          toast.close(loadingToastId)
+        }
+
         toast({
-          title: "Successful Submission",
-          description: 'Token ID: ' + String(resMintNFT?.Ok.token_id),
-          status: "success",
+          title: "Submission Error",
+          description:
+            "There was an error submitting the form. Please try again.",
+          status: "error",
           duration: 5000,
           isClosable: true,
           variant: "solid",
-        });
+        })
+        console.error("Error on backend.mintNFT() call:", error)
       }
-  
-      onClose();
-    } catch (error) {
-      if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
-      }
-  
-      toast({
-        title: "Submission Error",
-        description: "There was an error submitting the form. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      });
-      console.error("Error on backend.mintNFT() call:", error);
     }
-  };
-  
 
   return (
     <Center>
@@ -190,7 +193,11 @@ const FoundersItems = () => {
               </Tag>
             </Box>
           </Flex>
-          <HStack spacing={4} alignItems="center" display={{ base: "none", md: "flex" }}>
+          <HStack
+            spacing={4}
+            alignItems="center"
+            display={{ base: "none", md: "flex" }}
+          >
             <Tag
               size="lg"
               variant="subtle"
@@ -273,8 +280,7 @@ const FoundersItems = () => {
               display="flex"
               alignItems="center"
               justifyContent="flex-start"
-            >
-            </Box>
+            ></Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
             Minted: 7 / 444
@@ -289,22 +295,22 @@ const FoundersItems = () => {
             <Button size="sm" marginLeft="10px" onClick={handleIncrease}>
               +
             </Button>
-            {(currentUser.name !== "") &&  <Button
-              backgroundColor="#1FAFC8"
-              textColor="#000000"
-              variant="solid"
-              ml="10px"
-              borderRadius="10px"
-              onClick={handleSubmitMint} // Abre modal de confirmación de minted
-              _hover={{
-                backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
-                textColor: "#000000", // Mantener el mismo color de texto
-              }}
-            >
-              Mint
-            </Button>}
-            
-
+            {currentUser.name !== "" && (
+              <Button
+                backgroundColor="#1FAFC8"
+                textColor="#000000"
+                variant="solid"
+                ml="10px"
+                borderRadius="10px"
+                onClick={handleSubmitMint} // Abre modal de confirmación de minted
+                _hover={{
+                  backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
+                  textColor: "#000000", // Mantener el mismo color de texto
+                }}
+              >
+                Mint
+              </Button>
+            )}
           </Box>
           <Text
             fontSize="16px"
@@ -316,16 +322,10 @@ const FoundersItems = () => {
             * At the time of minted you are exchanging your crypto assets for a
             random NFT within the NFTs pool.
           </Text>
-          <Text
-            fontSize="22px"
-            color="#FFFFFF"
-            mr="20"
-            marginTop="50px"
-          >
+          <Text fontSize="22px" color="#FFFFFF" mr="20" marginTop="50px">
             Closing date: August 12, 2024
           </Text>
         </GridItem>
-
 
         <Modal isOpen={isOpen} onClose={onClose} size="md">
           {/* Agregar el estilo para el ModalOverlay */}
@@ -343,7 +343,10 @@ const FoundersItems = () => {
             <ModalCloseButton />
             <ModalBody>
               {/* Contenido del modal */}
-              <p>If you confirm the transaction, an NFTs will be minted to your wallet address.</p>
+              <p>
+                If you confirm the transaction, an NFTs will be minted to your
+                wallet address.
+              </p>
             </ModalBody>
             <ModalFooter>
               <Button

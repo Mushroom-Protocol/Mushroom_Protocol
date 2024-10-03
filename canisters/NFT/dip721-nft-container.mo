@@ -10,6 +10,7 @@ import Rand "mo:random/Rand";
 import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
+import TypesNft "../NFT/Types";
 
 shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier]) = Self {
     
@@ -253,6 +254,17 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         return totalSupply
     };
 
+    public query func holdersDip721() : async [TypesNft.Holder] {
+        return holders
+    };
+
+    public query func getPricesDip721(): async [{tierName: Text; price: Nat}] {
+        Prim.Array_tabulate<{tierName: Text; price: Nat}>(
+            tiersComposition.size(),
+            func x = {tierName = tiersComposition[x].tierName; price = tiersComposition[x].price}
+        )
+    };
+
     public query func getMetadataDip721(token_id : TokenId) : async Types.MetadataResult {
         let item = Map.get<Nat64, Nft>(nfts, n64hash, token_id);
         switch (item) {
@@ -267,6 +279,10 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     public query func getMaxLimitDip721() : async Nat64 {
         return maxLimit
+    };
+
+    public query func getBaseUrl() : async Text {
+        return baseUrl
     };
 
     public func getMetadataForUserDip721(user : Principal) : async Types.ExtendedMetadataResult {

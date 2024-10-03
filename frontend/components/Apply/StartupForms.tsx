@@ -23,12 +23,14 @@ import { BsFillRocketTakeoffFill } from "react-icons/bs";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useCanister } from "@connect2ic/react";
 import { base64ToBlob, convertFileToBase64 } from "../CommonHelpers";
+import { useNavigate } from "react-router-dom";
 // import {Industry} from "../../declarations/backend";
 
 const StartupForms = () => {
   const { isOpen, onToggle } = useDisclosure();
   const [backend] = useCanister("backend");
   const toast = useToast();
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     startUpName: "",
@@ -126,6 +128,8 @@ const StartupForms = () => {
         isClosable: true,
         variant: 'solid',
       });
+
+      navigate('/Dashboard')
     } catch (error) {
       // Cierra el toast de carga cuando la acción falla
       if (loadingToastId !== undefined) {

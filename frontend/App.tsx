@@ -12,6 +12,8 @@ import * as backend from "../src/declarations/backend/"
 import { router } from "./router/AppRouter"
 import { Text } from "@chakra-ui/react"
 
+import { idlFactory as BackendNFT_idl } from '../src/declarations/backendNFT'
+
 function App() {
   const { isConnected, principal, activeProvider  } = useConnect()
 
