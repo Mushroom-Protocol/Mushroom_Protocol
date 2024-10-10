@@ -48,7 +48,9 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const toast = useToast()
   const [backend] = useCanister("backend")
   const [totalSupply, setTotalSupply] = useState(0)
+  const [maxLimit, setMaxLimit] = useState(0)
   const [projectsByStartup, setProjectsByStartup] = useState([])
+  const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
 
   let null_address: string = "aaaaa-aa"
 
@@ -67,6 +69,19 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
+    const callGetPrices = async (projectID: string) => {
+      try {
+        const resCallGetPrices: {tierName: string, price: number}[] | null | undefined =
+          (await backend.getPrices(projectID)) as
+            | {tierName: string, price: number}[]
+            | null
+            | undefined
+        return resCallGetPrices
+      } catch (error) {
+        console.error("Error on backend.getPrices() call:", error)
+      }
+    }
+
     const getCanisterIdByProject = async (projectID: string): Promise<any> => {
       try {
         const resCanisterId: string | null | undefined =
@@ -77,18 +92,32 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
+    // getProjectsByStartup(startupFetched.startupId)
+    //   .then((dataProjectsByStartup) => {
+    //     setProjectsByStartup(dataProjectsByStartup)
+    //     return getCanisterIdByProject(dataProjectsByStartup[0][0])
+    //       .then((resCanisterIdByProject) => {
+    //         return backend.getTotalSupply(resCanisterIdByProject).then(resTotalSupply => {
+    //           const numTotalSupply = Number(resTotalSupply)
+    //           setTotalSupply(numTotalSupply)
+    //           return numTotalSupply
+    //         }).catch(error => console.error(error))
+    //       })
+    //       .catch((error) => console.error(error))
+    //   })
+    //   .catch((error) => console.error(error))
+
     getProjectsByStartup(startupFetched.startupId)
       .then((dataProjectsByStartup) => {
         setProjectsByStartup(dataProjectsByStartup)
-        return getCanisterIdByProject(dataProjectsByStartup[0][0])
-          .then((resCanisterIdByProject) => {
-            return backend.getTotalSupply(resCanisterIdByProject).then(resTotalSupply => {
-              const numTotalSupply = Number(resTotalSupply)
-              setTotalSupply(numTotalSupply)
-              return numTotalSupply
-            }).catch(error => console.error(error))
-          })
-          .catch((error) => console.error(error))
+        return Promise.all([getCanisterIdByProject(dataProjectsByStartup[0][0]), callGetPrices(dataProjectsByStartup[0][0])]).then(([resCanisterIdByProject, resCallGetPrices]) => {
+          setTiersPrices(resCallGetPrices)
+          return backend.getMaxLimit(resCanisterIdByProject).then(resMaxLimit => {
+            const numMaxLimit = Number(resMaxLimit)
+            setMaxLimit(numMaxLimit)
+            return numMaxLimit
+          }).catch(error => console.error(error))
+        }).catch(error => console.error(error))
       })
       .catch((error) => console.error(error))
   }, [])
@@ -255,7 +284,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 fontSize="12px"
                 mr="20"
               >
-                Total Items: {totalSupply}
+                Total Items: {maxLimit}
               </Tag>
             </Box>
             <Spacer />
@@ -313,47 +342,28 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           padding="30px"
         >
           <Box display="flex" alignItems="flex-start">
-            {}
-            <Box
-              backgroundColor="#000000"
-              color="#FFFFFF"
-              fontSize="18px"
-              display="flex"
-              alignItems="center"
-              p="8px"
-              borderRadius="15px"
-              border="1px"
-              borderColor="#1FAFC8"
-            >
-              Price: 5
-              <img
-                src={favicon}
-                alt="Icon"
-                width="22"
-                height="22"
-                style={{ marginLeft: "5px" }}
-              />
-            </Box>
-            <Box
-              backgroundColor="#000000"
-              color="#FFFFFF"
-              fontSize="18px"
-              display="flex"
-              alignItems="center"
-              p="8px"
-              borderRadius="15px"
-              border="1px"
-              borderColor="#1FAFC8"
-            >
-              Price: 5
-              <img
-                src={favicon}
-                alt="Icon"
-                width="22"
-                height="22"
-                style={{ marginLeft: "5px" }}
-              />
-            </Box>
+            {tiersPrices.map(tierPrice => {
+              return <Box
+                backgroundColor="#000000"
+                color="#FFFFFF"
+                fontSize="18px"
+                display="flex"
+                alignItems="center"
+                p="8px"
+                borderRadius="15px"
+                border="1px"
+                borderColor="#1FAFC8"
+              >
+                Price {tierPrice.tierName}: {Number(tierPrice.price)}
+                <img
+                  src={favicon}
+                  alt="Icon"
+                  width="22"
+                  height="22"
+                  style={{ marginLeft: "5px" }}
+                />
+              </Box>
+            })}
           </Box>
           <Box
             backgroundColor="#1E1E1E"
@@ -378,7 +388,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             </Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
-            Minted: 0 / {totalSupply}
+            Minted: 0 / {maxLimit}
           </Text>
           <Box display="flex" alignItems="center" marginTop="20px">
             <Button size="sm" marginRight="10px" onClick={handleDecrease}>

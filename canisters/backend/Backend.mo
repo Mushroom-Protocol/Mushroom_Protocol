@@ -937,6 +937,13 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         await remoteNFT.getMaxLimitDip721();
     };
 
+    public shared ({ caller }) func getTotalSupply(canisterId : Text) : async Nat64 {
+        let remoteNFT = actor (canisterId) : actor {
+            totalSupplyDip721 : shared () -> async Nat64;
+        };
+        await remoteNFT.totalSupplyDip721();
+    };
+
     public shared ({ caller }) func getBaseUrl(canisterId : Text) : async Text {
         let remoteNFT = actor (canisterId) : actor {
             getBaseUrl : shared () -> async Text;
