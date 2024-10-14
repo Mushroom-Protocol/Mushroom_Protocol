@@ -29,6 +29,7 @@ import {
   CollectionPreInit,
   DeployConfig,
   Dip721NonFungibleToken,
+  Tier
 } from "../CommonTypes"
 import { readFileLines } from "../CommonHelpers"
 
@@ -42,7 +43,7 @@ const CollectionsReqs: React.FC = () => {
     nftName: "",
     nftLogo: "",
     nftSymbol: "",
-    nftMaxLimit: 0,
+    nftMaxLimit: "",
     nftProyectId: "",
     nftBaseUrl: "",
     nftAssetsNamesFile: null as File | null,
@@ -50,7 +51,7 @@ const CollectionsReqs: React.FC = () => {
     nftCustodian: "",
     nftDistribution: [],
     nftComposition: [],
-    nftFee: 0,
+    nftFee: ""
   })
   const [tierTotalColumns, setTierTotalColumns] = useState({
     tierA: 0,
@@ -91,6 +92,14 @@ const CollectionsReqs: React.FC = () => {
     }))
   }
 
+  const handleChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormDataDeploy((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  }
+
   const handleOpenModal = async (currStartup: string) => {
     toast({
       title: "Loading forms...",
@@ -118,6 +127,16 @@ const CollectionsReqs: React.FC = () => {
     await backend.rejectCollection(currStartup)
   }
 
+  const buildTiersAssets = (mainFileLines: string[]): any => {
+    let tiersAssetsNames = {}
+    mainFileLines.map(mainFileLine => {
+      let extractedTierName = mainFileLine.substring(mainFileLine.indexOf("-")+1, mainFileLine.lastIndexOf("-"))
+      extractedTierName = extractedTierName.substring(0, 1).toLowerCase() + extractedTierName.substring(1)
+      tiersAssetsNames = {...tiersAssetsNames, [extractedTierName]: tiersAssetsNames[extractedTierName] ? [...tiersAssetsNames[extractedTierName], mainFileLine] : [mainFileLine]}
+    })
+    return tiersAssetsNames
+  }
+
   const handleDeploy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const targetForm = event.target
@@ -138,6 +157,24 @@ const CollectionsReqs: React.FC = () => {
         symbol: formDataDeploy.nftSymbol,
         maxLimit: Number(formDataDeploy.nftMaxLimit),
       }
+
+      const mainFileLines = await readFileLines(targetForm[8].files[0])
+      const tiersAssets = buildTiersAssets(mainFileLines)
+      Object.keys(tiersAssets).map(tierElm => {
+        formDataDeploy.nftComposition.map(nftElm => {
+          if (tierElm.toLocaleLowerCase() === tierElm.toLowerCase()) {
+            nftElm.assetsNames = tiersAssets[nftElm.tierName]
+            setFormDataDeploy(prevData => {
+              return {
+                ...prevData, nftComposition: formDataDeploy.nftComposition.map(compositionElm => {
+                  if (compositionElm.tierName.toLowerCase() === nftElm.tierName.toLowerCase()) return nftElm
+                  else return compositionElm
+                })
+              }
+            })
+          }
+        })
+      })
       const cfgMushroom: DeployConfig = {
         projectId: formDataDeploy.nftProyectId[0],
         baseUrl: formDataDeploy.nftBaseUrl,
@@ -321,7 +358,7 @@ const CollectionsReqs: React.FC = () => {
                       name="nftAssetsNamesFile"
                       placeholder="Assets names..."
                       type="file"
-                      onChange={handleChangeForm}
+                      onChange={handleChangeFile}
                       accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
                     />
                   </FormControl>
@@ -350,7 +387,12 @@ const CollectionsReqs: React.FC = () => {
                       return <>
                         <Text><b>Principal:</b> {elm.principal.toText()}</Text>
                         <Text><b>Category:</b> {Object.keys(elm.category)}</Text>
-                        <Text><b>Quantity:</b> {Number(elm.qty)}</Text>
+                        <p>
+                          <Text><b>Quantity per Tier:</b></Text>
+                          {elm.qtyPerTier.map(qtyTier => {
+                            return <Text>{`${qtyTier.tierName}: ${qtyTier.qty}`}</Text>
+                          })}
+                        </p>
                         <Text><b>Is Vesting:</b> {elm.isVesting.toString()}</Text>
                         <hr />
                       </>

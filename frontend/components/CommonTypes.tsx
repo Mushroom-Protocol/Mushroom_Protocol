@@ -119,7 +119,7 @@ export interface CollectionPreInit {
   collectionName: string
   shortStorytelling: string
   storytellingCollection: string
-  totalSupply: number
+  totalSupply: number | string
   distribution: Holder[]
   composition: Tier[];
   utilities: string[]
@@ -136,7 +136,7 @@ export const initialStateCollectionPreInit: CollectionPreInit = {
   collectionName: "",
   shortStorytelling: "",
   storytellingCollection: "",
-  totalSupply: 0,
+  totalSupply: "",
   distribution: [],
   composition: [],
   utilities: [],

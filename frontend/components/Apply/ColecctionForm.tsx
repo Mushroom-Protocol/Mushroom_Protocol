@@ -80,9 +80,9 @@ const TierFieldsInit: TierFields = {
 }
 
 const tiersPrices = {
-  tierA: 0,
-  tierB: 0,
-  tierC: 0,
+  tierA: "",
+  tierB: "",
+  tierC: "",
 }
 
 interface DistributionType {
@@ -461,7 +461,7 @@ const ColecctionForm = () => {
                     type="number"
                     value={formData.totalSupply}
                     onChange={handleChange}
-                    placeholder="Tokenomics: Total number of tokens issued..."
+                    placeholder="Total number of tokens issued..."
                   />
                 </FormControl>
 
@@ -660,7 +660,7 @@ const ColecctionForm = () => {
                       id="tierAPrice"
                       name="tierAPrice"
                       type="number"
-                      width="10%"
+                      width="20%"
                       value={formTiersPrices.tierA}
                       onChange={handleChangeTiersPrices}
                       placeholder="Tier A price..."
@@ -672,7 +672,7 @@ const ColecctionForm = () => {
                       id="tierBPrice"
                       name="tierBPrice"
                       type="number"
-                      width="10%"
+                      width="20%"
                       value={formTiersPrices.tierB}
                       onChange={handleChangeTiersPrices}
                       placeholder="Tier B price..."
@@ -684,7 +684,7 @@ const ColecctionForm = () => {
                       id="tierCPrice"
                       name="tierCPrice"
                       type="number"
-                      width="10%"
+                      width="20%"
                       value={formTiersPrices.tierC}
                       onChange={handleChangeTiersPrices}
                       placeholder="Tier C price..."

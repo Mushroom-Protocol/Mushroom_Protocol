@@ -50,7 +50,7 @@ const StartupsReqs: React.FC = () => {
         const initials = response.map((resStartup, index) => {
           return forms[index] ?
             {startupValoration: forms[index]?.startupValoration} :
-            {startupValoration: 0}
+            {startupValoration: ""}
         })
         setForms(initials)
         return response
