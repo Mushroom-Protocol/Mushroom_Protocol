@@ -966,6 +966,36 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             case null {[]};
         };
     };
+
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {maxLimit: Nat64; totalSupply: Nat64; baseUrl: Text; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]} {
+        let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
+        switch (actorRef) {
+            case (?value) {
+                let fetchedPricesDip721 = await value.getPricesDip721();
+                let fetchedHoldersDip721 = await value.holdersDip721();
+                let fetchedBaseUrl = await value.getBaseUrl();
+                let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
+                let fetchedMaxLimit = await value.getMaxLimitDip721();
+                let nftCollMetadata = {
+                    maxLimit = fetchedMaxLimit;
+                    totalSupply = fetchedTotalSupplyDip721;
+                    baseUrl = fetchedBaseUrl;
+                    holders = fetchedHoldersDip721;
+                    prices = fetchedPricesDip721;
+                };
+                return nftCollMetadata
+            };
+            case null {
+                {
+                    maxLimit = 0;
+                    totalSupply = 0;
+                    baseUrl = "";
+                    holders = [];
+                    prices = [];
+                }
+            };
+        };
+    };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
     public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {

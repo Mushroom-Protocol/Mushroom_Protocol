@@ -172,7 +172,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT("PR492415")) as {
+        const resMintNFT = (await backend.mintNFT("PR472255", "tierB")) as {
           Ok: any
           Err: String
         }
@@ -447,7 +447,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 backgroundColor="#1FAFC8"
                 variant="solid"
                 borderRadius="10px"
-                onClick={onClose}
+                onClick={handleSubmitMint}
               >
                 Mint
               </Button>

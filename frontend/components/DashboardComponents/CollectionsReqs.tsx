@@ -325,6 +325,7 @@ const CollectionsReqs: React.FC = () => {
                       placeholder="Max limit..."
                       id="nftMaxLimit"
                       name="nftMaxLimit"
+                      type="number"
                       value={formDataDeploy.nftMaxLimit}
                       onChange={handleChangeForm}
                     />
@@ -446,6 +447,7 @@ const CollectionsReqs: React.FC = () => {
                     <Input
                       id="nftFee"
                       name="nftFee"
+                      type="number"
                       placeholder="Total fee..."
                       value={formDataDeploy.nftFee}
                       onChange={handleChangeForm}

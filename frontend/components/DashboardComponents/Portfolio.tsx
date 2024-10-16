@@ -1,12 +1,14 @@
 import { useCanister } from "@connect2ic/react"
 import React, { useEffect, useState } from "react"
 import { MetadataResultExtended } from "../CommonTypes"
-import { Button, ButtonGroup, Card, CardBody, CardFooter, Center, Divider, Heading, Image, List, ListItem, Stack, Text } from "@chakra-ui/react"
+import { Button, ButtonGroup, Card, CardBody, CardFooter, Center, Divider, Heading, Image, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text, useDisclosure } from "@chakra-ui/react"
 import { blobToBase64 } from "../CommonHelpers"
 
 const Portfolio: React.FC = () => {
   const [backend] = useCanister("backend")
   const [myNfts, setMyNfts] = useState<MetadataResultExtended[]>()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
   let nftImageUrl = ""
 
   useEffect(() => {
@@ -22,6 +24,14 @@ const Portfolio: React.FC = () => {
 
     getMyNfts()
   }, [])
+
+  const openMetadata = async (projectId: string) => {
+    onOpen()
+    const resMetadataNFTColl: any = (await backend.getMetadataNFTColl(
+      projectId,
+    )) as any
+    setMetadataNFTColl(resMetadataNFTColl)
+  }
 
   return (
     <>
@@ -53,22 +63,69 @@ const Portfolio: React.FC = () => {
                     {/* <Text size="md">{startup.startUpSlogan}</Text> */}
                   </Stack>
                 </CardBody>
-                {/* <Divider />
+                <Divider />
                 <CardFooter>
                   <ButtonGroup spacing="2">
                     <Button
                       colorScheme="blue"
-                      // onClick={() => openDetails(startup.startupId)}
+                      onClick={() => openMetadata("PR472255")}
                     >
-                      Details
+                      Metadata
                     </Button>
                   </ButtonGroup>
-                </CardFooter> */}
+                </CardFooter>
               </Card>
             </ListItem>
           )
         })}
       </List>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Heading color="blue.600" fontSize="2xl">
+              NFT collection meta-data
+            </Heading>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody style={{ color: "black" }}>
+            <Text>
+              <b>Max limit:</b> {Number(metadataNFTColl?.maxLimit)}
+            </Text>
+            <Text>
+              <b>Total supply:</b> {Number(metadataNFTColl?.totalSupply)}
+            </Text>
+            <Text>
+              <b>Base URL:</b> {metadataNFTColl?.baseUrl}
+            </Text>
+            <Text>
+              {/* <b>Holders:</b> {metadataNFTColl?.holders} */}
+            </Text>
+            <Text>
+              {/* <b>Prices:</b> {metadataNFTColl?.prices} */}
+            </Text>
+            {/* <Center>
+              <Image
+                src={
+                  "data:image/png;base64," + blobToBase64(projectDetails?.coverImage || new Uint8Array)
+                }
+                alt={projectDetails?.projectTitle}
+                borderRadius="lg"
+                height="200px"
+                width="200px"
+                textAlign="center"
+              />
+            </Center> */}
+          </ModalBody>
+          <hr />
+          <ModalFooter>
+            <Button variant="ghost" colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   )
 }
