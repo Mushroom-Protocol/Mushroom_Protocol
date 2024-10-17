@@ -51,6 +51,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [maxLimit, setMaxLimit] = useState(0)
   const [projectsByStartup, setProjectsByStartup] = useState([])
   const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
+  const [selectedTier, setSelectedTier] = useState<string>(null)
 
   let null_address: string = "aaaaa-aa"
 
@@ -172,7 +173,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT("PR472255", "tierB")) as {
+        const resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier)) as {
           Ok: any
           Err: String
         }
@@ -230,6 +231,11 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
     if (quantity < 10) {
       setQuantity(quantity + 1)
     }
+  }
+
+  const handleSelectTier = async (tierName: string) => {
+    setSelectedTier(tierName)
+    return 0
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -352,6 +358,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 p="8px"
                 borderRadius="15px"
                 border="1px"
+                onClick={() => handleSelectTier(tierPrice.tierName)}
                 borderColor="#1FAFC8"
               >
                 Price {tierPrice.tierName}: {Number(tierPrice.price)}
@@ -365,6 +372,9 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
               </Box>
             })}
           </Box>
+          <Flex>
+            <Text color='gray.300'>Selected Tier price: </Text><Text color='green.300'>{selectedTier}</Text>
+          </Flex>
           <Box
             backgroundColor="#1E1E1E"
             height="30px"
