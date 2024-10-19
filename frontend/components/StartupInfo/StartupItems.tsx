@@ -106,7 +106,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         if (await window.ic.plug.isConnected()) {
           const params = {
             to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
-            amount: 4e7,
+            amount: 4e7
           }
 
           try {
