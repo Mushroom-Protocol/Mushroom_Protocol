@@ -13,10 +13,15 @@ import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
 
+
+////////////// DEBUG ////////////////
+// import {print} "mo:base/Debug";
+/////////////////////////////////////
+
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
-// import {print} "mo:base/Debug";
+
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -33,7 +38,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     type Project = Types.Project;
     type StartupID = Text;
     type ProjectID = Text;
-    // type CollectionID = Text;
     type NftID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
@@ -1053,7 +1057,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             let tokensInCurrentCollection = await collection.getTokenIdsForUserDip721(userPrincipal);
             for (tokenId in tokensInCurrentCollection.vals()) {
                 let metadata = await collection.getMetadataDip721(tokenId);
-                tempBuffer.add({ projectId; tokenId; metadata })
+                tempBuffer.add({ projectId; tokenId; metadata });
             }
         };
         Buffer.toArray<MetadataResultExtended>(tempBuffer)

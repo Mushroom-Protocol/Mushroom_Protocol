@@ -11,9 +11,11 @@ import Set "mo:map/Set";
 import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 import TypesNft "../NFT/Types";
-//////
-import { print } "mo:base/Debug";
-import Nat "mo:base/Nat";
+
+// ///////////// DEBUG ////////////////////
+// import { print } "mo:base/Debug";
+// import Nat "mo:base/Nat";
+// ////////////////////////////////////////
 
 shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier]) = Self {
     
@@ -50,11 +52,9 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 var toMint = qty;
                 while(toMint > 0){
                    let result = await mintDip721(holder.principal, tierName);
-                   print(debug_show(result));
+                //    print(debug_show(result));
                    toMint -= 1;
-
-                }
-                
+                } 
             }
         }
     };

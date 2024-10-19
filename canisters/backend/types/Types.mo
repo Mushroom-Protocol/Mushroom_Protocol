@@ -190,8 +190,6 @@ module {
             distribution : [Holder];
             composition: [Tier];
             utilities : [Utilities];
-            //decimals: Nat;
-            tokenPrice : Nat;
             documentsFolderUrl : Text;
             typesImages : ImageType;
             nftImagesUrl : Text;
