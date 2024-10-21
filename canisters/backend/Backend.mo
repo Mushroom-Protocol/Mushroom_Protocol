@@ -13,10 +13,15 @@ import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
 
+
+////////////// DEBUG ////////////////
+// import {print} "mo:base/Debug";
+/////////////////////////////////////
+
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
-// import {print} "mo:base/Debug";
+
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -33,7 +38,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     type Project = Types.Project;
     type StartupID = Text;
     type ProjectID = Text;
-    // type CollectionID = Text;
     type NftID = Text;
     type ProjectCard = Types.ProjectCard;
     type StartupCard = Types.StartupCard;
@@ -930,7 +934,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMaxLimit(canisterId : Text) : async Nat64 {
+    public shared func getMaxLimit(canisterId : Text) : async Nat64 {
         let remoteNFT = actor (canisterId) : actor {
             getMaxLimitDip721 : shared () -> async Nat64;
         };
@@ -951,7 +955,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         await remoteNFT.getBaseUrl();
     };
 
-    public shared ({ caller }) func getHolders(canisterId : Text) : async [TypesNft.Holder] {
+    public shared func getHolders(canisterId : Text) : async [TypesNft.Holder] {
         let remoteNFT = actor (canisterId) : actor {
             holdersDip721 : shared () -> async [TypesNft.Holder];
         };
@@ -959,7 +963,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         return fetchedHolders
     };
 
-    public shared ({ caller }) func getPrices(projectID : Text) : async [{tierName: Text; price: Nat}] {
+    public shared func getPrices(projectID : Text) : async [{tierName: Text; price: Nat}] {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch (actorRef) {
             case (?value) await value.getPricesDip721();
@@ -1028,6 +1032,9 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 case (?pr){pr.startupID};
             };
             HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
+            //TODO verificar initializeCollection() 
+            await newCanister.initializeCollection();
+            
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             return #ok(canisterId)
         } catch (e) {
@@ -1057,7 +1064,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         metadata : MetadataResult
     };
 
-    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text) : async TypesNft.MintReceipt {
+    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text /* TODO tranferStatus*/) : async TypesNft.MintReceipt {
         // TODO verificar pago
         assert(activeMint);
         assert (isUser(caller));
@@ -1100,7 +1107,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             let tokensInCurrentCollection = await collection.getTokenIdsForUserDip721(userPrincipal);
             for (tokenId in tokensInCurrentCollection.vals()) {
                 let metadata = await collection.getMetadataDip721(tokenId);
-                tempBuffer.add({ projectId; tokenId; metadata })
+                tempBuffer.add({ projectId; tokenId; metadata });
             }
         };
         Buffer.toArray<MetadataResultExtended>(tempBuffer)

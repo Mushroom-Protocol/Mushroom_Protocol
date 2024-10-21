@@ -12,6 +12,11 @@ import Map "mo:map/Map";
 import { nhash; n64hash; phash } "mo:map/Map";
 import TypesNft "../NFT/Types";
 
+// ///////////// DEBUG ////////////////////
+// import { print } "mo:base/Debug";
+// import Nat "mo:base/Nat";
+// ////////////////////////////////////////
+
 shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier]) = Self {
     
     type Nft = Types.Nft;
@@ -41,38 +46,17 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     stable let holders: [Types.Holder] = init.distribution;
     stable var isInitializedCollection = false;
 
-    func initialDistribution():async  (){
-        for(holder in holders.vals()){
+    func initialDistribution(): async () {
+        for(holder in holders.vals()) {
             for({tierName: Text; qty: Nat} in holder.qtyPerTier.vals()){
-                // let tierIndex: ?Nat = null;
-                var i = 0;
-                while(tiersComposition[i].tierName != tierName){ i += 1 };
-                if(tiersComposition[i].tierName == tierName) {
-                    var toMint = qty;
-
-                    while (toMint > 0){
-                        let tokenId = await generateRandomID();
-                        let metadata : Types.MetadataDesc = [{
-                            purpose = #Rendered;
-                            key_val_data = [
-                                { key = "url"; val = #TextContent(baseUrl # tiersComposition[i].assetsNames[toMint])},
-                            ];
-                            data : Blob = "/00/00"
-                        }];
-                        let nft = { owner = holder.principal; id = tokenId; metadata };
-                        ignore Map.put<Nat64, Nft>(nfts, n64hash, tokenId, nft);
-                        let assetsNames = Array.subArray<Text>(
-                            tiersComposition[i].assetsNames, 
-                            Prim.nat64ToNat(Prim.intToNat64Wrap(toMint)), 
-                            tiersComposition[i].assetsNames.size()
-                        );
-                        let tierUpdate = {tiersComposition[i] with assetsNames};
-                        tiersComposition[i] := tierUpdate;
-                        toMint -= 1;
-                    };            
-                }                
-            };   
-        };
+                var toMint = qty;
+                while(toMint > 0){
+                   let result = await mintDip721(holder.principal, tierName);
+                //    print(debug_show(result));
+                   toMint -= 1;
+                } 
+            }
+        }
     };
 
     public shared ({caller}) func initializeCollection(): async () {
@@ -309,7 +293,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({ caller }) func mintDip721(to : Principal, /* metadata : Types.MetadataDesc */ _tierName: Text) : async Types.MintReceipt {
-        if (not Set.has<Principal>(custodians, phash, caller)) {
+        if (not Set.has<Principal>(custodians, phash, caller) and caller != Principal.fromActor(Self)) {
             return #Err(#Unauthorized)
         };
         var index = 0;
@@ -324,6 +308,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                         let tokenId = await generateRandomID();
                         let indexImgsArray = Nat64.toNat(tokenId) % available;
                         let metadata : Types.MetadataDesc = [{
+                            tier = _tierName;
                             purpose = #Rendered;
                             key_val_data = [
                                 { key = "url"; val = #TextContent(baseUrl # tiersComposition[index].assetsNames[indexImgsArray])},
