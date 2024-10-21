@@ -31,6 +31,7 @@ const Portfolio: React.FC = () => {
       projectId,
     )) as any
     setMetadataNFTColl(resMetadataNFTColl)
+    return resMetadataNFTColl
   }
 
   return (
@@ -91,20 +92,32 @@ const Portfolio: React.FC = () => {
           <ModalCloseButton />
           <ModalBody style={{ color: "black" }}>
             <Text>
+              <b>Name:</b> {metadataNFTColl?.name}
+            </Text>
+            <Text>
+              <b>Symbol:</b> {metadataNFTColl?.symbol}
+            </Text>
+            <Text>
+              <b>Base URL:</b> {metadataNFTColl?.symbol}
+            </Text>
+            <Text>
               <b>Max limit:</b> {Number(metadataNFTColl?.maxLimit)}
             </Text>
             <Text>
               <b>Total supply:</b> {Number(metadataNFTColl?.totalSupply)}
             </Text>
             <Text>
-              <b>Base URL:</b> {metadataNFTColl?.baseUrl}
+              <b>Logo:</b> {metadataNFTColl?.logo}
+            </Text>
+            {/* <Text>
+              <b>Holders:</b> {JSON.stringify(metadataNFTColl?.holders)}
             </Text>
             <Text>
-              {/* <b>Holders:</b> {metadataNFTColl?.holders} */}
+              <b>Prices:</b> {JSON.stringify(metadataNFTColl?.prices)}
             </Text>
             <Text>
-              {/* <b>Prices:</b> {metadataNFTColl?.prices} */}
-            </Text>
+              <b>Custodians:</b> {JSON.stringify(metadataNFTColl?.baseUrl)}
+            </Text> */}
             {/* <Center>
               <Image
                 src={

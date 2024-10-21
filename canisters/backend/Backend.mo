@@ -967,31 +967,44 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {maxLimit: Nat64; totalSupply: Nat64; baseUrl: Text; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]} {
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {name: Text; symbol: Text; baseUrl: Text; maxLimit: Nat64; totalSupply: Nat64; logo: TypesNft.LogoResult; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]; custodians: [Text]} {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch (actorRef) {
             case (?value) {
-                let fetchedPricesDip721 = await value.getPricesDip721();
-                let fetchedHoldersDip721 = await value.holdersDip721();
+                let fetchedName = await value.nameDip721();
+                let fetchedSymbol = await value.symbolDip721();
                 let fetchedBaseUrl = await value.getBaseUrl();
-                let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
                 let fetchedMaxLimit = await value.getMaxLimitDip721();
+                let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
+                let fetchedLogo = await value.logoDip721();
+                let fetchedHoldersDip721 = await value.holdersDip721();
+                let fetchedPricesDip721 = await value.getPricesDip721();
+                let fetchedCustodians = await value.getCustodians();
+
                 let nftCollMetadata = {
+                    name = fetchedName;
+                    symbol = fetchedSymbol;
+                    baseUrl = fetchedBaseUrl;
                     maxLimit = fetchedMaxLimit;
                     totalSupply = fetchedTotalSupplyDip721;
-                    baseUrl = fetchedBaseUrl;
+                    logo = fetchedLogo;
                     holders = fetchedHoldersDip721;
                     prices = fetchedPricesDip721;
+                    custodians = fetchedCustodians;
                 };
                 return nftCollMetadata
             };
             case null {
                 {
+                    name = "";
+                    symbol = "";
+                    baseUrl = "";
                     maxLimit = 0;
                     totalSupply = 0;
-                    baseUrl = "";
+                    logo = {data = ""; logo_type = ""};
                     holders = [];
                     prices = [];
+                    custodians = [];
                 }
             };
         };
