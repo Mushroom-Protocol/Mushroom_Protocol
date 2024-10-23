@@ -162,8 +162,9 @@ const CollectionsReqs: React.FC = () => {
       const tiersAssets = buildTiersAssets(mainFileLines)
       Object.keys(tiersAssets).map(tierElm => {
         formDataDeploy.nftComposition.map(nftElm => {
-          if (tierElm.toLocaleLowerCase() === tierElm.toLowerCase()) {
+          if (tierElm.toLowerCase() === nftElm.tierName.toLowerCase()) {
             nftElm.assetsNames = tiersAssets[nftElm.tierName]
+            nftElm.qty = tiersAssets[nftElm.tierName].length
             setFormDataDeploy(prevData => {
               return {
                 ...prevData, nftComposition: formDataDeploy.nftComposition.map(compositionElm => {

@@ -169,8 +169,8 @@ export default function MenuUser() {
           <MenuItem onClick={() => handleItemClick("/Dashboard")}>
             Dashboard
           </MenuItem>
-          <MenuItem onClick={() => handleItemClick("/Portfolio")}>
-            Portafolio
+          <MenuItem onClick={() => handleItemClick("/Dashboard/Portfolio")}>
+            Portfolio
           </MenuItem>
           <MenuItem onClick={() => handleItemClick("/Edit")}>Edit</MenuItem>
           <MenuItem onClick={() => handleItemClick("/")}>Home</MenuItem>

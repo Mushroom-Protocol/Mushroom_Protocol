@@ -9,6 +9,7 @@ const Portfolio: React.FC = () => {
   const [myNfts, setMyNfts] = useState<MetadataResultExtended[]>()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
+  const [currentNFT, setCurrentNFT] = useState<any>({})
   let nftImageUrl = ""
 
   useEffect(() => {
@@ -25,13 +26,15 @@ const Portfolio: React.FC = () => {
     getMyNfts()
   }, [])
 
-  const openMetadata = async (projectId: string) => {
-    onOpen()
+  const openMetadata = async (currNft: any) => {
     const resMetadataNFTColl: any = (await backend.getMetadataNFTColl(
-      projectId,
+      currNft.projectId,
     )) as any
+    console.log(resMetadataNFTColl)
     setMetadataNFTColl(resMetadataNFTColl)
-    return resMetadataNFTColl
+    setCurrentNFT(currNft)
+    onOpen()
+    // return resMetadataNFTColl
   }
 
   return (
@@ -69,7 +72,7 @@ const Portfolio: React.FC = () => {
                   <ButtonGroup spacing="2">
                     <Button
                       colorScheme="blue"
-                      onClick={() => openMetadata("PR472255")}
+                      onClick={() => openMetadata(myNft)}
                     >
                       Metadata
                     </Button>
@@ -86,7 +89,7 @@ const Portfolio: React.FC = () => {
         <ModalContent>
           <ModalHeader>
             <Heading color="blue.600" fontSize="2xl">
-              NFT collection meta-data
+              {`NFT token ${currentNFT.tokenId} (${currentNFT.projectId})`}
             </Heading>
           </ModalHeader>
           <ModalCloseButton />
@@ -107,7 +110,7 @@ const Portfolio: React.FC = () => {
               <b>Total supply:</b> {Number(metadataNFTColl?.totalSupply)}
             </Text>
             <Text>
-              <b>Logo:</b> {metadataNFTColl?.logo}
+              <b>Logo:</b> {metadataNFTColl?.logo?.data}
             </Text>
             {/* <Text>
               <b>Holders:</b> {JSON.stringify(metadataNFTColl?.holders)}
