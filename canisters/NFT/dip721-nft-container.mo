@@ -52,7 +52,6 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
                 var toMint = qty;
                 while(toMint > 0){
                    let result = await mintDip721(holder.principal, tierName);
-                //    print(debug_show(result));
                    toMint -= 1;
                 } 
             }
