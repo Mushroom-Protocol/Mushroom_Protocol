@@ -15,7 +15,7 @@ dfx canister call backend getUsersPendingVerification
 
 #### 5 registerStartUp: (User verified)
 ```
-dfx canister call backend enterVerificationCode "805364"
+dfx canister call backend enterVerificationCode "504484"
 dfx canister call backend registerStartUp '(record {
     startUpName = "StartUp uno";
     email = "email@gmail.com";
@@ -40,7 +40,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "epvyw-ddnza-4wy4p-joxft-ciutt-s7pji-cfxm3-khwlb-x2tb7-uo7tc-xae")'
 ```
 #### Approve Startup
 ```
@@ -53,7 +53,7 @@ dfx canister call backend approveStartUp '(
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "ST750225";
+        startupID = "ST908541";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -73,7 +73,7 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
+dfx canister call backend approveProject '(principal "5epvyw-ddnza-4wy4p-joxft-ciutt-s7pji-cfxm3-khwlb-x2tb7-uo7tc-xae")'
 ```
 #### Create NFT Collection Form (User)
 
@@ -82,13 +82,13 @@ dfx canister call backend approveProject '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr
 dfx canister call backend createCollection '(record {
     typesImages = variant { JPG };
     creator = "Van Gogh";
-    startupID = "ST750225";
+    startupID = "ST908541";
     tokenPrice = 10 : nat;
     storytellingCollection = "storitelling";
     utilities = vec { variant { Governance }; variant { IpNFT } };
     shortStorytelling = "Short storitelling";
     totalSupply = 35 : nat;
-    projectID = "PR777601";
+    projectID = "PR901585";
     nftImagesUrl = "drive imagenes";
     composition = vec {
       record {
@@ -147,7 +147,7 @@ dfxcc backend deployCollection '(
   },
   record {
     baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
-    projectId = "PR777601";
+    projectId = "PR901585";
     composition = vec {
       record {
         qty = 20 : nat;
