@@ -185,7 +185,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         if (resMintNFT.Err !== undefined) {
           toast({
             title: "Minting Error",
-            description: resMintNFT.Err,
+            description: JSON.stringify(resMintNFT?.Err),
             status: "error",
             duration: 5000,
             isClosable: true,
