@@ -46,7 +46,8 @@ module {
         #ZeroAddress;
         #InvalidCollection;
         #SenderIsNotOwner;
-        #Other
+        #Other;
+        #VestingIsNotFinishedYet
     };
 
     public type Result<S, E> = {
