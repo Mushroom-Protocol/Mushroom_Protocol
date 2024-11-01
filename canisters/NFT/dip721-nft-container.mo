@@ -17,7 +17,7 @@ import TypesNft "../NFT/Types";
 // import Nat "mo:base/Nat";
 // ////////////////////////////////////////
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier]) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
@@ -51,7 +51,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
             for({tierName: Text; qty: Nat} in holder.qtyPerTier.vals()){
                 var toMint = qty;
                 while(toMint > 0){
-                   let result = await mintDip721(holder.principal, tierName);
+                   ignore await mintDip721(holder.principal, tierName);
                    toMint -= 1;
                 } 
             }
@@ -81,6 +81,9 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     stable let symbol : Text = init.symbol;
     stable let maxLimit : Nat64 = init.maxLimit;
     stable var totalSupply : Nat64 = 0;
+    // stable let vestingTime = Time.now() + _vestingTime * 30 * 24 * 60 *60 *1_000_000_000;
+    stable let vestingTime = Time.now() + _vestingTime  * 60 *1_000_000_000;
+
 
     let rand = Rand.Rand(); // get random Nat value with rand.next()
     rand.setRange(10000, 99999); // Establecer un rango para los Nftid
@@ -143,7 +146,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({ caller }) func safeTransferFromDip721(from : Principal, to : Principal, token_id : TokenId) : async Types.TxReceipt {
-        //TODO validar que from no sea vesting y ademas no haya termindo el periodo de vesting
+        if(Time.now() < vestingTime) {return #Err(#VestingIsNotFinishedYet)};
         transferFrom(from, to, token_id, caller)
     };
 
