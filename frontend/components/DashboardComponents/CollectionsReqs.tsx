@@ -118,7 +118,7 @@ const CollectionsReqs: React.FC = () => {
     })
 
     const resCollectionRequestByStartUp: CollectionPreInit | null | undefined = await backend.getCollectionRequestByStartUp(currStartup) as CollectionPreInit | null | undefined
-    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution, nftComposition: resCollectionRequestByStartUp[0].composition}))
+    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution, nftComposition: resCollectionRequestByStartUp[0].composition, nftMaxLimit: resCollectionRequestByStartUp[0].totalSupply}))
 
     onOpen()
   }
@@ -323,11 +323,12 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                   <FormControl>
                     <Input
-                      placeholder="Max limit..."
+                      placeholder="Max supply..."
                       id="nftMaxLimit"
                       name="nftMaxLimit"
                       type="number"
-                      value={formDataDeploy.nftMaxLimit}
+                      disabled
+                      value={String(formDataDeploy.nftMaxLimit)}
                       onChange={handleChangeForm}
                     />
                   </FormControl>

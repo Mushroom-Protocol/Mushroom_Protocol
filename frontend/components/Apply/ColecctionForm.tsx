@@ -304,7 +304,7 @@ const ColecctionForm = () => {
         ...formData,
         startupID: getRoleStartup(currentUser.roles)[0],
         projectID: projectsByStartup[0],
-        totalSupply: formData.totalSupply.map(supplyTier => BigInt(supplyTier)),
+        totalSupply: BigInt((formData.totalSupply as any[]).reduce((acc, curr) => Number(acc)+Number(curr), 0)),
         tokenPrice: BigInt(formData.tokenPrice),
         typesImages: {PNG: null},
         distribution: Object.keys(formDistribution).map((elm) => {
@@ -471,30 +471,41 @@ const ColecctionForm = () => {
 
                 <FormControl isRequired mt={4}>
                   <FormLabel>Maximum Supply</FormLabel>
-                  <Input
-                    id="totalSupplyTierA"
-                    name="totalSupplyTierA"
-                    type="number"
-                    value={formData.totalSupply[0]}
-                    onChange={handleChangeSupply}
-                    placeholder="TierA number of tokens..."
-                  />
-                  <Input
-                    id="totalSupplyTierB"
-                    name="totalSupplyTierB"
-                    type="number"
-                    value={formData.totalSupply[1]}
-                    onChange={handleChangeSupply}
-                    placeholder="TierB number of tokens..."
-                  />
-                  <Input
-                    id="totalSupplyTierC"
-                    name="totalSupplyTierC"
-                    type="number"
-                    value={formData.totalSupply[2]}
-                    onChange={handleChangeSupply}
-                    placeholder="TierC number of tokens..."
-                  />
+                  <Flex justify="center" gap="4">
+                    <Box>
+                      <Text>Tier A</Text>
+                      <Input
+                        id="totalSupplyTierA"
+                        name="totalSupplyTierA"
+                        type="number"
+                        value={formData.totalSupply[0]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierA number of tokens..."
+                      />
+                    </Box>
+                    <Box>
+                      <Text>Tier B</Text>
+                      <Input
+                        id="totalSupplyTierB"
+                        name="totalSupplyTierB"
+                        type="number"
+                        value={formData.totalSupply[1]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierB number of tokens..."
+                      />
+                    </Box>
+                    <Box>
+                      <Text>Tier C</Text>
+                      <Input
+                        id="totalSupplyTierC"
+                        name="totalSupplyTierC"
+                        type="number"
+                        value={formData.totalSupply[2]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierC number of tokens..."
+                      />
+                    </Box>
+                  </Flex>
                 </FormControl>
 
                 <FormControl isRequired mt={4}>
