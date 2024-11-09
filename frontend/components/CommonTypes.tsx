@@ -119,9 +119,9 @@ export interface CollectionPreInit {
   collectionName: string
   shortStorytelling: string
   storytellingCollection: string
-  totalSupply: number | string
+  totalSupply: number[] | string[]
   distribution: Holder[]
-  composition: Tier[];
+  composition: Tier[]
   utilities: string[]
   tokenPrice: number
   documentsFolderUrl: string
@@ -136,7 +136,7 @@ export const initialStateCollectionPreInit: CollectionPreInit = {
   collectionName: "",
   shortStorytelling: "",
   storytellingCollection: "",
-  totalSupply: "",
+  totalSupply: [0, 0, 0],
   distribution: [],
   composition: [],
   utilities: [],
