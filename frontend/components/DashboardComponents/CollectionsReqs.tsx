@@ -47,8 +47,8 @@ const CollectionsReqs: React.FC = () => {
     nftProyectId: "",
     nftBaseUrl: "",
     nftAssetsNamesFile: null as File | null,
-    // nftAssetsNames: [],
     nftCustodian: "",
+    nftAgreementFile: null as File | null,
     nftDistribution: [],
     nftComposition: [],
     nftFee: ""
@@ -293,95 +293,123 @@ const CollectionsReqs: React.FC = () => {
             <ModalBody>
               <form onSubmit={handleDeploy}>
                 <fieldset>
-                  <legend>Sección DIP-721</legend>
+                  <legend><b>Sección DIP-721</b></legend>
                   <FormControl isRequired>
-                    <Input
-                      placeholder="Logo..."
-                      id="nftLogo"
-                      name="nftLogo"
-                      value={formDataDeploy.nftLogo}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">Logo:</Text>
+                      <Input
+                        placeholder="Logo..."
+                        id="nftLogo"
+                        name="nftLogo"
+                        value={formDataDeploy.nftLogo}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl isRequired>
-                    <Input
-                      placeholder="Name..."
-                      id="nftName"
-                      name="nftName"
-                      value={formDataDeploy.nftName}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">Name:</Text>
+                      <Input
+                        placeholder="Name..."
+                        id="nftName"
+                        name="nftName"
+                        value={formDataDeploy.nftName}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl>
-                    <Input
-                      placeholder="Symbol..."
-                      id="nftSymbol"
-                      name="nftSymbol"
-                      value={formDataDeploy.nftSymbol}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">Symbol:</Text>
+                      <Input
+                        placeholder="Symbol..."
+                        id="nftSymbol"
+                        name="nftSymbol"
+                        value={formDataDeploy.nftSymbol}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl>
-                    <Input
-                      placeholder="Max supply..."
-                      id="nftMaxLimit"
-                      name="nftMaxLimit"
-                      type="number"
-                      disabled
-                      value={String(formDataDeploy.nftMaxLimit)}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">Max supply:</Text>
+                      <Input
+                        placeholder="Max supply..."
+                        id="nftMaxLimit"
+                        name="nftMaxLimit"
+                        type="number"
+                        disabled
+                        value={String(formDataDeploy.nftMaxLimit)}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
                   </FormControl>
                 </fieldset>
                 <br />
                 <fieldset>
-                  <legend>Sección Mushroom</legend>
+                  <legend><b>Sección Mushroom</b></legend>
                   <FormControl>
-                    <Input
-                      id="nftProyectId"
-                      name="nftProyectId"
-                      placeholder="Project Id..."
-                      disabled
-                      value={formDataDeploy.nftProyectId}
-                    />
+                    <Flex>
+                      <Text width="30%">Project:</Text>
+                      <Input
+                        id="nftProyectId"
+                        name="nftProyectId"
+                        placeholder="Project Id..."
+                        disabled
+                        value={formDataDeploy.nftProyectId}
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl>
-                    <Input
-                      id="nftBaseUrl"
-                      name="nftBaseUrl"
-                      type="url"
-                      placeholder="Base URL..."
-                      value={formDataDeploy.nftBaseUrl}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">URL:</Text>
+                      <Input
+                        id="nftBaseUrl"
+                        name="nftBaseUrl"
+                        type="url"
+                        placeholder="Base URL..."
+                        value={formDataDeploy.nftBaseUrl}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl>
-                    <Input
-                      id="nftAssetsNamesFile"
-                      name="nftAssetsNamesFile"
-                      placeholder="Assets names..."
-                      type="file"
-                      onChange={handleChangeFile}
-                      accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
-                    />
+                    <Flex>
+                      <Text width="30%">Assets:</Text>
+                      <Input
+                        id="nftAssetsNamesFile"
+                        name="nftAssetsNamesFile"
+                        placeholder="Assets names..."
+                        type="file"
+                        onChange={handleChangeFile}
+                        accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
+                      />
+                    </Flex>
                   </FormControl>
-                  {/* <FormControl>
-                    <Input
-                      id="nftAssetsNames"
-                      name="nftAssetsNames"
-                      placeholder="Assets names..."
-                      value={formDataDeploy.nftAssetsNames}
-                      onChange={handleChangeForm}
-                    />
-                  </FormControl> */}
                   <FormControl>
-                    <Input
-                      id="nftCustodian"
-                      name="nftCustodian"
-                      placeholder="Custodian..."
-                      value={formDataDeploy.nftCustodian}
-                      onChange={handleChangeForm}
-                    />
+                    <Flex>
+                      <Text width="30%">Custodian:</Text>
+                      <Input
+                        id="nftCustodian"
+                        name="nftCustodian"
+                        placeholder="Custodian..."
+                        value={formDataDeploy.nftCustodian}
+                        onChange={handleChangeForm}
+                      />
+                    </Flex>
+                  </FormControl>
+                  <FormControl>
+                    <Flex>
+                      <Text width="30%">Agreement:</Text>
+                      <Input
+                        id="nftAgreementFile"
+                        name="nftAgreementFile"
+                        placeholder="Agreement document..."
+                        type="file"
+                        onChange={handleChangeFile}
+                        accept=".pdf,.odt,.rtf,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      />
+                    </Flex>
                   </FormControl>
                   <FormControl>
                     Distribution:
@@ -404,8 +432,8 @@ const CollectionsReqs: React.FC = () => {
                 </fieldset>
                 <br />
                 <fieldset>
-                <FormControl isRequired mt={4}>
-                  <FormLabel>Distribution</FormLabel>
+                  <FormControl isRequired mt={4}>
+                    <FormLabel>Distribution</FormLabel>
                     <Flex>
                       <Text width="30%" alignItems="right">Category</Text>
                       <Text width="10%" alignItems="right">Tier A</Text>
@@ -444,7 +472,7 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                 </fieldset>
                 <fieldset>
-                  <legend>Sección Fee</legend>
+                  <legend><b>Sección Fee</b></legend>
                   <FormControl>
                     <Input
                       id="nftFee"
