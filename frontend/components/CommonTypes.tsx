@@ -123,7 +123,7 @@ export interface CollectionPreInit {
   distribution: Holder[]
   composition: Tier[]
   utilities: string[]
-  tokenPrice: number
+  //tokenPrice: number
   documentsFolderUrl: string
   typesImages: string
   nftImagesUrl: string
@@ -140,7 +140,7 @@ export const initialStateCollectionPreInit: CollectionPreInit = {
   distribution: [],
   composition: [],
   utilities: [],
-  tokenPrice: 0,
+  //tokenPrice: 0,
   documentsFolderUrl: "",
   typesImages: "",
   nftImagesUrl: "",
