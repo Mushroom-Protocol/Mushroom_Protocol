@@ -305,7 +305,7 @@ const ColecctionForm = () => {
         startupID: getRoleStartup(currentUser.roles)[0],
         projectID: projectsByStartup[0],
         totalSupply: BigInt((formData.totalSupply as any[]).reduce((acc, curr) => Number(acc)+Number(curr), 0)),
-        // tokenPrice: BigInt(formData.tokenPrice),
+        tokenPrice: BigInt(314),
         typesImages: {PNG: null},
         distribution: Object.keys(formDistribution).map((elm) => {
           return {
@@ -332,7 +332,7 @@ const ColecctionForm = () => {
         // composition: [],
         utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
-      console.log("formDataToSend")
+      console.log("formDataToSend 2")
       console.log(formDataToSend)
 
       const resCreateCollection = (await backend.createCollection(
