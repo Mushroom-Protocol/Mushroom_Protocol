@@ -140,7 +140,7 @@ const ColecctionForm = () => {
   const [formTiersPrices, setFormTiersPrices] = useState(tiersPrices)
   const [isCheckedReserveFund, setIsCheckedReserveFund] = useState(true)
   const [isCheckedInventorTeam, setIsCheckedInventorTeam] = useState(true)
-  const [isCheckedAirdrop, setIsCheckedAirdrop] = useState(true)
+  const [isCheckedAirdrop, setIsCheckedAirdrop] = useState(false)
   const [isCheckedPublicSale, setIsCheckedPublicSale] = useState(false)
   const [totalNFTCategories, setTotalNFTCategories] = useState<{PublicSale: number, InventorTeam: number, ReserveFund: number, Airdrop: number}>({PublicSale: 0, InventorTeam: 0, ReserveFund: 0, Airdrop: 0})
   const [totalTiersQuantity, setTotalTiersQuantity] = useState<{tierA: number, tierB: number, tierC: number}>({tierA: 0, tierB: 0, tierC: 0})
@@ -305,7 +305,7 @@ const ColecctionForm = () => {
         startupID: getRoleStartup(currentUser.roles)[0],
         projectID: projectsByStartup[0],
         totalSupply: BigInt((formData.totalSupply as any[]).reduce((acc, curr) => Number(acc)+Number(curr), 0)),
-        tokenPrice: BigInt(formData.tokenPrice),
+        // tokenPrice: BigInt(formData.tokenPrice),
         typesImages: {PNG: null},
         distribution: Object.keys(formDistribution).map((elm) => {
           return {
@@ -332,6 +332,7 @@ const ColecctionForm = () => {
         // composition: [],
         utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
+      console.log(formDataToSend)
 
       const resCreateCollection = (await backend.createCollection(
         formDataToSend,
