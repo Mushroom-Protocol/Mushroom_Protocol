@@ -332,6 +332,7 @@ const ColecctionForm = () => {
         // composition: [],
         utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
+      console.log("formDataToSend")
       console.log(formDataToSend)
 
       const resCreateCollection = (await backend.createCollection(
