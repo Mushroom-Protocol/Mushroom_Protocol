@@ -1030,7 +1030,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
         ExperimentalCycles.add(fee);
         try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime);
+            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document);
             let canisterId = Principal.fromActor(newCanister);
             ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
             ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721

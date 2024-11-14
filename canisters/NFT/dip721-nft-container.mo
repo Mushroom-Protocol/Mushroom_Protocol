@@ -17,17 +17,15 @@ import TypesNft "../NFT/Types";
 // import Nat "mo:base/Nat";
 // ////////////////////////////////////////
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int, doc: Types.Document) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
     type Tier = Types.Tier;
     type Trx = Types.Trx;
-    type Document = {
-        title: Text;
-        data: Blob;
-    };
+    type Document = Types.Document;
+    
     let dhash = (
         func(d: Document): Nat32 = Prim.hashBlob(d.data), 
         func(a: Document, b: Document): Bool = (a.title == b.title) and (a.data == b.data)
@@ -49,6 +47,8 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     
     stable let DEPLOYER = caller;
     stable let documents = Set.new<Document>();
+
+    Set.add<Document>(documents, dhash, {doc with date = Time.now()});
 
     //////////////////////////// Initial distribution  and load fileNames///////////////////////
     stable let holders: [Types.Holder] = init.distribution;
@@ -99,13 +99,13 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
   ////////////////////////// Access control function //////////////////////////////////////////
     func isCustodian(p: Principal): Bool {
-        Set.has<Principal>(custodians, phash, caller);
+        Set.has<Principal>(custodians, phash, p);
     };
   
 
   ///////////////////////////// Private Fucntions ////////////////////////////////////////////
     func _addDocument(d: Document): Bool {
-        Set.add<Document>(documents, dhash, d);
+        Set.add<Document>(documents, dhash, {d with date = Time.now()});
         true
     };
  

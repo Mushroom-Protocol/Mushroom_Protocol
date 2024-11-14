@@ -172,12 +172,18 @@ module {
             #SVG
         };
 
+        // public type Document = {
+        //     #PDF : Blob;
+        //     #MP4 : Blob;
+        //     #MD : Text;
+        //     #HTML : Text;
+        //     #Image : Blob
+        // };
+
         public type Document = {
-            #PDF : Blob;
-            #MP4 : Blob;
-            #MD : Text;
-            #HTML : Text;
-            #Image : Blob
+            title: Text;
+            date: Int;
+            data: Blob;
         };
 
         public type CollectionPreInit = {
@@ -207,7 +213,7 @@ module {
             utilities : [Utilities];
             //decimals: Nat;
             tokenPrice : Nat;
-            documents : [Document];
+            documents : Document;
             typesImages : ImageType;
             nftImages : [Blob];
             creator : Text
@@ -227,6 +233,7 @@ module {
             composition: [Tier];
             custodian : Text;
             distribution : [Holder];
+            document: Document;
 
             // initialStaking: ?StakingParams;
 

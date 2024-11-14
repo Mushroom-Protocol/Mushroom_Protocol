@@ -11,10 +11,15 @@ module {
         logo : LogoResult;
         name : Text;
         symbol : Text;
-        maxLimit : Nat64
+        maxLimit : Nat64;
+    };
+    public type Document = {
+        title: Text;
+        date: Int;
+        data: Blob;
     };
     public type Dip721NonFungibleTokenExtended = Dip721NonFungibleToken and {
-        distribution : [Holder]
+        distribution : [Holder]; 
     };
 
     public type Category = {
