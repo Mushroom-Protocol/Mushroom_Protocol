@@ -1015,7 +1015,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
-    public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
+    public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig) : async DeployResult {
         assert (authorizedCaller(caller));
         assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
@@ -1028,7 +1028,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 vestingTime := project.projectDuration;
             }
         };
-        ExperimentalCycles.add(fee);
+        ExperimentalCycles.add(2_00_000_000);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document);
             let canisterId = Principal.fromActor(newCanister);

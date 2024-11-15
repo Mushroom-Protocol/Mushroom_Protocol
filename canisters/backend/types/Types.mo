@@ -211,13 +211,10 @@ module {
             totalSupply : Nat;
             distribution : [Holder];
             utilities : [Utilities];
-            //decimals: Nat;
-            tokenPrice : Nat;
             documents : Document;
             typesImages : ImageType;
             nftImages : [Blob];
             creator : Text
-
         };
 
         public type Tier = {
