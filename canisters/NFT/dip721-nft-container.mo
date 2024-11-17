@@ -17,13 +17,19 @@ import TypesNft "../NFT/Types";
 // import Nat "mo:base/Nat";
 // ////////////////////////////////////////
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int, doc: Types.Document) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
     type TransactionId = Types.TransactionId;
     type Tier = Types.Tier;
     type Trx = Types.Trx;
+    type Document = Types.Document;
+    
+    let dhash = (
+        func(d: Document): Nat32 = Prim.hashBlob(d.data), 
+        func(a: Document, b: Document): Bool = (a.title == b.title) and (a.data == b.data)
+    );
 
     var i: Nat = 0;
 
@@ -40,7 +46,9 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     
     stable let DEPLOYER = caller;
+    stable let documents = Set.new<Document>();
 
+    Set.add<Document>(documents, dhash, {doc with date = Time.now()});
 
     //////////////////////////// Initial distribution  and load fileNames///////////////////////
     stable let holders: [Types.Holder] = init.distribution;
@@ -89,7 +97,33 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     rand.setRange(10000, 99999); // Establecer un rango para los Nftid
     stable let tokenIdUsed = Set.new<TokenId>();
 
-    ////////////////////////// Ledger NFT Colection ////////////////////////////////////////
+  ////////////////////////// Access control function //////////////////////////////////////////
+    func isCustodian(p: Principal): Bool {
+        Set.has<Principal>(custodians, phash, p);
+    };
+  
+
+  ///////////////////////////// Private Fucntions ////////////////////////////////////////////
+    func _addDocument(d: Document): Bool {
+        Set.add<Document>(documents, dhash, {d with date = Time.now()});
+        true
+    };
+ 
+   //////////////////////////////////// Documents /////////////////////////////////////////////
+    public shared ({ caller }) func addDocument(d: Document): async {#Ok; #Err: Text}{
+        if(not isCustodian(caller)){ return #Err("Caller is not custodian of this collection")};
+        if(_addDocument(d)){
+            #Ok;
+        } else {
+            #Err("Unexpected Error in _addDocument funcion")
+        }
+    };
+
+    public query func getDocuments(): async [Document]{
+        Set.toArray(documents);
+    };
+
+    //////////////////////////// Ledger NFT Colection //////////////////////////////////////
 
     stable let transactionsLedger = Map.new<TransactionId, Trx>();
     stable let nftHistory = Map.new<TokenId, [TransactionId]>();
@@ -295,7 +329,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     };
 
     public shared ({ caller }) func mintDip721(to : Principal, /* metadata : Types.MetadataDesc */ _tierName: Text) : async Types.MintReceipt {
-        if (not Set.has<Principal>(custodians, phash, caller) and caller != Principal.fromActor(Self)) {
+        if (not isCustodian(caller) and caller != Principal.fromActor(Self)) {
             return #Err(#Unauthorized)
         };
         var index = 0;
