@@ -1028,7 +1028,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 vestingTime := project.projectDuration;
             }
         };
-        ExperimentalCycles.add(2_00_000_000);
+        ExperimentalCycles.add(20_000_000_000);
         try {
             let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document);
             let canisterId = Principal.fromActor(newCanister);

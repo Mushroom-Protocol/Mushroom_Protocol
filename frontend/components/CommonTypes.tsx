@@ -123,7 +123,7 @@ export interface CollectionPreInit {
   distribution: Holder[]
   composition: Tier[]
   utilities: string[]
-  //tokenPrice: number
+  startupWallet: string
   documentsFolderUrl: string
   typesImages: string
   nftImagesUrl: string
@@ -140,7 +140,7 @@ export const initialStateCollectionPreInit: CollectionPreInit = {
   distribution: [],
   composition: [],
   utilities: [],
-  //tokenPrice: 0,
+  startupWallet: "",
   documentsFolderUrl: "",
   typesImages: "",
   nftImagesUrl: "",
@@ -162,7 +162,8 @@ export interface Dip721NonFungibleToken {
 export interface DeployConfig {
   projectId: string;
   baseUrl: string;
-  assetsNames: string[];
+  startupWallet: string;
+  document: {title: string, date: number, data: Uint8Array};
   custodian: string;
   distribution: Holder[];
   composition: Tier[];

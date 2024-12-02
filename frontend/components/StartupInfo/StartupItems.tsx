@@ -29,7 +29,7 @@ import { FaClock } from "react-icons/fa6"
 import MpFavicon from "../../assets/MpFavicon.png"
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
-import { Startup } from "../CommonTypes"
+import { CollectionPreInit, Startup } from "../CommonTypes"
 import { useCanister } from "@connect2ic/react"
 
 // import { CollectionActorClass } from "../../../src/declarations/backend/backend.did"
@@ -47,7 +47,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [quantity, setQuantity] = useState(1)
   const toast = useToast()
   const [backend] = useCanister("backend")
-  const [totalSupply, setTotalSupply] = useState(0)
+  const [collectionRequest, setCollectionRequest] = useState<CollectionPreInit | any | null | undefined>({})
   const [maxLimit, setMaxLimit] = useState(0)
   const [projectsByStartup, setProjectsByStartup] = useState([])
   const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
@@ -93,6 +93,17 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
+    const getCollectionRequestByStartUp = async (startupId: string): Promise<CollectionPreInit | any | null | undefined> => {
+      try {
+        const resGetCollectionRequestByStartUp: CollectionPreInit | any | null | undefined = (await backend.getCollectionRequestByStartUp(startupId)) as CollectionPreInit | any | null | undefined
+        setCollectionRequest(resGetCollectionRequestByStartUp[0])
+        return resGetCollectionRequestByStartUp[0]
+      }
+      catch(error) {
+        console.error("Error on backend.getCollectionRequestByStartUp() call:", error)
+      }
+    }
+
     // getProjectsByStartup(startupFetched.startupId)
     //   .then((dataProjectsByStartup) => {
     //     setProjectsByStartup(dataProjectsByStartup)
@@ -121,6 +132,10 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         }).catch(error => console.error(error))
       })
       .catch((error) => console.error(error))
+
+    getCollectionRequestByStartUp(startupFetched.startupId).then(dataCollectionRequestByStartUp => {
+      return dataCollectionRequestByStartUp
+    }).catch(error => console.error(error))
   }, [])
 
   const handleSubmitMint =
@@ -135,7 +150,8 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
 
         if (await window.ic.plug.isConnected()) {
           const params = {
-            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+            // to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+            to: collectionRequest.startupWallet,
             amount: 4e7
           }
 

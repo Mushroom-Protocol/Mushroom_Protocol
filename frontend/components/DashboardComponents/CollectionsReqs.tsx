@@ -46,7 +46,10 @@ const CollectionsReqs: React.FC = () => {
     nftMaxLimit: "",
     nftProyectId: "",
     nftBaseUrl: "",
-    nftAssetsNamesFile: null as File | null,
+    nftStartupWallet: "",
+    nftAssetsNamesFileA: null as File | null,
+    nftAssetsNamesFileB: null as File | null,
+    nftAssetsNamesFileC: null as File | null,
     nftCustodian: "",
     nftAgreementFile: null as File | null,
     nftDistribution: [],
@@ -118,7 +121,7 @@ const CollectionsReqs: React.FC = () => {
     })
 
     const resCollectionRequestByStartUp: CollectionPreInit | null | undefined = await backend.getCollectionRequestByStartUp(currStartup) as CollectionPreInit | null | undefined
-    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution, nftComposition: resCollectionRequestByStartUp[0].composition, nftMaxLimit: resCollectionRequestByStartUp[0].totalSupply}))
+    setFormDataDeploy(prevData => ({...prevData, nftDistribution: resCollectionRequestByStartUp[0].distribution, nftComposition: resCollectionRequestByStartUp[0].composition, nftMaxLimit: resCollectionRequestByStartUp[0].totalSupply, nftStartupWallet: resCollectionRequestByStartUp[0].startupWallet}))
 
     onOpen()
   }
@@ -158,8 +161,12 @@ const CollectionsReqs: React.FC = () => {
         maxLimit: Number(formDataDeploy.nftMaxLimit),
       }
 
-      const mainFileLines = await readFileLines(targetForm[8].files[0])
-      const tiersAssets = buildTiersAssets(mainFileLines)
+      // const mainFileLines = await readFileLines(targetForm[8].files[0])
+      const tierA = await readFileLines(targetForm[9].files[0])
+      const tierB = await readFileLines(targetForm[10].files[0])
+      const tierC = await readFileLines(targetForm[11].files[0])
+      // const tiersAssets = buildTiersAssets(mainFileLines)
+      const tiersAssets = {tierA, tierB, tierC}
       Object.keys(tiersAssets).map(tierElm => {
         formDataDeploy.nftComposition.map(nftElm => {
           if (tierElm.toLowerCase() === nftElm.tierName.toLowerCase()) {
@@ -176,10 +183,14 @@ const CollectionsReqs: React.FC = () => {
           }
         })
       })
+      const fileDocument = targetForm[13].files[0]; // File object from input
+      const arrayBuffer = await fileDocument.arrayBuffer(); // Convert to ArrayBuffer
+      const uint8Array = new Uint8Array(arrayBuffer); // Convert to Uint8Array
       const cfgMushroom: DeployConfig = {
         projectId: formDataDeploy.nftProyectId[0],
         baseUrl: formDataDeploy.nftBaseUrl,
-        assetsNames: await readFileLines(targetForm[8].files[0]),
+        startupWallet: formDataDeploy.nftStartupWallet,
+        document: {title: "Document 1", date: 0, data: uint8Array},
         custodian: formDataDeploy.nftCustodian,
         distribution: formDataDeploy.nftDistribution,
         composition: formDataDeploy.nftComposition
@@ -188,7 +199,6 @@ const CollectionsReqs: React.FC = () => {
       const resDeployCollection: any = (await backend.deployCollection(
         initDip721,
         cfgMushroom,
-        Number(formDataDeploy.nftFee),
       )) as any
       setResponseBackend(resDeployCollection)
 
@@ -276,7 +286,7 @@ const CollectionsReqs: React.FC = () => {
         })}
       </List>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
           {/* Agregar el estilo para el ModalOverlay */}
           <ModalOverlay style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }} />
 
@@ -350,7 +360,7 @@ const CollectionsReqs: React.FC = () => {
                   <legend><b>Sección Mushroom</b></legend>
                   <FormControl>
                     <Flex>
-                      <Text width="30%">Project:</Text>
+                      <Text width="40%">Project:</Text>
                       <Input
                         id="nftProyectId"
                         name="nftProyectId"
@@ -362,7 +372,7 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                   <FormControl>
                     <Flex>
-                      <Text width="30%">URL:</Text>
+                      <Text width="40%">URL:</Text>
                       <Input
                         id="nftBaseUrl"
                         name="nftBaseUrl"
@@ -374,12 +384,46 @@ const CollectionsReqs: React.FC = () => {
                     </Flex>
                   </FormControl>
                   <FormControl>
-                    <Flex>
-                      <Text width="30%">Assets:</Text>
+                    <Flex bgColor="red.200" borderRadius="sm" p="2" color="yellow.900">
+                      <Text width="40%">Wallet:</Text>
                       <Input
-                        id="nftAssetsNamesFile"
-                        name="nftAssetsNamesFile"
-                        placeholder="Assets names..."
+                        id="nftStartupWallet"
+                        name="nftStartupWallet"
+                        placeholder="Startup wallet..."
+                        disabled
+                        value={formDataDeploy.nftStartupWallet}
+                      />
+                    </Flex>
+                  </FormControl>
+                  <FormControl>
+                    <Flex>
+                      <Text width="40%">Assets (Tier A):</Text>
+                      <Input
+                        id="nftAssetsNamesFileA"
+                        name="nftAssetsNamesFileA"
+                        placeholder="TierA assets..."
+                        type="file"
+                        onChange={handleChangeFile}
+                        accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
+                      />
+                    </Flex>
+                    <Flex>
+                      <Text width="40%">Assets (Tier B):</Text>
+                      <Input
+                        id="nftAssetsNamesFileB"
+                        name="nftAssetsNamesFileB"
+                        placeholder="TierB assets..."
+                        type="file"
+                        onChange={handleChangeFile}
+                        accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
+                      />
+                    </Flex>
+                    <Flex>
+                      <Text width="40%">Assets (Tier C):</Text>
+                      <Input
+                        id="nftAssetsNamesFileC"
+                        name="nftAssetsNamesFileC"
+                        placeholder="TierC assets..."
                         type="file"
                         onChange={handleChangeFile}
                         accept="text/*" // Asegura que solo se puedan seleccionar archivos de texto
@@ -388,7 +432,7 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                   <FormControl>
                     <Flex>
-                      <Text width="30%">Custodian:</Text>
+                      <Text width="40%">Custodian:</Text>
                       <Input
                         id="nftCustodian"
                         name="nftCustodian"
@@ -400,7 +444,7 @@ const CollectionsReqs: React.FC = () => {
                   </FormControl>
                   <FormControl>
                     <Flex>
-                      <Text width="30%">Agreement:</Text>
+                      <Text width="40%">Agreement:</Text>
                       <Input
                         id="nftAgreementFile"
                         name="nftAgreementFile"
@@ -471,7 +515,7 @@ const CollectionsReqs: React.FC = () => {
                     </Flex>
                   </FormControl>
                 </fieldset>
-                <fieldset>
+                {/* <fieldset>
                   <legend><b>Sección Fee</b></legend>
                   <FormControl>
                     <Input
@@ -483,7 +527,7 @@ const CollectionsReqs: React.FC = () => {
                       onChange={handleChangeForm}
                     />
                   </FormControl>
-                </fieldset>
+                </fieldset> */}
                 {/* <FormControl> */}
                   <Button
                     type="submit"

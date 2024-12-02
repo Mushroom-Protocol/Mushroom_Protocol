@@ -199,7 +199,8 @@ module {
             documentsFolderUrl : Text;
             typesImages : ImageType;
             nftImagesUrl : Text;
-            creator : Text
+            creator : Text;
+            startupWallet : Text;
         };
 
         public type CollectionInit = {
@@ -214,7 +215,8 @@ module {
             documents : Document;
             typesImages : ImageType;
             nftImages : [Blob];
-            creator : Text
+            creator : Text;
+            startupWallet : Text;
         };
 
         public type Tier = {
@@ -231,7 +233,7 @@ module {
             custodian : Text;
             distribution : [Holder];
             document: Document;
-
+            startupWallet : Text;
             // initialStaking: ?StakingParams;
 
         };

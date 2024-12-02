@@ -17,6 +17,7 @@ import {
   Tooltip,
   useToast,
   Select,
+  VStack,
 } from "@chakra-ui/react"
 import { AiFillPicture } from "react-icons/ai"
 import { IoInformationCircleOutline } from "react-icons/io5"
@@ -305,7 +306,6 @@ const ColecctionForm = () => {
         startupID: getRoleStartup(currentUser.roles)[0],
         projectID: projectsByStartup[0],
         totalSupply: BigInt((formData.totalSupply as any[]).reduce((acc, curr) => Number(acc)+Number(curr), 0)),
-        tokenPrice: BigInt(314),
         typesImages: {PNG: null},
         distribution: Object.keys(formDistribution).map((elm) => {
           return {
@@ -332,8 +332,6 @@ const ColecctionForm = () => {
         // composition: [],
         utilities: formData.utilities.map((e) => ({ [e]: null }))
       }
-      console.log("formDataToSend 2")
-      console.log(formDataToSend)
 
       const resCreateCollection = (await backend.createCollection(
         formDataToSend,
@@ -722,6 +720,24 @@ const ColecctionForm = () => {
                       placeholder="Tier C price..."
                     />
                   </Flex>
+                </FormControl>
+
+                <FormControl isRequired mt={4}>
+                  <Center>
+                    <VStack bgColor="red.200" p="8" borderRadius="md" width="80%">
+                        <Text color='yellow.900' textAlign="center">¡¡¡ PLEASE BE CAREFUL TAKING CARE OF THIS INFORMATION BECAUSE THE LOSS OF IT WILL RESOLVE IN THE LOSS OF THE COLLECTED FUNDS !!!</Text>
+                        <Text color='red.600' fontSize="lg" fontWeight="bold">Startup wallet:</Text>
+                        <Input
+                          id="startupWallet"
+                          name="startupWallet"
+                          width="80%"
+                          value={formData.startupWallet}
+                          onChange={handleChange}
+                          placeholder="Paste or write the startup wallet here..."
+                          borderColor="red.600"
+                        />
+                    </VStack>
+                  </Center>
                 </FormControl>
 
                 <FormControl mt={4}>
