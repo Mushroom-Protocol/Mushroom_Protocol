@@ -40,7 +40,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
 ```
 #### Appro
 
@@ -88,7 +88,7 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae")'
+dfx canister call backend approveProject '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
 ```
 #### Create NFT Collection Form (User)
 
@@ -97,13 +97,12 @@ dfx canister call backend approveProject '(principal "s5nfe-pgwki-dkuc6-jswmg-jj
 dfx canister call backend createCollection '(record {
     typesImages = variant { JPG };
     creator = "Van Gogh";
-    startupID = "ST144836";
-    tokenPrice = 10 : nat;
+    startupID = "ST347177";
     storytellingCollection = "storitelling";
     utilities = vec { variant { Governance }; variant { IpNFT } };
     shortStorytelling = "Short storitelling";
     totalSupply = 45 : nat;
-    projectID = "PR308042";
+    projectID = "PR546399";
     nftImagesUrl = "drive imagenes";
     composition = vec {
       record {
@@ -171,10 +170,10 @@ dfxcc backend deployCollection '(
   },
   record {
     baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
-    projectId = "PR308042";
+    projectId = "PR546399";
     composition = vec {
       record {
-        qty = 30 : nat;getTokenIdsForUserDip721
+        qty = 30 : nat;
         tierName = "Basic";
         assetsNames = vec { "1"; "2"; "3"; "4"; "5"; "6"; "7"; "8"; "9"; "10"; "11"; "12"; "13"; "14"; "15"; "16"; "17"; "18"; "19"; "20"; "21"; "22"; "23"; "24"; "25"; "26"; "27"; "28"; "29"; "30";};
         price = 5 : nat;
@@ -212,11 +211,11 @@ dfxcc backend deployCollection '(
           record { qty = 1 : nat; tierName = "Medium" };
         };
       };
-    };
-    custodian = "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae";
-  },
-  200_000_000_000 : nat
-  )'
+    }; 
+    document = null;
+    custodian = "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae" 
+  }
+)'
 ```
 #### Mint NFT Collection
 ```
