@@ -941,6 +941,13 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         await remoteNFT.getMaxLimitDip721();
     };
 
+    public shared func getStartupWallet(canisterId : Text) : async Text {
+        let remoteNFT = actor (canisterId) : actor {
+            getWallet : shared () -> async Text;
+        };
+        await remoteNFT.getWallet();
+    };
+
     public shared ({ caller }) func getTotalSupply(canisterId : Text) : async Nat64 {
         let remoteNFT = actor (canisterId) : actor {
             totalSupplyDip721 : shared () -> async Nat64;
@@ -971,13 +978,14 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {name: Text; symbol: Text; baseUrl: Text; maxLimit: Nat64; totalSupply: Nat64; logo: TypesNft.LogoResult; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]; custodians: [Text]} {
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {name: Text; symbol: Text; baseUrl: Text; wallet: Text; maxLimit: Nat64; totalSupply: Nat64; logo: TypesNft.LogoResult; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]; custodians: [Text]} {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch (actorRef) {
             case (?value) {
                 let fetchedName = await value.nameDip721();
                 let fetchedSymbol = await value.symbolDip721();
                 let fetchedBaseUrl = await value.getBaseUrl();
+                let fetchedWallet = await value.getWallet();
                 let fetchedMaxLimit = await value.getMaxLimitDip721();
                 let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
                 let fetchedLogo = await value.logoDip721();
@@ -989,6 +997,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     name = fetchedName;
                     symbol = fetchedSymbol;
                     baseUrl = fetchedBaseUrl;
+                    wallet = fetchedWallet;
                     maxLimit = fetchedMaxLimit;
                     totalSupply = fetchedTotalSupplyDip721;
                     logo = fetchedLogo;
@@ -1003,6 +1012,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     name = "";
                     symbol = "";
                     baseUrl = "";
+                    wallet = "";
                     maxLimit = 0;
                     totalSupply = 0;
                     logo = {data = ""; logo_type = ""};
@@ -1030,7 +1040,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
         ExperimentalCycles.add(20_000_000_000);
         try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document);
+            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
             let canisterId = Principal.fromActor(newCanister);
             ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
             ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721

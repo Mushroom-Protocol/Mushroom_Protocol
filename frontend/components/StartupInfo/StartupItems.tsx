@@ -52,6 +52,8 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [projectsByStartup, setProjectsByStartup] = useState([])
   const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
   const [selectedTier, setSelectedTier] = useState<string>(null)
+  const [canisterId, setCanisterId] = useState<string>("")
+  const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
 
   let null_address: string = "aaaaa-aa"
 
@@ -123,12 +125,24 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       .then((dataProjectsByStartup) => {
         setProjectsByStartup(dataProjectsByStartup)
         return Promise.all([getCanisterIdByProject(dataProjectsByStartup[0][0]), callGetPrices(dataProjectsByStartup[0][0])]).then(([resCanisterIdByProject, resCallGetPrices]) => {
+          setCanisterId(resCanisterIdByProject)
           setTiersPrices(resCallGetPrices)
-          return backend.getMaxLimit(resCanisterIdByProject).then(resMaxLimit => {
-            const numMaxLimit = Number(resMaxLimit)
-            setMaxLimit(numMaxLimit)
-            return numMaxLimit
+          return backend.getMetadataNFTColl(dataProjectsByStartup[0][0]).then(resMetadataNFTColl => {
+            setMetadataNFTColl(resMetadataNFTColl)
+            return resMetadataNFTColl
           }).catch(error => console.error(error))
+          // return Promise.all([backend.getMaxLimit(resCanisterIdByProject), backend.getStartupWallet(resCanisterIdByProject)]).then(([resMaxLimit, resStartupWallet]) => {
+          //   backend.getMaxLimit(canisterId).then(resMaxLimit => {
+          //     const numMaxLimit = Number(resMaxLimit)
+          //     setMaxLimit(numMaxLimit)
+          //     return numMaxLimit
+          //   }).catch(error => console.error(error))
+          //   backend.getStartupWallet(resCanisterIdByProject).then(resStartupWallet => {
+          //     console.log("resStartupWallet", resStartupWallet)
+          //     setStartupWallet(resStartupWallet as string)
+          //     return resStartupWallet
+          //   }).catch(error => console.error(error))
+          // }).catch(error => console.error(error))
         }).catch(error => console.error(error))
       })
       .catch((error) => console.error(error))
@@ -150,8 +164,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
 
         if (await window.ic.plug.isConnected()) {
           const params = {
-            // to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
-            to: collectionRequest.startupWallet,
+            to: metadataNFTColl.wallet,
             amount: 4e7
           }
 
@@ -306,7 +319,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 fontSize="12px"
                 mr="20"
               >
-                Total Items: {maxLimit}
+                Total Items: {String(metadataNFTColl?.maxLimit)}
               </Tag>
             </Box>
             <Spacer />
@@ -414,7 +427,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             </Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
-            Minted: 0 / {maxLimit}
+            Minted: 0 / {String(metadataNFTColl?.maxLimit)}
           </Text>
           <Box display="flex" alignItems="center" marginTop="20px">
             <Button size="sm" marginRight="10px" onClick={handleDecrease}>

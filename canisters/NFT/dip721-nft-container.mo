@@ -17,7 +17,7 @@ import TypesNft "../NFT/Types";
 // import Nat "mo:base/Nat";
 // ////////////////////////////////////////
 
-shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int, doc: Types.Document) = Self {
+shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721NonFungibleTokenExtended, _baseUrl : Text, _composition: [Types.Tier], _vestingTime: Int, doc: Types.Document, _wallet: Text) = Self {
     
     type Nft = Types.Nft;
     type TokenId = Types.TokenId;
@@ -80,6 +80,7 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     stable var transactionId : TransactionId = 0;
     stable let nfts = Map.new<TokenId, Nft>();
     stable let baseUrl = _baseUrl;
+    stable let wallet = _wallet;
 
     stable var custodians = Set.new<Principal>();
     ignore Set.put<Principal>(custodians, phash, DEPLOYER);
@@ -303,6 +304,10 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
 
     public query func getBaseUrl() : async Text {
         return baseUrl
+    };
+
+    public query func getWallet() : async Text {
+        return wallet
     };
 
     public func getMetadataForUserDip721(user : Principal) : async Types.ExtendedMetadataResult {
