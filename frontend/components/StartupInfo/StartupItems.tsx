@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import RandomBigInt from 'random-bigint';
 import {
   Flex,
   Image,
@@ -37,7 +38,14 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import { idlFactory as CollectionActorClass } from "../../../src/declarations/backend/backend.did"; // Assuming you have an IDL file for the canister.
 import { Principal } from "@dfinity/principal";
+import { IDL } from "@dfinity/candid"
 import { error } from "console"
+
+const ckUSDCIdlFactory = ({ IDL }) => {
+  return IDL.Service({
+      transfer: IDL.Func([IDL.Principal, IDL.Nat], [IDL.Bool], []),
+  });
+};
 
 interface PropsType {
   startup: Startup
@@ -157,19 +165,34 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
+      let transferCkUsdcStatus
 
       try {
         const e = await window.ic.plug.requestConnect()
         console.log(e)
 
+        
+        // idl = ckUSDCIdlFactory;
+        // canisterId = "xevnm-gaaaa-aaaar-qafnq-cai";
+        // methodName: 'ircr1_transfer',
+        // args [{to: }]
+        
+        const randomMemo = RandomBigInt();
+
         if (await window.ic.plug.isConnected()) {
           const params = {
             to: metadataNFTColl.wallet,
-            amount: 4e7
+            amount: 4e7,
+            memo: randomMemo
           }
 
           try {
-            transferStatus = await window.ic.plug.requestTransfer(params)
+            transferCkUsdcStatus = await window.ic.plug.batchTransactions([{
+              idl: ckUSDCIdlFactory,
+              canisterId: "xevnm-gaaaa-aaaar-qafnq-cai",
+              args: [params]
+            }])
+            // transferStatus = await window.ic.plug.requestTransfer(params)
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined
