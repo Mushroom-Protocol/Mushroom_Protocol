@@ -922,6 +922,11 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
     };
 
+    public query ({ caller }) func getCollectionsPreview() : async [Types.NFT.CollectionPreview] {
+        assert (authorizedCaller(caller));
+        []
+    };
+
     // public query func getNftsAddreses() : async [(ProjectID, Text)] {
     //     HashMap.toArray<ProjectID, Text>(nftCollections)
     // };

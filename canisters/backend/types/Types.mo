@@ -243,7 +243,12 @@ module {
         //     period: Int //In days
         // };
         
-        
+        public type CollectionPreview = {
+            name : Text;
+            symbol : Text;
+            logo: Blob;
+            canister : Text;
+        };
 
     }
 
