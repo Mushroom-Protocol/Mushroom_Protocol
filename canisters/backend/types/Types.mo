@@ -261,7 +261,7 @@ module {
             holders: [TypesNFT.Holder];
             prices: [{tierName: Text; price: Nat}];
             custodians: [Text];
-            canister: Text;
+            canisterId: Text;
         }
     }
 }

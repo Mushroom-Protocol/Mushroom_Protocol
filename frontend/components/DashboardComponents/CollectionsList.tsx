@@ -24,6 +24,7 @@ import {
   Text,
   useDisclosure,
   useToast,
+  UnorderedList,
 } from "@chakra-ui/react"
 import { useCanister } from "@connect2ic/react"
 import { Startup, StartupCard } from "../CommonTypes"
@@ -44,7 +45,7 @@ const initialStateStartUpsPreview = [
 const CollectionsList: React.FC = () => {
   const [backend] = useCanister("backend")
   const [collectionsMetadata, setCollectionsMetadata] = useState<any[] | null>([])
-  const [startupDetails, setStartupDetails] = useState<Startup>()
+  const [currentCollection, setCurrentCollection] = useState<any>({})
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
 
@@ -68,10 +69,9 @@ const CollectionsList: React.FC = () => {
     }).catch(error => console.error(error))
   }, [])
 
-  const openDetails = async (startupId: string) => {
+  const openDetails = async (collMetaIdx: number) => {
     onOpen()
-    const resExpandStartUp: Startup[] = (await backend.expandStartUp(startupId)) as Startup[]
-    setStartupDetails(resExpandStartUp[0])
+    setCurrentCollection(collectionsMetadata[collMetaIdx])
   }
 
   return (
@@ -80,7 +80,7 @@ const CollectionsList: React.FC = () => {
         Collections list
       </Heading>
       <List spacing={3}>
-        {collectionsMetadata?.map((collectionMetadata) => {
+        {collectionsMetadata?.map((collectionMetadata, collectionMetadataIndex) => {
           return (
             <ListItem>
               <Card maxW="sm">
@@ -106,7 +106,7 @@ const CollectionsList: React.FC = () => {
                   <ButtonGroup spacing="2">
                     <Button
                       colorScheme="blue"
-                      onClick={() => openDetails(collectionMetadata?.canisterId)}
+                      onClick={() => openDetails(collectionMetadataIndex)}
                     >
                       Details
                     </Button>
@@ -117,6 +117,28 @@ const CollectionsList: React.FC = () => {
           )
         })}
       </List>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent color="black">
+          <ModalHeader>Collection Details</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <UnorderedList>
+              <ListItem>Name: {currentCollection?.name}</ListItem>
+              <ListItem>Symbol: {currentCollection?.symbol}</ListItem>
+              <ListItem>Base URL: {currentCollection?.baseUrl}</ListItem>
+              <ListItem>Wallet: {currentCollection?.wallet}</ListItem>
+              <ListItem>Maximum Limit: {currentCollection?.maxLimit}</ListItem>
+              <ListItem>Total Supply: {currentCollection?.totalSupply}</ListItem>
+              <ListItem>Canister Id: {currentCollection?.canisterId}</ListItem>
+            </UnorderedList>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={onClose}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   )
 }

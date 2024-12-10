@@ -1005,7 +1005,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     holders = fetchedHoldersDip721;
                     prices = fetchedPricesDip721;
                     custodians = fetchedCustodians;
-                    canister = obtainedCanisterId;
+                    canisterId = obtainedCanisterId;
                 };
                 return nftCollMetadata
             };
@@ -1021,7 +1021,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     holders = [];
                     prices = [];
                     custodians = [];
-                    canister = "";
+                    canisterId = "";
                 }
             };
         };
