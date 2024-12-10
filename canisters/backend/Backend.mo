@@ -922,11 +922,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
     };
 
-    public query ({ caller }) func getCollectionsPreview() : async [Types.NFT.CollectionPreview] {
-        assert (authorizedCaller(caller));
-        []
-    };
-
     // public query func getNftsAddreses() : async [(ProjectID, Text)] {
     //     HashMap.toArray<ProjectID, Text>(nftCollections)
     // };
@@ -983,7 +978,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {name: Text; symbol: Text; baseUrl: Text; wallet: Text; maxLimit: Nat64; totalSupply: Nat64; logo: TypesNft.LogoResult; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]; custodians: [Text]} {
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async Types.NFT.CollectionMetadata {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch (actorRef) {
             case (?value) {
@@ -997,6 +992,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 let fetchedHoldersDip721 = await value.holdersDip721();
                 let fetchedPricesDip721 = await value.getPricesDip721();
                 let fetchedCustodians = await value.getCustodians();
+                let obtainedCanisterId = await getCanisterIdByProject(projectID);
 
                 let nftCollMetadata = {
                     name = fetchedName;
@@ -1009,6 +1005,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     holders = fetchedHoldersDip721;
                     prices = fetchedPricesDip721;
                     custodians = fetchedCustodians;
+                    canister = obtainedCanisterId;
                 };
                 return nftCollMetadata
             };
@@ -1024,6 +1021,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     holders = [];
                     prices = [];
                     custodians = [];
+                    canister = "";
                 }
             };
         };

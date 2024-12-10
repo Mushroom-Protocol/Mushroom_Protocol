@@ -250,6 +250,18 @@ module {
             canister : Text;
         };
 
+        public type CollectionMetadata = {
+            name: Text;
+            symbol: Text;
+            baseUrl: Text;
+            wallet: Text;
+            maxLimit: Nat64;
+            totalSupply: Nat64;
+            logo: TypesNFT.LogoResult;
+            holders: [TypesNFT.Holder];
+            prices: [{tierName: Text; price: Nat}];
+            custodians: [Text];
+            canister: Text;
+        }
     }
-
 }
