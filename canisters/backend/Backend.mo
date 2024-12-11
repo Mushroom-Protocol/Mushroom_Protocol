@@ -812,6 +812,10 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 case null { return [] };
                 case (?st) { startupName := st.startUpName }
             };
+            let collectionCanisterId: ?Text = switch (pr.nftCollections.size()){
+                case 0 {null};
+                case _ {?Principal.toText(pr.nftCollections[0])}
+            };
             let entrie = {
                 owner = Principal.fromText("aaaaa-aa");
                 startupName;
@@ -819,7 +823,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 problemSolving = pr.problemSolving;
                 pojectID = id;
                 coverImage = pr.coverImage;
-                collectionCanisterId = null;
+                collectionCanisterId = collectionCanisterId;
             };
             resultBuffer.add(entrie)
         };
