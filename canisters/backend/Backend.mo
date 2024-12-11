@@ -49,6 +49,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     type DeployConfig = Types.NFT.DeployConfig;
     public type CollectionActorClass = NFT.Dip721NFT;
 
+    // TODO agregar HashMap preview collections deployed
+
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
     public shared ({ caller }) func removeStartUp(st : Text) : async () {
@@ -599,7 +601,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                         pojectID = "";
                         projectTitle = pr.projectTitle;
                         coverImage = pr.coverImage;
-                        problemSolving = pr.problemSolving
+                        problemSolving = pr.problemSolving;
+                        collectionCanisterId = null;
                     };
                     resultBuffer.add(entrie)
                 };
@@ -815,7 +818,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 projectTitle = pr.projectTitle;
                 problemSolving = pr.problemSolving;
                 pojectID = id;
-                coverImage = pr.coverImage
+                coverImage = pr.coverImage;
+                collectionCanisterId = null;
             };
             resultBuffer.add(entrie)
         };
@@ -1019,6 +1023,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     holders = [];
                     prices = [];
                     custodians = [];
+                    canisterId = "";
                 }
             };
         };
@@ -1036,28 +1041,33 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             case null { return #err("Project id error")};
             case (?project){
                 vestingTime := project.projectDuration;
+                ExperimentalCycles.add<system>(20_000_000_000);
+                try {
+                    let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
+                    let canisterId = Principal.fromActor(newCanister);
+                    ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
+                    ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721
+                    ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
+                    let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
+                        case null {""};
+                        case (?pr){pr.startupID};
+                    };
+                    HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
+                    let updateNftCollections = Prim.Array_tabulate<Principal>(
+                        project.nftCollections.size(),
+                        func x = if(x == 0) {canisterId} else {project.nftCollections[ x -1]}
+                    );
+                    ignore  HashMap.put<ProjectID, Project>(projects, thash, cfg.projectId, {project with nftCollections = updateNftCollections });
+                    //TODO verificar initializeCollection() 
+                    await newCanister.initializeCollection();
+                    
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    return #ok(canisterId)
+                } catch (e) {
+                    return #err(Error.message(e))
+                }
             }
-        };
-        ExperimentalCycles.add(20_000_000_000);
-        try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
-            let canisterId = Principal.fromActor(newCanister);
-            ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
-            ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721
-            ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
-            let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
-                case null {""};
-                case (?pr){pr.startupID};
-            };
-            HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
-            //TODO verificar initializeCollection() 
-            await newCanister.initializeCollection();
-            
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            return #ok(canisterId)
-        } catch (e) {
-            return #err(Error.message(e))
-        }
+        };  
     };
 
     public query func getCollectionCanisterId(projectID: Text): async ?Principal {
