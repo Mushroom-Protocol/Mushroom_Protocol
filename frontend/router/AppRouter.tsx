@@ -34,6 +34,7 @@ import UsersPendingVerification from "../components/DashboardComponents/UsersPen
 import ConnectionsRecords from "../components/DashboardComponents/ConnectionsRecords"
 import CollectionsReqs from "../components/DashboardComponents/CollectionsReqs"
 import StartupPage from "../pages/StartupPage"
+import CollectionsList from "../components/DashboardComponents/CollectionsList"
 
 
 function Layout() {
@@ -98,6 +99,7 @@ export const router = createBrowserRouter([
               { path: "StartupsList", element: <StartupsList /> },
               { path: "ProjectsReqs", element: <ProjectsReqs /> },
               { path: "Projects", element: <ProjectsList /> },
+              { path: "CollectionsList", element: <CollectionsList /> },
               { path: "CollectionsReqs", element: <CollectionsReqs /> },
               { path: "UsersPendingVerification", element: <UsersPendingVerification /> },
               { path: "ConnectionsRecords", element: <ConnectionsRecords /> },
