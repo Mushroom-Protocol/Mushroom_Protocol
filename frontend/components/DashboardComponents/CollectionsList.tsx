@@ -60,7 +60,7 @@ const CollectionsList: React.FC = () => {
     }
 
     getProjectsPreview().then((dataProjectsPreview: any[]) => {
-      return Promise.all(dataProjectsPreview.map(projectCard => {
+      return Promise.all(dataProjectsPreview.filter(x => x.collectionCanisterId.length > 0).map(projectCard => {
         return backend.getMetadataNFTColl(projectCard.pojectID) as any
       })).then((allMetadata: any[]) => {
         setCollectionsMetadata(allMetadata)

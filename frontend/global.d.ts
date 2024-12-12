@@ -7,16 +7,16 @@ const ckUSDCIdlFactory = ({ IDL }) => {
   
   ic: {
     plug: {
-      batchTransactions: ({
-        idl: ckUSDCIdlFactory,
-        canisterId: string,
-        methodName: string,
-        args: {
-          to: string,
-          amount: number,
-          memo: BigInt}
-        }
-      ) => Promise<any>;
+      // batchTransactions: ({
+      //   idl: ckUSDCIdlFactory,
+      //   canisterId: string,
+      //   methodName: string,
+      //   args: {
+      //     to: string,
+      //     amount: number,
+      //     memo: BigInt}
+      //   }
+      // ) => Promise<any>;
       requestConnect: (params?: RequestConnectParams) => Promise<string>;
       isConnected: () => Promise<boolean>;
       requestTransfer: ([{

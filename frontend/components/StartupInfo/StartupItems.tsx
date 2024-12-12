@@ -180,19 +180,26 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         const randomMemo = RandomBigInt();
 
         if (await window.ic.plug.isConnected()) {
+          const tier = tiersPrices.find(x => x.tierName === selectedTier)
+          if ( tier === undefined){
+            console.log("Error TierName") 
+            return 
+          }
+
           const params = {
             to: metadataNFTColl.wallet,
-            amount: 4e7,
+            amount: tier.price,
             memo: randomMemo
           }
 
           try {
-            transferCkUsdcStatus = await window.ic.plug.batchTransactions([{
-              idl: ckUSDCIdlFactory,
-              canisterId: "xevnm-gaaaa-aaaar-qafnq-cai",
-              args: [params]
-            }])
-            // transferStatus = await window.ic.plug.requestTransfer(params)
+            // transferCkUsdcStatus = await window.ic.plug.requestTransfer([{
+            //   idl: ckUSDCIdlFactory,
+            //   canisterId: "xevnm-gaaaa-aaaar-qafnq-cai",
+            //   args: [params]
+            // }])
+            transferStatus = await window.ic.plug.requestTransfer([params])
+
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined

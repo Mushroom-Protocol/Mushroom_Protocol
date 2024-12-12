@@ -97,7 +97,8 @@ module {
         projectTitle : Text;
         pojectID : Text;
         coverImage : ?Blob;
-        problemSolving : Text
+        problemSolving : Text;
+        collectionCanisterId: ?Text;
     };
 
     public type DataProject = {
@@ -237,6 +238,7 @@ module {
             // initialStaking: ?StakingParams;
 
         };
+        
         
         // public type StakingParams = {
         //     startStaking: {#Deploy; #Mint};
