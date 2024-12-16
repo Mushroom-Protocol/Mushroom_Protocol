@@ -165,7 +165,6 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
-      let transferCkUsdcStatus
 
       try {
         const e = await window.ic.plug.requestConnect()
@@ -177,7 +176,6 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         // methodName: 'ircr1_transfer',
         // args [{to: }]
         
-        const randomMemo = RandomBigInt();
 
         if (await window.ic.plug.isConnected()) {
           const tier = tiersPrices.find(x => x.tierName === selectedTier)
@@ -188,18 +186,12 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
 
           const params = {
             to: metadataNFTColl.wallet,
-            amount: tier.price,
-            memo: randomMemo
+            amount: tier.price / 100000000,
+            memo: "123456789"
           }
 
           try {
-            // transferCkUsdcStatus = await window.ic.plug.requestTransfer([{
-            //   idl: ckUSDCIdlFactory,
-            //   canisterId: "xevnm-gaaaa-aaaar-qafnq-cai",
-            //   args: [params]
-            // }])
-            transferStatus = await window.ic.plug.requestTransfer([params])
-
+            transferStatus = await window.ic.plug.requestTransfer(params)
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined

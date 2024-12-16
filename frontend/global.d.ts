@@ -19,11 +19,11 @@ const ckUSDCIdlFactory = ({ IDL }) => {
       // ) => Promise<any>;
       requestConnect: (params?: RequestConnectParams) => Promise<string>;
       isConnected: () => Promise<boolean>;
-      requestTransfer: ([{
+      requestTransfer: ({
         to: string,
         amount: number,
-        memo: BigInt
-      }]
+        memo: string
+      }
       ) => Promise<{ height: Number }>;
       requestBalance: () => Promise<Number>;
       sessionManager: {
