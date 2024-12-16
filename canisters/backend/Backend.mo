@@ -12,10 +12,11 @@ import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
+import Ledger "./interfaces/ledger_icp";
 
 
 ////////////// DEBUG ////////////////
-// import {print} "mo:base/Debug";
+import {print} "mo:base/Debug";
 /////////////////////////////////////
 
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
@@ -337,7 +338,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             } else {
                 Principal.isController(caller) or isAdmin(caller)
             }
-        )
+        );
+ 
     };
 
     /////////////////////////////////////   Registration functions   /////////////////////////////////////////////
@@ -1100,7 +1102,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
 
     public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text /* TODO tranferStatus*/) : async TypesNft.MintReceipt {
         // TODO verificar pago
-        assert(activeMint);
+        // assert(activeMint);
         assert (isUser(caller));
         let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
         switch collection {
@@ -1110,6 +1112,37 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             }
         }
     };
+
+    
+
+
+    public shared ({ caller }) func verifyTransaction({to: Text; amount: Nat; memo: Nat; from: Text}, height: Nat64): async (){
+        let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
+            query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
+        };
+        let result = (await ledgerICP.query_blocks({ start = height; length = height + 1 })).blocks;
+        print(debug_show(result[0].transaction))
+    };
+
+    /*
+
+    type AccountIdentifier = text;
+    type SubAccount = blob;
+    type Tokens = record { e8s : nat64 };
+    type TransferArg = record {
+    memo : nat64;
+    amount : Tokens;
+    fee : Tokens;
+    to : AccountIdentifier;
+    from_subaccount : opt SubAccount;
+    created_at_time : opt nat64;
+    };
+
+    service : {
+    account_balance_dfx : (AccountIdentifier) -> (Tokens) query;
+    transfer_dfx : (TransferArg) -> (variant { Ok : nat64; Err : text });
+    }
+    */
 
     ////////////////////////////// Transfer /////////////////////////////////////////////
 
