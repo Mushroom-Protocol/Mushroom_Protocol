@@ -52,7 +52,8 @@ module {
         #InvalidCollection;
         #SenderIsNotOwner;
         #Other;
-        #VestingIsNotFinishedYet
+        #VestingIsNotFinishedYet;
+        #TransactionIsNotVerified;
     };
 
     public type Result<S, E> = {

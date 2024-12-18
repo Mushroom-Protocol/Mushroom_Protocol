@@ -1106,8 +1106,14 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         metadata : MetadataResult
     };
 
-    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text /* TODO tranferStatus*/) : async TypesNft.MintReceipt {
-        // TODO verificar pago
+    type DataTransaction = {from: Text; to: Text; amount: Nat64; height: Nat64};
+
+    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text, toVerify: DataTransaction) : async TypesNft.MintReceipt {
+        
+        let transactionOk = await verifyTransaction(toVerify);
+        if(not transactionOk){
+            return #Err(#TransactionIsNotVerified)
+        };
         // assert(activeMint);
         assert (isUser(caller));
         let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
@@ -1120,62 +1126,38 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     };
 
 
-    // public shared ({ caller }) func verifyTransaction({to: Text; amount: Nat; memo: Nat; from: Text}, height: Nat64): async (){
-    //     let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
-    //         query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
-    //     };
-    //     let result = (await ledgerICP.query_blocks({ start = height; length = height + 1 }));
-    //     for 
-    //     print(debug_show(result[0].transaction))
-    // };
+    ////////////////// Ledger ICP //////////////////
 
-
-    func _blobToText(t: Blob): Text {
+    func blobToText(t: Blob): Text {
         let nat8Array = Blob.toArray(t);
         var result = "";
+        let chars = ["0", "1" , "2" , "3" ,"4" , "5" , "6" , "7" , "8" , "9" , "a" , "b" , "c" , "d" , "e" , "f"];
         for (c in nat8Array.vals()){
-            result #= Nat8.toText(c)
+            result #= chars[Nat8.toNat(c) / 16];
+            result #= chars[Nat8.toNat(c) % 16] 
         };
         result
     };
-    public func verifyTransaction({from: Text; to: Text; amount: Nat64; height: Nat64}): async Bool {
+
+    public func verifyTransaction({from; to; amount; height}: DataTransaction): async Bool {
         let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
             query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
         };
-        let result: Ledger.QueryBlocksResponse = (await ledgerICP.query_blocks({ start = height; length = height + 1 }));
+        let result = await ledgerICP.query_blocks({ start = height; length = height + 1 });
+        var index = 0;
         for (resultItem in result.blocks.vals()) {
             switch (resultItem.transaction.operation) {
-                    case (?#Transfer(transfer)) {
-                        if (transfer.to == Text.encodeUtf8(to) and transfer.from == Text.encodeUtf8(from) and transfer.amount.e8s == amount) {
-                            return true
-                        }
-                    };
-                    case (_) {}
-            }
+                case (?#Transfer(tx)) {
+                    if (blobToText(tx.to) == to and blobToText(tx.from ) == from and tx.amount.e8s >= amount ) {
+                        return true
+                    }; 
+                };
+                case (_) {  };
+            };
+            index += 1;
         };
         return false
-        // print(debug_show(result[0].transaction))
     };
-
-    /*
-
-    type AccountIdentifier = text;
-    type SubAccount = blob;
-    type Tokens = record { e8s : nat64 };
-    type TransferArg = record {
-    memo : nat64;
-    amount : Tokens;
-    fee : Tokens;
-    to : AccountIdentifier;
-    from_subaccount : opt SubAccount;
-    created_at_time : opt nat64;
-    };
-
-    service : {
-    account_balance_dfx : (AccountIdentifier) -> (Tokens) query;
-    transfer_dfx : (TransferArg) -> (variant { Ok : nat64; Err : text });
-    }
-    */
 
     ////////////////////////////// Transfer /////////////////////////////////////////////
 
