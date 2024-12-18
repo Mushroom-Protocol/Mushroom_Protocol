@@ -26,6 +26,9 @@ import Blob "mo:base/Blob";
 import Char "mo:base/Char";
 import Nat8 "mo:base/Nat8";
 
+import List "mo:base/List";
+import Nat64 "mo:base/Nat64";
+
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
 
@@ -1127,7 +1130,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     // };
 
 
-    func blobToText(t: Blob): Text {
+    func _blobToText(t: Blob): Text {
         let nat8Array = Blob.toArray(t);
         var result = "";
         for (c in nat8Array.vals()){
@@ -1143,7 +1146,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         for (resultItem in result.blocks.vals()) {
             switch (resultItem.transaction.operation) {
                     case (?#Transfer(transfer)) {
-                        if (blobToText(transfer.to) == to and blobToText(transfer.from ) == from and transfer.amount.e8s == amount) {
+                        if (transfer.to == Text.encodeUtf8(to) and transfer.from == Text.encodeUtf8(from) and transfer.amount.e8s == amount) {
                             return true
                         }
                     };
@@ -1151,6 +1154,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             }
         };
         return false
+        // print(debug_show(result[0].transaction))
     };
 
     /*

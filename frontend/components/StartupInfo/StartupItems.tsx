@@ -165,41 +165,30 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
-      let transferCkUsdcStatus
+      let resMintNFT
+      const tier = tiersPrices.find(x => x.tierName === selectedTier)
+      if (tier === undefined) {
+        console.log("Error TierName") 
+        return 
+      }
+      console.log({tier})
 
       try {
         const e = await window.ic.plug.requestConnect()
         console.log(e)
 
-        
-        // idl = ckUSDCIdlFactory;
-        // canisterId = "xevnm-gaaaa-aaaar-qafnq-cai";
-        // methodName: 'ircr1_transfer',
-        // args [{to: }]
-        
-        const randomMemo = RandomBigInt();
-
         if (await window.ic.plug.isConnected()) {
-          const tier = tiersPrices.find(x => x.tierName === selectedTier)
-          if ( tier === undefined){
-            console.log("Error TierName") 
-            return 
-          }
-
           const params = {
             to: metadataNFTColl.wallet,
-            amount: tier.price,
-            memo: randomMemo
+            // amount: parseFloat(Number(tier.price).toString()) * 100000000 / 100000000,
+            amount: 0.02,
+            memo: "123456789"
           }
+          console.log(params)
 
           try {
-            // transferCkUsdcStatus = await window.ic.plug.requestTransfer([{
-            //   idl: ckUSDCIdlFactory,
-            //   canisterId: "xevnm-gaaaa-aaaar-qafnq-cai",
-            //   args: [params]
-            // }])
-            transferStatus = await window.ic.plug.requestTransfer([params])
-
+            transferStatus = await window.ic.plug.requestTransfer(params)
+            console.log(transferStatus)
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined
@@ -232,9 +221,24 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier)) as {
+        const paramsVerify = {
+          to: metadataNFTColl.wallet,
+          amount: tier.price / 100000000,
+          from: await window.ic.plug.accountId
+        }
+        console.log(paramsVerify)
+        const resVerifyTransaction = (await backend.verifyTransaction(paramsVerify, transferStatus.height)) as {
           Ok: any
           Err: String
+        }
+        console.log(resVerifyTransaction)
+
+        if (resVerifyTransaction) {
+          resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier)) as {
+            Ok: any
+            Err: String
+          }
+          console.log(resMintNFT)
         }
 
         if (loadingToastId !== undefined) {
