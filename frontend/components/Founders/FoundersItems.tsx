@@ -61,6 +61,7 @@ const FoundersItems = () => {
           const params = {
             to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
             amount: 4e7,
+            memo: "123456789",
           }
 
           try {
