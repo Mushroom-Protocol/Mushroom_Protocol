@@ -22,6 +22,9 @@ import {print} "mo:base/Debug";
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
+import Blob "mo:base/Blob";
+import Char "mo:base/Char";
+import Nat8 "mo:base/Nat8";
 
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
@@ -1113,15 +1116,41 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         }
     };
 
-    
+
+    // public shared ({ caller }) func verifyTransaction({to: Text; amount: Nat; memo: Nat; from: Text}, height: Nat64): async (){
+    //     let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
+    //         query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
+    //     };
+    //     let result = (await ledgerICP.query_blocks({ start = height; length = height + 1 }));
+    //     for 
+    //     print(debug_show(result[0].transaction))
+    // };
 
 
-    public shared ({ caller }) func verifyTransaction({to: Text; amount: Nat; memo: Nat; from: Text}, height: Nat64): async (){
+    func blobToText(t: Blob): Text {
+        let nat8Array = Blob.toArray(t);
+        var result = "";
+        for (c in nat8Array.vals()){
+            result #= Nat8.toText(c)
+        };
+        result
+    };
+    public func verifyTransaction({from: Text; to: Text; amount: Nat64; height: Nat64}): async Bool {
         let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
             query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
         };
-        let result = (await ledgerICP.query_blocks({ start = height; length = height + 1 })).blocks;
-        print(debug_show(result[0].transaction))
+        let result: Ledger.QueryBlocksResponse = (await ledgerICP.query_blocks({ start = height; length = height + 1 }));
+        for (resultItem in result.blocks.vals()) {
+            switch (resultItem.transaction.operation) {
+                    case (?#Transfer(transfer)) {
+                        if (blobToText(transfer.to) == to and blobToText(transfer.from ) == from and transfer.amount.e8s == amount) {
+                            return true
+                        }
+                    };
+                    case (_) {}
+            }
+        };
+        return false
     };
 
     /*
