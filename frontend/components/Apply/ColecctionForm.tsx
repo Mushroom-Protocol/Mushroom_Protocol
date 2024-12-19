@@ -324,7 +324,7 @@ const ColecctionForm = () => {
         composition: Object.keys(tiersPrices).map(elm => {
           return {
             tierName: elm,
-            price: BigInt(formTiersPrices[elm]),
+            price: BigInt(Number(formTiersPrices[elm]) * 10e8),
             qty: BigInt(calculateTierQuantity(elm)),
             assetsNames: []
           }

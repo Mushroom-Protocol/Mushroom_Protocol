@@ -139,18 +139,6 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             setMetadataNFTColl(resMetadataNFTColl)
             return resMetadataNFTColl
           }).catch(error => console.error(error))
-          // return Promise.all([backend.getMaxLimit(resCanisterIdByProject), backend.getStartupWallet(resCanisterIdByProject)]).then(([resMaxLimit, resStartupWallet]) => {
-          //   backend.getMaxLimit(canisterId).then(resMaxLimit => {
-          //     const numMaxLimit = Number(resMaxLimit)
-          //     setMaxLimit(numMaxLimit)
-          //     return numMaxLimit
-          //   }).catch(error => console.error(error))
-          //   backend.getStartupWallet(resCanisterIdByProject).then(resStartupWallet => {
-          //     console.log("resStartupWallet", resStartupWallet)
-          //     setStartupWallet(resStartupWallet as string)
-          //     return resStartupWallet
-          //   }).catch(error => console.error(error))
-          // }).catch(error => console.error(error))
         }).catch(error => console.error(error))
       })
       .catch((error) => console.error(error))
@@ -166,6 +154,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       let loadingToastId
       let transferStatus
       let resMintNFT
+      
       const tier = tiersPrices.find(x => x.tierName === selectedTier)
       if (tier === undefined) {
         console.log("Error TierName") 
@@ -173,18 +162,18 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
       console.log({tier})
 
+      const params = {
+        to: metadataNFTColl.wallet,
+        amount: tier.price,
+        memo: "123456789"
+      }
+      console.log({params})
+
       try {
         const e = await window.ic.plug.requestConnect()
         console.log({e})
 
         if (await window.ic.plug.isConnected()) {
-          const params = {
-            to: metadataNFTColl.wallet,
-            amount: parseFloat(Number(tier.price).toString()) / 100000000,
-            memo: "123456789"
-          }
-          console.log({params})
-
           try {
             transferStatus = await window.ic.plug.requestTransfer(params)
             console.log({transferStatus})
@@ -220,25 +209,13 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           variant: "solid",
         })
 
-        const paramsVerify = {
-          to: metadataNFTColl.wallet,
-          amount: tier.price / 100000000,
-          from: await window.ic.plug.accountId
-        }
-        console.log({paramsVerify})
-        const resVerifyTransaction = (await backend.verifyTransaction(paramsVerify, transferStatus.height)) as {
+        const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
+        console.log(dataTransaction)
+        resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }
-        console.log({resVerifyTransaction})
-
-        if (resVerifyTransaction) {
-          resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier)) as {
-            Ok: any
-            Err: String
-          }
-          console.log({resMintNFT})
-        }
+        console.log({resMintNFT})
 
         if (loadingToastId !== undefined) {
           toast.close(loadingToastId)
