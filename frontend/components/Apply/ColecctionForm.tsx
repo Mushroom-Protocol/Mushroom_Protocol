@@ -17,6 +17,7 @@ import {
   Tooltip,
   useToast,
   Select,
+  VStack,
 } from "@chakra-ui/react"
 import { AiFillPicture } from "react-icons/ai"
 import { IoInformationCircleOutline } from "react-icons/io5"
@@ -89,14 +90,20 @@ interface DistributionType {
   Airdrop: {tiers: TierFields, holder: string, isVesting: boolean}
   InventorTeam: {tiers: TierFields, holder: string, isVesting: boolean}
   ReserveFund: {tiers: TierFields, holder: string, isVesting: boolean}
+}
+
+interface PublicDistributionType {
   PublicSale: {tiers: TierFields, holder: string, isVesting: boolean}
 }
 
 const formDataDistribution: DistributionType = {
-  Airdrop: {tiers: TierFieldsInit, holder: "", isVesting: false},
+  Airdrop: {tiers: TierFieldsInit, holder: "", isVesting: true},
   InventorTeam: {tiers: TierFieldsInit, holder: "", isVesting: true},
   ReserveFund: {tiers: TierFieldsInit, holder: "", isVesting: true},
-  PublicSale: {tiers: TierFieldsInit, holder: "", isVesting: true}
+}
+
+const publicDataDistribution: PublicDistributionType = {
+  PublicSale: {tiers: TierFieldsInit, holder: "", isVesting: false}
 }
 
 const formDataComposition: Tier[] = [
@@ -130,9 +137,10 @@ const ColecctionForm = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState<CollectionPreInit>(initialStateCollectionPreInit)
   const [formDistribution, setFormDistribution] = useState<DistributionType>(formDataDistribution)
+  const [publicDistribution, setPublicDistribution] = useState<PublicDistributionType>(publicDataDistribution)
   const [formTiersPrices, setFormTiersPrices] = useState(tiersPrices)
-  const [isCheckedReserveFund, setIsCheckedReserveFund] = useState(false)
-  const [isCheckedInventorTeam, setIsCheckedInventorTeam] = useState(false)
+  const [isCheckedReserveFund, setIsCheckedReserveFund] = useState(true)
+  const [isCheckedInventorTeam, setIsCheckedInventorTeam] = useState(true)
   const [isCheckedAirdrop, setIsCheckedAirdrop] = useState(false)
   const [isCheckedPublicSale, setIsCheckedPublicSale] = useState(false)
   const [totalNFTCategories, setTotalNFTCategories] = useState<{PublicSale: number, InventorTeam: number, ReserveFund: number, Airdrop: number}>({PublicSale: 0, InventorTeam: 0, ReserveFund: 0, Airdrop: 0})
@@ -180,6 +188,21 @@ const ColecctionForm = () => {
       ...prevData,
       [name]: value,
     }))
+  }
+
+  const handleChangeSupply = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    let idxSupply = 0
+    if (name.indexOf("TierB") !== -1) idxSupply = 1
+    if (name.indexOf("TierC") !== -1) idxSupply = 2
+    setFormData((prevData) => {
+      let currSupplies = prevData["totalSupply"]
+      currSupplies[idxSupply] = value
+      return {
+        ...prevData,
+        totalSupply: currSupplies,
+      }
+    })
   }
 
   const handleCheckboxChange = (checkedValues: string[]) => {
@@ -242,9 +265,18 @@ const ColecctionForm = () => {
   }
 
   const calculateTierQuantity = (tierName): number => {
-    return Object.keys(formDistribution).reduce((acc, curr) => {
+    let result = Object.keys(formDistribution).reduce((acc, curr) => {
       return acc + parseInt(formDistribution[curr].tiers[tierName].qty)
     }, 0)
+
+    let idxTier = 0
+    if (tierName === "tierB") idxTier = 1
+    if (tierName === "tierC") idxTier = 2
+
+    setPublicDistribution(prevData => {
+      return {...prevData, PublicSale: {...prevData["PublicSale"], tiers: {...prevData["PublicSale"].tiers, [tierName]: {...prevData["PublicSale"].tiers[tierName], qty: Number(formData.totalSupply[idxTier])-result}}}}
+    })
+    return result
   }
 
   const calculateTotalNFTCategory = (category: string): number => {
@@ -256,21 +288,6 @@ const ColecctionForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
-    // if (Object.keys(formDistribution).reduce((acc, curr) => acc + parseFloat(formDistribution[curr]), 0) !== 100) {
-    // if (Object.keys(formDistribution).reduce((acc, curr) => {
-    //     return acc + parseInt(formDistribution[curr].qty)
-    // }, 0) !== 100) {
-    //   toast({
-    //     title: "Submission Error",
-    //     description: "Tokenomics distribution out of range.",
-    //     status: "error",
-    //     duration: 5000,
-    //     isClosable: true,
-    //     variant: "solid",
-    //   })
-    //   return false
-    // }
 
     let loadingToastId: string | number | undefined
 
@@ -288,8 +305,7 @@ const ColecctionForm = () => {
         ...formData,
         startupID: getRoleStartup(currentUser.roles)[0],
         projectID: projectsByStartup[0],
-        totalSupply: BigInt(formData.totalSupply),
-        tokenPrice: BigInt(formData.tokenPrice),
+        totalSupply: BigInt((formData.totalSupply as any[]).reduce((acc, curr) => Number(acc)+Number(curr), 0)),
         typesImages: {PNG: null},
         distribution: Object.keys(formDistribution).map((elm) => {
           return {
@@ -308,7 +324,7 @@ const ColecctionForm = () => {
         composition: Object.keys(tiersPrices).map(elm => {
           return {
             tierName: elm,
-            price: BigInt(formTiersPrices[elm]),
+            price: BigInt(Number(formTiersPrices[elm]) * 10e8),
             qty: BigInt(calculateTierQuantity(elm)),
             assetsNames: []
           }
@@ -454,15 +470,42 @@ const ColecctionForm = () => {
                 </FormControl>
 
                 <FormControl isRequired mt={4}>
-                  <FormLabel>Total Supply</FormLabel>
-                  <Input
-                    id="totalSupply"
-                    name="totalSupply"
-                    type="number"
-                    value={formData.totalSupply}
-                    onChange={handleChange}
-                    placeholder="Total number of tokens issued..."
-                  />
+                  <FormLabel>Maximum Supply</FormLabel>
+                  <Flex justify="center" gap="4">
+                    <Box>
+                      <Text>Tier A</Text>
+                      <Input
+                        id="totalSupplyTierA"
+                        name="totalSupplyTierA"
+                        type="number"
+                        value={formData.totalSupply[0]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierA number of tokens..."
+                      />
+                    </Box>
+                    <Box>
+                      <Text>Tier B</Text>
+                      <Input
+                        id="totalSupplyTierB"
+                        name="totalSupplyTierB"
+                        type="number"
+                        value={formData.totalSupply[1]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierB number of tokens..."
+                      />
+                    </Box>
+                    <Box>
+                      <Text>Tier C</Text>
+                      <Input
+                        id="totalSupplyTierC"
+                        name="totalSupplyTierC"
+                        type="number"
+                        value={formData.totalSupply[2]}
+                        onChange={handleChangeSupply}
+                        placeholder="TierC number of tokens..."
+                      />
+                    </Box>
+                  </Flex>
                 </FormControl>
 
                 <FormControl isRequired mt={4}>
@@ -474,13 +517,6 @@ const ColecctionForm = () => {
                     <Text width="10%" alignItems="right">Tier C</Text>
                     <Text width="10%"></Text>
                     <Text width="30%" alignItems="right">Holder</Text>
-                    {/* <Checkbox
-                      id="ReserveFundVesting"
-                      name="ReserveFundVesting"
-                      onChange={handleChangeReserveFund}
-                      isChecked={isCheckedReserveFund}
-                      required={false}
-                    >Is vesting</Checkbox> */}
                   </Flex>
                   <Flex>
                     <Text width="30%" alignContent="right">Public Sale</Text>
@@ -489,7 +525,8 @@ const ColecctionForm = () => {
                       name="PublicSale_tierA"
                       type="number"
                       width="10%"
-                      value={formDistribution.PublicSale.tiers.tierA.qty}
+                      disabled
+                      value={publicDistribution.PublicSale.tiers.tierA.qty}
                       onChange={handleChangeDistribution}
                       placeholder="Public Sale, Tier A quantity of tokens..."
                     />
@@ -498,7 +535,8 @@ const ColecctionForm = () => {
                       name="PublicSale_tierB"
                       type="number"
                       width="10%"
-                      value={formDistribution.PublicSale.tiers.tierB.qty}
+                      disabled
+                      value={publicDistribution.PublicSale.tiers.tierB.qty}
                       onChange={handleChangeDistribution}
                       placeholder="Public Sale, Tier B quantity of tokens..."
                     />
@@ -507,20 +545,12 @@ const ColecctionForm = () => {
                       name="PublicSale_tierC"
                       type="number"
                       width="10%"
-                      value={formDistribution.PublicSale.tiers.tierC.qty}
+                      disabled
+                      value={publicDistribution.PublicSale.tiers.tierC.qty}
                       onChange={handleChangeDistribution}
                       placeholder="Public Sale, Tier C quantity of tokens..."
                     />
                     <Text width="10%" alignItems="center">{totalNFTCategories.PublicSale}</Text>
-                    <Input
-                      id="PublicSaleHolder"
-                      name="PublicSaleHolder"
-                      type="text"
-                      width="30%"
-                      value={formDistribution.PublicSale.holder}
-                      onChange={handleChangeDistributionHolder}
-                      placeholder="Public Sale holder..."
-                    />
                   </Flex>
                   <Flex>
                     <Text width="30%" alignContent="right">Inventor Team</Text>
@@ -690,6 +720,24 @@ const ColecctionForm = () => {
                       placeholder="Tier C price..."
                     />
                   </Flex>
+                </FormControl>
+
+                <FormControl isRequired mt={4}>
+                  <Center>
+                    <VStack bgColor="red.200" p="8" borderRadius="md" width="80%">
+                        <Text color='yellow.900' textAlign="center">¡¡¡ PLEASE BE CAREFUL TAKING CARE OF THIS INFORMATION BECAUSE THE LOSS OF IT WILL RESOLVE IN THE LOSS OF THE COLLECTED FUNDS !!!</Text>
+                        <Text color='red.600' fontSize="lg" fontWeight="bold">Startup wallet:</Text>
+                        <Input
+                          id="startupWallet"
+                          name="startupWallet"
+                          width="80%"
+                          value={formData.startupWallet}
+                          onChange={handleChange}
+                          placeholder="Paste or write the startup wallet here..."
+                          borderColor="red.600"
+                        />
+                    </VStack>
+                  </Center>
                 </FormControl>
 
                 <FormControl mt={4}>

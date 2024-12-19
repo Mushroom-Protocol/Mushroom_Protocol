@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import RandomBigInt from 'random-bigint';
 import {
   Flex,
   Image,
@@ -29,7 +30,7 @@ import { FaClock } from "react-icons/fa6"
 import MpFavicon from "../../assets/MpFavicon.png"
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
-import { Startup } from "../CommonTypes"
+import { CollectionPreInit, Startup } from "../CommonTypes"
 import { useCanister } from "@connect2ic/react"
 
 // import { CollectionActorClass } from "../../../src/declarations/backend/backend.did"
@@ -37,7 +38,14 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import { idlFactory as CollectionActorClass } from "../../../src/declarations/backend/backend.did"; // Assuming you have an IDL file for the canister.
 import { Principal } from "@dfinity/principal";
+import { IDL } from "@dfinity/candid"
 import { error } from "console"
+
+const ckUSDCIdlFactory = ({ IDL }) => {
+  return IDL.Service({
+      transfer: IDL.Func([IDL.Principal, IDL.Nat], [IDL.Bool], []),
+  });
+};
 
 interface PropsType {
   startup: Startup
@@ -47,11 +55,13 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   const [quantity, setQuantity] = useState(1)
   const toast = useToast()
   const [backend] = useCanister("backend")
-  const [totalSupply, setTotalSupply] = useState(0)
+  const [collectionRequest, setCollectionRequest] = useState<CollectionPreInit | any | null | undefined>({})
   const [maxLimit, setMaxLimit] = useState(0)
   const [projectsByStartup, setProjectsByStartup] = useState([])
   const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
   const [selectedTier, setSelectedTier] = useState<string>(null)
+  const [canisterId, setCanisterId] = useState<string>("")
+  const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
 
   let null_address: string = "aaaaa-aa"
 
@@ -93,6 +103,17 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
+    const getCollectionRequestByStartUp = async (startupId: string): Promise<CollectionPreInit | any | null | undefined> => {
+      try {
+        const resGetCollectionRequestByStartUp: CollectionPreInit | any | null | undefined = (await backend.getCollectionRequestByStartUp(startupId)) as CollectionPreInit | any | null | undefined
+        setCollectionRequest(resGetCollectionRequestByStartUp[0])
+        return resGetCollectionRequestByStartUp[0]
+      }
+      catch(error) {
+        console.error("Error on backend.getCollectionRequestByStartUp() call:", error)
+      }
+    }
+
     // getProjectsByStartup(startupFetched.startupId)
     //   .then((dataProjectsByStartup) => {
     //     setProjectsByStartup(dataProjectsByStartup)
@@ -112,15 +133,19 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       .then((dataProjectsByStartup) => {
         setProjectsByStartup(dataProjectsByStartup)
         return Promise.all([getCanisterIdByProject(dataProjectsByStartup[0][0]), callGetPrices(dataProjectsByStartup[0][0])]).then(([resCanisterIdByProject, resCallGetPrices]) => {
+          setCanisterId(resCanisterIdByProject)
           setTiersPrices(resCallGetPrices)
-          return backend.getMaxLimit(resCanisterIdByProject).then(resMaxLimit => {
-            const numMaxLimit = Number(resMaxLimit)
-            setMaxLimit(numMaxLimit)
-            return numMaxLimit
+          return backend.getMetadataNFTColl(dataProjectsByStartup[0][0]).then(resMetadataNFTColl => {
+            setMetadataNFTColl(resMetadataNFTColl)
+            return resMetadataNFTColl
           }).catch(error => console.error(error))
         }).catch(error => console.error(error))
       })
       .catch((error) => console.error(error))
+
+    getCollectionRequestByStartUp(startupFetched.startupId).then(dataCollectionRequestByStartUp => {
+      return dataCollectionRequestByStartUp
+    }).catch(error => console.error(error))
   }, [])
 
   const handleSubmitMint =
@@ -128,19 +153,30 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
+      let resMintNFT
+      
+      const tier = tiersPrices.find(x => x.tierName === selectedTier)
+      if (tier === undefined) {
+        console.log("Error TierName") 
+        return 
+      }
+      console.log({tier})
+
+      const params = {
+        to: metadataNFTColl.wallet,
+        amount: tier.price,
+        memo: "123456789"
+      }
+      console.log({params})
 
       try {
         const e = await window.ic.plug.requestConnect()
-        console.log(e)
+        console.log({e})
 
         if (await window.ic.plug.isConnected()) {
-          const params = {
-            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
-            amount: 4e7
-          }
-
           try {
             transferStatus = await window.ic.plug.requestTransfer(params)
+            console.log({transferStatus})
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined
@@ -173,10 +209,13 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier)) as {
+        const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
+        console.log(dataTransaction)
+        resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }
+        console.log({resMintNFT})
 
         if (loadingToastId !== undefined) {
           toast.close(loadingToastId)
@@ -185,7 +224,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
         if (resMintNFT.Err !== undefined) {
           toast({
             title: "Minting Error",
-            description: resMintNFT.Err,
+            description: JSON.stringify(resMintNFT?.Err),
             status: "error",
             duration: 5000,
             isClosable: true,
@@ -290,7 +329,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 fontSize="12px"
                 mr="20"
               >
-                Total Items: {maxLimit}
+                Total Items: {String(metadataNFTColl?.maxLimit)}
               </Tag>
             </Box>
             <Spacer />
@@ -398,7 +437,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             </Box>
           </Box>
           <Text fontSize="16px" color="#737373" marginTop="10px">
-            Minted: 0 / {maxLimit}
+            Minted: 0 / {String(metadataNFTColl?.maxLimit)}
           </Text>
           <Box display="flex" alignItems="center" marginTop="20px">
             <Button size="sm" marginRight="10px" onClick={handleDecrease}>

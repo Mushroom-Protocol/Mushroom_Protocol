@@ -97,7 +97,8 @@ module {
         projectTitle : Text;
         pojectID : Text;
         coverImage : ?Blob;
-        problemSolving : Text
+        problemSolving : Text;
+        collectionCanisterId: ?Text;
     };
 
     public type DataProject = {
@@ -172,12 +173,18 @@ module {
             #SVG
         };
 
+        // public type Document = {
+        //     #PDF : Blob;
+        //     #MP4 : Blob;
+        //     #MD : Text;
+        //     #HTML : Text;
+        //     #Image : Blob
+        // };
+
         public type Document = {
-            #PDF : Blob;
-            #MP4 : Blob;
-            #MD : Text;
-            #HTML : Text;
-            #Image : Blob
+            title: Text;
+            date: Int;
+            data: Blob;
         };
 
         public type CollectionPreInit = {
@@ -193,7 +200,8 @@ module {
             documentsFolderUrl : Text;
             typesImages : ImageType;
             nftImagesUrl : Text;
-            creator : Text
+            creator : Text;
+            startupWallet : Text;
         };
 
         public type CollectionInit = {
@@ -205,13 +213,11 @@ module {
             totalSupply : Nat;
             distribution : [Holder];
             utilities : [Utilities];
-            //decimals: Nat;
-            tokenPrice : Nat;
-            documents : [Document];
+            documents : Document;
             typesImages : ImageType;
             nftImages : [Blob];
-            creator : Text
-
+            creator : Text;
+            startupWallet : Text;
         };
 
         public type Tier = {
@@ -227,18 +233,37 @@ module {
             composition: [Tier];
             custodian : Text;
             distribution : [Holder];
-
+            document: Document;
+            startupWallet : Text;
             // initialStaking: ?StakingParams;
 
         };
+        
         
         // public type StakingParams = {
         //     startStaking: {#Deploy; #Mint};
         //     period: Int //In days
         // };
         
-        
+        public type CollectionPreview = {
+            name : Text;
+            symbol : Text;
+            logo: Blob;
+            canister : Text;
+        };
 
+        public type CollectionMetadata = {
+            name: Text;
+            symbol: Text;
+            baseUrl: Text;
+            wallet: Text;
+            maxLimit: Nat64;
+            totalSupply: Nat64;
+            logo: TypesNFT.LogoResult;
+            holders: [TypesNFT.Holder];
+            prices: [{tierName: Text; price: Nat}];
+            custodians: [Text];
+            canisterId: Text;
+        }
     }
-
 }

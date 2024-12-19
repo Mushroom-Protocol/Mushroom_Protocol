@@ -12,15 +12,22 @@ import HashMap "mo:map/Map";
 import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
+import Ledger "./interfaces/ledger_icp";
 
 
 ////////////// DEBUG ////////////////
-// import {print} "mo:base/Debug";
+import {print} "mo:base/Debug";
 /////////////////////////////////////
 
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
+import Blob "mo:base/Blob";
+import Char "mo:base/Char";
+import Nat8 "mo:base/Nat8";
+
+import List "mo:base/List";
+import Nat64 "mo:base/Nat64";
 
 import NFT "../NFT/dip721-nft-container";
 import TypesNft "../NFT/Types";
@@ -48,6 +55,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     type Dip721NonFungibleTokenExtended = TypesNft.Dip721NonFungibleTokenExtended;
     type DeployConfig = Types.NFT.DeployConfig;
     public type CollectionActorClass = NFT.Dip721NFT;
+
+    // TODO agregar HashMap preview collections deployed
 
     ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
@@ -335,7 +344,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             } else {
                 Principal.isController(caller) or isAdmin(caller)
             }
-        )
+        );
+ 
     };
 
     /////////////////////////////////////   Registration functions   /////////////////////////////////////////////
@@ -599,7 +609,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                         pojectID = "";
                         projectTitle = pr.projectTitle;
                         coverImage = pr.coverImage;
-                        problemSolving = pr.problemSolving
+                        problemSolving = pr.problemSolving;
+                        collectionCanisterId = null;
                     };
                     resultBuffer.add(entrie)
                 };
@@ -809,13 +820,18 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 case null { return [] };
                 case (?st) { startupName := st.startUpName }
             };
+            let collectionCanisterId: ?Text = switch (pr.nftCollections.size()){
+                case 0 {null};
+                case _ {?Principal.toText(pr.nftCollections[0])}
+            };
             let entrie = {
                 owner = Principal.fromText("aaaaa-aa");
                 startupName;
                 projectTitle = pr.projectTitle;
                 problemSolving = pr.problemSolving;
                 pojectID = id;
-                coverImage = pr.coverImage
+                coverImage = pr.coverImage;
+                collectionCanisterId = collectionCanisterId;
             };
             resultBuffer.add(entrie)
         };
@@ -941,6 +957,13 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         await remoteNFT.getMaxLimitDip721();
     };
 
+    public shared func getStartupWallet(canisterId : Text) : async Text {
+        let remoteNFT = actor (canisterId) : actor {
+            getWallet : shared () -> async Text;
+        };
+        await remoteNFT.getWallet();
+    };
+
     public shared ({ caller }) func getTotalSupply(canisterId : Text) : async Nat64 {
         let remoteNFT = actor (canisterId) : actor {
             totalSupplyDip721 : shared () -> async Nat64;
@@ -971,30 +994,34 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async {name: Text; symbol: Text; baseUrl: Text; maxLimit: Nat64; totalSupply: Nat64; logo: TypesNft.LogoResult; holders: [TypesNft.Holder]; prices: [{tierName: Text; price: Nat}]; custodians: [Text]} {
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async Types.NFT.CollectionMetadata {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
         switch (actorRef) {
             case (?value) {
                 let fetchedName = await value.nameDip721();
                 let fetchedSymbol = await value.symbolDip721();
                 let fetchedBaseUrl = await value.getBaseUrl();
+                let fetchedWallet = await value.getWallet();
                 let fetchedMaxLimit = await value.getMaxLimitDip721();
                 let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
                 let fetchedLogo = await value.logoDip721();
                 let fetchedHoldersDip721 = await value.holdersDip721();
                 let fetchedPricesDip721 = await value.getPricesDip721();
                 let fetchedCustodians = await value.getCustodians();
+                let obtainedCanisterId = await getCanisterIdByProject(projectID);
 
                 let nftCollMetadata = {
                     name = fetchedName;
                     symbol = fetchedSymbol;
                     baseUrl = fetchedBaseUrl;
+                    wallet = fetchedWallet;
                     maxLimit = fetchedMaxLimit;
                     totalSupply = fetchedTotalSupplyDip721;
                     logo = fetchedLogo;
                     holders = fetchedHoldersDip721;
                     prices = fetchedPricesDip721;
                     custodians = fetchedCustodians;
+                    canisterId = obtainedCanisterId;
                 };
                 return nftCollMetadata
             };
@@ -1003,43 +1030,58 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     name = "";
                     symbol = "";
                     baseUrl = "";
+                    wallet = "";
                     maxLimit = 0;
                     totalSupply = 0;
                     logo = {data = ""; logo_type = ""};
                     holders = [];
                     prices = [];
                     custodians = [];
+                    canisterId = "";
                 }
             };
         };
     };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 
-    public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig, fee : Nat) : async DeployResult {
+    public shared ({ caller }) func deployCollection(init : Dip721NonFungibleToken, cfg : DeployConfig) : async DeployResult {
         assert (authorizedCaller(caller));
         assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
         // ExperimentalCycles.add<system>(fee);
-        ExperimentalCycles.add(fee);
-        try {
-            let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition);
-            let canisterId = Principal.fromActor(newCanister);
-            ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
-            ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721
-            ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
-            let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
-                case null {""};
-                case (?pr){pr.startupID};
-            };
-            HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
-            //TODO verificar initializeCollection() 
-            await newCanister.initializeCollection();
-            
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            return #ok(canisterId)
-        } catch (e) {
-            return #err(Error.message(e))
-        }
+        let project = HashMap.get<ProjectID, Project>(projects, thash, cfg.projectId);
+        var vestingTime: Int = 0;
+        switch project {
+            case null { return #err("Project id error")};
+            case (?project){
+                vestingTime := project.projectDuration;
+                ExperimentalCycles.add<system>(20_000_000_000);
+                try {
+                    let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
+                    let canisterId = Principal.fromActor(newCanister);
+                    ignore HashMap.put<ProjectID, CollectionActorClass>(nftCollections, thash, cfg.projectId, newCanister);
+                    ignore addControllers([Principal.fromActor(Mushroom), DEPLOYER], ?canisterId); //Para eventuales actualizaciones del standard Dip721
+                    ////////////////// Borrar del HashMap la entrada correspondiente a la solicitud de collección //////////////////////////////
+                    let stID = switch (HashMap.get<ProjectID,Project>(projects, thash, cfg.projectId)){
+                        case null {""};
+                        case (?pr){pr.startupID};
+                    };
+                    HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
+                    let updateNftCollections = Prim.Array_tabulate<Principal>(
+                        project.nftCollections.size(),
+                        func x = if(x == 0) {canisterId} else {project.nftCollections[ x -1]}
+                    );
+                    ignore  HashMap.put<ProjectID, Project>(projects, thash, cfg.projectId, {project with nftCollections = updateNftCollections });
+                    //TODO verificar initializeCollection() 
+                    await newCanister.initializeCollection();
+                    
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    return #ok(canisterId)
+                } catch (e) {
+                    return #err(Error.message(e))
+                }
+            }
+        };  
     };
 
     public query func getCollectionCanisterId(projectID: Text): async ?Principal {
@@ -1064,9 +1106,15 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         metadata : MetadataResult
     };
 
-    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text /* TODO tranferStatus*/) : async TypesNft.MintReceipt {
-        // TODO verificar pago
-        assert(activeMint);
+    type DataTransaction = {from: Text; to: Text; amount: Nat64; height: Nat64};
+
+    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text, toVerify: DataTransaction) : async TypesNft.MintReceipt {
+        
+        let transactionOk = await verifyTransaction(toVerify);
+        if(not transactionOk){
+            return #Err(#TransactionIsNotVerified)
+        };
+        // assert(activeMint);
         assert (isUser(caller));
         let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
         switch collection {
@@ -1075,6 +1123,40 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 await collection.mintDip721(caller, _tierName)
             }
         }
+    };
+
+
+    ////////////////// Ledger ICP //////////////////
+
+    func blobToText(t: Blob): Text {
+        let nat8Array = Blob.toArray(t);
+        var result = "";
+        let chars = ["0", "1" , "2" , "3" ,"4" , "5" , "6" , "7" , "8" , "9" , "a" , "b" , "c" , "d" , "e" , "f"];
+        for (c in nat8Array.vals()){
+            result #= chars[Nat8.toNat(c) / 16];
+            result #= chars[Nat8.toNat(c) % 16] 
+        };
+        result
+    };
+
+    public func verifyTransaction({from; to; amount; height}: DataTransaction): async Bool {
+        let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
+            query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
+        };
+        let result = await ledgerICP.query_blocks({ start = height; length = height + 1 });
+        var index = 0;
+        for (resultItem in result.blocks.vals()) {
+            switch (resultItem.transaction.operation) {
+                case (?#Transfer(tx)) {
+                    if (blobToText(tx.to) == to and blobToText(tx.from ) == from and tx.amount.e8s >= amount ) {
+                        return true
+                    }; 
+                };
+                case (_) {  };
+            };
+            index += 1;
+        };
+        return false
     };
 
     ////////////////////////////// Transfer /////////////////////////////////////////////
