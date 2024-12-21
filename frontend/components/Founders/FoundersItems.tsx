@@ -308,22 +308,20 @@ const FoundersItems = () => {
             <Button size="sm" marginLeft="10px" onClick={handleIncrease}>
               +
             </Button>
-            {currentUser.name !== "" && (
-              <Button
-                backgroundColor="#1FAFC8"
-                textColor="#000000"
-                variant="solid"
-                ml="10px"
-                borderRadius="10px"
-                onClick={handleSubmitMint} // Abre modal de confirmación de minted
-                _hover={{
-                  backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
-                  textColor: "#000000", // Mantener el mismo color de texto
-                }}
-              >
-                Mint
-              </Button>
-            )}
+            <Button
+              backgroundColor="#1FAFC8"
+              textColor="#000000"
+              variant="solid"
+              ml="10px"
+              borderRadius="10px"
+              onClick={onOpen} // Abre modal de confirmación de minted
+              _hover={{
+                backgroundColor: "#f9f9f9",
+                textColor: "#000000",
+              }}
+            >
+              Mint
+            </Button>
           </Box>
           <Text
             fontSize="16px"
@@ -352,14 +350,10 @@ const FoundersItems = () => {
             left="40%"
             transform="translate(-50%, -50%)"
           >
-            <ModalHeader>Confirm transaction</ModalHeader>
+            <ModalHeader>Do you confirm the minting?</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {/* Contenido del modal */}
-              <p>
-                If you confirm the transaction, an NFTs will be minted to your
-                wallet address.
-              </p>
+              <p>If you confirm the transaction, the NFT(s) will be minted to your wallet address.</p>
             </ModalBody>
             <ModalFooter>
               <Button

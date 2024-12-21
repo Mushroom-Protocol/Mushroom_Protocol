@@ -310,7 +310,7 @@ const ReciqloItems = () => {
               borderRadius="10px"
               onClick={onOpen}
               _hover={{
-                backgroundColor: "#1FAFC8",
+                backgroundColor: "#f9f9f9",
                 textColor: "#000000",
               }}
             >
@@ -346,10 +346,10 @@ const ReciqloItems = () => {
             left="40%"
             transform="translate(-50%, -50%)"
           >
-            <ModalHeader>Confirm transaction</ModalHeader>
+            <ModalHeader>Do you confirm the minting?</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <p>If you confirm the transaction, an NFTs will be minted to your wallet address.</p>
+              <p>If you confirm the transaction, the NFT(s) will be minted to your wallet address.</p>
             </ModalBody>
             <ModalFooter>
               <Button
