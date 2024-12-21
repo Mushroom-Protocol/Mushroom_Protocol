@@ -26,26 +26,74 @@ import { FaClock } from "react-icons/fa6";
 import ReciqloLogo from "../../assets/ReciqloLogo.jpg";
 import SilkongV1 from "../../assets/SilkongV1.jpg";
 import favicon from "../../assets/favicon.ico";
+import { useCanister } from "@connect2ic/react";
 
 const ReciqloItems = () => {
-  const [quantity, setQuantity] = useState(1);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
+  const [quantity, setQuantity] = useState(1)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const toast = useToast()
+  const [backend] = useCanister("backend")
+  const [selectedTier, setSelectedTier] = useState<string>(null)
 
   const handleDecrease = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
-  };
+  }
 
   const handleIncrease = () => {
     if (quantity < 10) {
       setQuantity(quantity + 1);
     }
-  };
+  }
+
+  const handleSelectTier = async (tierName: string) => {
+    setSelectedTier(tierName)
+    return 0
+  }
 
   const handleSubmitMint = async () => {
-    let loadingToastId: string | number | undefined;
+    let loadingToastId
+    let transferStatus
+    let resMintNFT
+
+    const params = {
+      to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+      amount: 200000000,
+      memo: "123456789"
+    }
+    console.log({params})
+
+    try {
+      const e = await window.ic.plug.requestConnect()
+      console.log({e})
+
+      if (await window.ic.plug.isConnected()) {
+        try {
+          transferStatus = await window.ic.plug.requestTransfer(params)
+          console.log({transferStatus})
+        } catch (transferError) {
+          console.error("Error en la transferencia:", transferError)
+          transferStatus = undefined
+        }
+      }
+    } catch (connectError) {
+      console.error("Error al conectar a Plug Wallet:", connectError)
+      window.open("https://plugwallet.ooo/", "_blank")
+      return // Termina la función si hay un error de conexión
+    }
+
+    if (transferStatus === undefined) {
+      toast({
+        title: "Transaction Rejected",
+        description: "The transaction was rejected. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        variant: "solid",
+      })
+      return // Termina la función si la transferencia falló
+    }
 
     try {
       loadingToastId = toast({
@@ -54,42 +102,58 @@ const ReciqloItems = () => {
         duration: null,
         isClosable: false,
         variant: "solid",
-      });
-      // Simulación de la llamada al backend
-      const resMintNFT = await new Promise((resolve) =>
-        setTimeout(() => resolve({ message: "Minted successfully!" }), 2000)
-      );
+      })
+
+      const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
+      console.log(dataTransaction)
+      resMintNFT = (await backend.mintNFT("12345", selectedTier, dataTransaction)) as {
+        Ok: any
+        Err: String
+      }
+      console.log({resMintNFT})
 
       if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
+        toast.close(loadingToastId)
       }
 
-      toast({
-        title: "Successful Submission",
-        description: JSON.stringify(resMintNFT),
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        variant: "solid",
-      });
+      if (resMintNFT.Err !== undefined) {
+        toast({
+          title: "Minting Error",
+          description: resMintNFT.Err,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      } else {
+        toast({
+          title: "Successful Submission",
+          description: "Token ID: " + String(resMintNFT?.Ok.token_id),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          variant: "solid",
+        })
+      }
 
-      onClose();
+      onClose()
     } catch (error) {
       if (loadingToastId !== undefined) {
-        toast.close(loadingToastId);
+        toast.close(loadingToastId)
       }
 
       toast({
         title: "Submission Error",
-        description: "There was an error submitting the form. Please try again.",
+        description:
+          "There was an error submitting the form. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
         variant: "solid",
-      });
-      console.error("Error on backend.mintNFT() call:", error);
+      })
+      console.error("Error on backend.mintNFT() call:", error)
     }
-  };
+  }
 
   return (
     <Center>
@@ -302,7 +366,7 @@ const ReciqloItems = () => {
         </Modal>
       </Grid>
     </Center>
-  );
-};
+  )
+}
 
-export default ReciqloItems;
+export default ReciqloItems

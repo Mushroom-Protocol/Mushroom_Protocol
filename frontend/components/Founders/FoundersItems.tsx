@@ -32,6 +32,7 @@ import favicon from "../../assets/favicon.ico"
 const FoundersItems = () => {
   const [quantity, setQuantity] = useState(1)
   const [backend] = useCanister("backend")
+  const [selectedTier, setSelectedTier] = useState<string>(null)
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -45,6 +46,11 @@ const FoundersItems = () => {
     }
   }
 
+  const handleSelectTier = async (tierName: string) => {
+    setSelectedTier(tierName)
+    return 0
+  }
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   let { currentUser, setCurrentUser } = useContext(EstadoContext)
@@ -52,20 +58,23 @@ const FoundersItems = () => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
+      let resMintNFT
+
+      const params = {
+        to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+        amount: 200000000,
+        memo: "123456789"
+      }
+      console.log({params})
 
       try {
         const e = await window.ic.plug.requestConnect()
-        console.log(e)
+        console.log({e})
 
         if (await window.ic.plug.isConnected()) {
-          const params = {
-            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
-            amount: 4e7,
-            memo: "123456789",
-          }
-
           try {
             transferStatus = await window.ic.plug.requestTransfer(params)
+            console.log({transferStatus})
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined
@@ -98,10 +107,13 @@ const FoundersItems = () => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT("PR492415")) as {
+        const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
+        console.log(dataTransaction)
+        resMintNFT = (await backend.mintNFT("12345", selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }
+        console.log({resMintNFT})
 
         if (loadingToastId !== undefined) {
           toast.close(loadingToastId)
