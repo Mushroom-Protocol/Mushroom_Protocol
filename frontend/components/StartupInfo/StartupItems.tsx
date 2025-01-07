@@ -411,8 +411,8 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
               </Box>
             })}
           </Box>
-          <Flex>
-            <Text color='gray.300'>Selected Tier price: </Text><Text color='green.300'>{selectedTier}</Text>
+          <Flex fontSize='xl' gap={2} mt={4}>
+            <Text color='gray.300'>Selected Tier price:</Text><Text color='green.300'>{selectedTier}</Text>
           </Flex>
           <Box
             backgroundColor="#1E1E1E"
@@ -450,12 +450,16 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
               +
             </Button>
             <Button
-              backgroundColor="#1E1E1E"
+              backgroundColor="#1FAFC8"
               textColor="#000000"
               variant="solid"
               ml="10px"
               borderRadius="10px"
               onClick={onOpen} // Abre modal de confirmación de minted
+              _hover={{
+                backgroundColor: "#f9f9f9",
+                textColor: "#000000",
+              }}
             >
               Mint
             </Button>
@@ -487,8 +491,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             <ModalHeader>Do you confirm the minting?</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {/* Contenido del modal */}
-              <p>You are about to mint a founder.</p>
+              <p>If you confirm the transaction, the NFT(s) will be minted to your wallet address.</p>
             </ModalBody>
             <ModalFooter>
               <Button
@@ -498,7 +501,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 borderRadius="10px"
                 onClick={handleSubmitMint}
               >
-                Mint
+                Approve
               </Button>
             </ModalFooter>
           </ModalContent>

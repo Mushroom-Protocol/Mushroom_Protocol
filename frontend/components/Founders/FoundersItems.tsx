@@ -32,6 +32,7 @@ import favicon from "../../assets/favicon.ico"
 const FoundersItems = () => {
   const [quantity, setQuantity] = useState(1)
   const [backend] = useCanister("backend")
+  const [selectedTier, setSelectedTier] = useState<string>(null)
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -45,6 +46,11 @@ const FoundersItems = () => {
     }
   }
 
+  const handleSelectTier = async (tierName: string) => {
+    setSelectedTier(tierName)
+    return 0
+  }
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   let { currentUser, setCurrentUser } = useContext(EstadoContext)
@@ -52,20 +58,23 @@ const FoundersItems = () => {
       // event.preventDefault()
       let loadingToastId
       let transferStatus
+      let resMintNFT
+
+      const params = {
+        to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
+        amount: 200000000,
+        memo: "123456789"
+      }
+      console.log({params})
 
       try {
         const e = await window.ic.plug.requestConnect()
-        console.log(e)
+        console.log({e})
 
         if (await window.ic.plug.isConnected()) {
-          const params = {
-            to: "827d788022a863123db4294da0e5d07eb308dd5913860fb0308715dd8fbfd682",
-            amount: 4e7,
-            memo: "123456789",
-          }
-
           try {
             transferStatus = await window.ic.plug.requestTransfer(params)
+            console.log({transferStatus})
           } catch (transferError) {
             console.error("Error en la transferencia:", transferError)
             transferStatus = undefined
@@ -98,10 +107,13 @@ const FoundersItems = () => {
           variant: "solid",
         })
 
-        const resMintNFT = (await backend.mintNFT("PR492415")) as {
+        const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
+        console.log(dataTransaction)
+        resMintNFT = (await backend.mintNFT("12345", selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }
+        console.log({resMintNFT})
 
         if (loadingToastId !== undefined) {
           toast.close(loadingToastId)
@@ -296,22 +308,20 @@ const FoundersItems = () => {
             <Button size="sm" marginLeft="10px" onClick={handleIncrease}>
               +
             </Button>
-            {currentUser.name !== "" && (
-              <Button
-                backgroundColor="#1FAFC8"
-                textColor="#000000"
-                variant="solid"
-                ml="10px"
-                borderRadius="10px"
-                onClick={handleSubmitMint} // Abre modal de confirmación de minted
-                _hover={{
-                  backgroundColor: "#1FAFC8", // Mantener el mismo color de fondo
-                  textColor: "#000000", // Mantener el mismo color de texto
-                }}
-              >
-                Mint
-              </Button>
-            )}
+            <Button
+              backgroundColor="#1FAFC8"
+              textColor="#000000"
+              variant="solid"
+              ml="10px"
+              borderRadius="10px"
+              onClick={onOpen} // Abre modal de confirmación de minted
+              _hover={{
+                backgroundColor: "#f9f9f9",
+                textColor: "#000000",
+              }}
+            >
+              Mint
+            </Button>
           </Box>
           <Text
             fontSize="16px"
@@ -340,14 +350,10 @@ const FoundersItems = () => {
             left="40%"
             transform="translate(-50%, -50%)"
           >
-            <ModalHeader>Confirm transaction</ModalHeader>
+            <ModalHeader>Do you confirm the minting?</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {/* Contenido del modal */}
-              <p>
-                If you confirm the transaction, an NFTs will be minted to your
-                wallet address.
-              </p>
+              <p>If you confirm the transaction, the NFT(s) will be minted to your wallet address.</p>
             </ModalBody>
             <ModalFooter>
               <Button
