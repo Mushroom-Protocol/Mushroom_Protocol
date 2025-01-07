@@ -40,7 +40,7 @@ dfx canister call backend getIncomingStartUps
 
 #### 7 Get incommig Startup by Principal: (Admin)
 ```
-dfx canister call backend getIncomingStartupByOwner '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
+dfx canister call backend getIncomingStartupByOwner '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Appro
 
@@ -62,13 +62,13 @@ dfx canister call backend approveStartUp '(
       industry = "Informatica";
     },
     10000,
-    principal "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae"
+    principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae"
 )'
 ```
 #### Register Project
 ```
 dfx canister call backend registerProject '(record {    
-        startupID = "ST361125";
+        startupID = "ST131571";
         projectTitle = "Proyecto de prueba de backend";
         coverImage = null;
         problemSolving = "Prueba de backend";
@@ -88,7 +88,7 @@ dfx canister call backend registerProject '(record {
 #### Approve Project
 
 ```
-dfx canister call backend approveProject '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr6df-pvwt5-srrpu-vkaox-kwfsl-f32hr-5ae")'
+dfx canister call backend approveProject '(principal "y77j5-4vnxl-ywos7-qjtcr-6iopc-i2ql2-iwoem-ehvwk-wruju-fr7ib-mae")'
 ```
 #### Create NFT Collection Form (User)
 
@@ -96,19 +96,20 @@ dfx canister call backend approveProject '(principal "5zx6s-nfhf2-4mhmk-3oc5h-tr
 ```
 dfx canister call backend createCollection '(record {
     typesImages = variant { JPG };
+    startupWallet = "0926ec2678e2bf049c12fb9ed332e9a3599342bcf4b6c173b6c551ca01d5bb3f";
     creator = "Van Gogh";
-    startupID = "ST347177";
+    startupID = "ST131571";
     storytellingCollection = "storitelling";
     utilities = vec { variant { Governance }; variant { IpNFT } };
     shortStorytelling = "Short storitelling";
     totalSupply = 45 : nat;
-    projectID = "PR546399";
+    projectID = "PR986574";
     nftImagesUrl = "drive imagenes";
     composition = vec {
       record {
         qty = 30 : nat;
         tierName = "Basic";
-        assetsNames = vec { "1"; "2"; "3"; "4"; "5"; "6"; "7"; "8"; "9"; "10"; "11"; "12"; "13"; "14"; "15"; "16"; "17"; "18"; "19"; "20"; "21"; "22"; "23"; "24"; "25"; "26"; "27"; "28"; "29"; "30";};
+        assetsNames = vec {"1"; "2"; "3"; "4"; "5"; "6"; "7"; "8"; "9"; "10"; "11"; "12"; "13"; "14"; "15"; "16"; "17"; "18"; "19"; "20"; "21"; "22"; "23"; "24"; "25"; "26"; "27"; "28"; "29"; "30";};
         price = 5 : nat;
       };
       record {
@@ -169,8 +170,9 @@ dfxcc backend deployCollection '(
     symbol = "MRPF";
   },
   record {
+    startupWallet = "0926ec2678e2bf049c12fb9ed332e9a3599342bcf4b6c173b6c551ca01d5bb3f";
     baseUrl = "https://5tauz-siaaa-aaaag-qjxnq-cai.icp0.io/";
-    projectId = "PR546399";
+    projectId = "PR986574";
     composition = vec {
       record {
         qty = 30 : nat;
@@ -212,7 +214,7 @@ dfxcc backend deployCollection '(
         };
       };
     }; 
-    document = null;
+    document = record {title= "Text"; date= 0; data = blob "00/00"};
     custodian = "s5nfe-pgwki-dkuc6-jswmg-jjg7j-2idty-4tedk-vbxxj-gp7ia-hrud4-cae" 
   }
 )'

@@ -13,20 +13,21 @@ import Set "mo:map/Set";
 import { thash; phash } "mo:map/Map";
 import Random "mo:random/Rand";
 import Ledger "./interfaces/ledger_icp";
+import Indexer_icp "./interfaces/indexer_icp";
 
 
 ////////////// DEBUG ////////////////
-import {print} "mo:base/Debug";
+// import {print} "mo:base/Debug";
 /////////////////////////////////////
 
 /////////////////////////////// Related to the creation of NFT collections  /////////////////////////////////////
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Error "mo:base/Error";
 import Blob "mo:base/Blob";
-import Char "mo:base/Char";
+// import Char "mo:base/Char";
 import Nat8 "mo:base/Nat8";
 
-import List "mo:base/List";
+// import List "mo:base/List";
 import Nat64 "mo:base/Nat64";
 
 import NFT "../NFT/dip721-nft-container";
@@ -933,14 +934,25 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         Iter.toArray(HashMap.keys<StartupID, CollectionPreInit>(incommingCollections))
     };
 
+    public shared ({ caller }) func clear(): async Bool{
+        assert (authorizedCaller(caller));
+        HashMap.clear<StartupID, CollectionPreInit>(incommingCollections);
+        HashMap.clear<ProjectID, CollectionActorClass>(nftCollections);
+        true
+    };
+
     public query ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
         assert (authorizedCaller(caller));
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
     };
 
-    // public query func getNftsAddreses() : async [(ProjectID, Text)] {
-    //     HashMap.toArray<ProjectID, Text>(nftCollections)
-    // };
+    public query func getNftsAddreses() : async [(ProjectID, Principal)] {
+        let arrayCol = HashMap.toArray<ProjectID, CollectionActorClass>(nftCollections);
+        Prim.Array_tabulate<(ProjectID, Principal)>(
+            arrayCol.size(),
+            func i = (arrayCol[i].0, Principal.fromActor(arrayCol[i].1))
+        );
+    };
 
     public shared query func getCanisterIdByProject(projectID : Text) : async Text {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
@@ -1048,14 +1060,14 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         assert (authorizedCaller(caller));
         assert (HashMap.get<Text, CollectionActorClass>(nftCollections, thash, cfg.projectId) == null); // verificamos que no se haya desplegado una coleccion para el mismo proyecto
         //verificar que cfg.canisterIdAssets sea un canister de assests válido
-        // ExperimentalCycles.add<system>(fee);
         let project = HashMap.get<ProjectID, Project>(projects, thash, cfg.projectId);
         var vestingTime: Int = 0;
         switch project {
             case null { return #err("Project id error")};
             case (?project){
                 vestingTime := project.projectDuration;
-                ExperimentalCycles.add<system>(20_000_000_000);
+                // ExperimentalCycles.add<system>(200_000_000_000);
+                ExperimentalCycles.add(200_000_000_000);
                 try {
                     let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
                     let canisterId = Principal.fromActor(newCanister);
@@ -1139,24 +1151,33 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         result
     };
 
-    public func verifyTransaction({from; to; amount; height}: DataTransaction): async Bool {
-        let ledgerICP = actor("ryjl3-tyaaa-aaaaa-aaaba-cai"): actor {
-            query_blocks : shared query Ledger.GetBlocksArgs -> async Ledger.QueryBlocksResponse;
+    public shared ({ caller }) func verifyTransaction({from; to; amount}: DataTransaction): async Bool {
+        let indexer_icp = actor("qhbym-qaaaa-aaaaa-aaafq-cai"): actor {
+                get_account_identifier_transactions : 
+                    shared query Indexer_icp.GetAccountIdentifierTransactionsArgs -> async Indexer_icp.GetAccountIdentifierTransactionsResult;
         };
-        let result = await ledgerICP.query_blocks({ start = height; length = height + 1 });
-        var index = 0;
-        for (resultItem in result.blocks.vals()) {
-            switch (resultItem.transaction.operation) {
-                case (?#Transfer(tx)) {
-                    if (blobToText(tx.to) == to and blobToText(tx.from ) == from and tx.amount.e8s >= amount ) {
-                        return true
+        let result = await indexer_icp.get_account_identifier_transactions({max_results = 10; start = null; account_identifier = from});
+        switch result {
+            case (#Ok(response)) {
+                for (transaction in response.transactions.vals()) {
+                    let operation = transaction.transaction.operation;
+                    switch operation {
+                        case( #Transfer(tx)) {
+                            if (tx.from == from and
+                            tx.to == to and
+                            tx.amount.e8s >= amount){
+                                return true
+                            }
+                        };
+                        case ( _ ) { }
                     }; 
                 };
-                case (_) {  };
+                false
+                    
             };
-            index += 1;
-        };
-        return false
+            case (#Err(_)) { false }
+        }
+
     };
 
     ////////////////////////////// Transfer /////////////////////////////////////////////

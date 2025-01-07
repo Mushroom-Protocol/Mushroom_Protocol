@@ -1,3 +1,5 @@
+import Prim "mo:⛔";
+
 module {
   public type canister_id = Principal;
 
@@ -52,6 +54,24 @@ module {
       canister_id : Principal;
       settings : canister_settings;
     } -> async ();
-
   };
+
+  public func addController(canister_id : Principal, controller : Principal) : async () {
+    let self = actor("aaaaa-aa"): Self;
+    let currentSetings = (await self.canister_status({canister_id})).settings;
+    let controllers = Prim.Array_tabulate<Principal> (
+        currentSetings.controllers.size() + 1,
+        func i = if(i == 0) {controller} else {currentSetings.controllers[i - 1]}
+    );
+    await self.update_settings({
+      canister_id;
+      settings = {
+        freezing_threshold = ?currentSetings.freezing_threshold;
+        controllers = ?controllers;
+        memory_allocation = ?currentSetings.memory_allocation;
+        compute_allocation = ?currentSetings.compute_allocation
+      };
+    });
+  };
+
 };
