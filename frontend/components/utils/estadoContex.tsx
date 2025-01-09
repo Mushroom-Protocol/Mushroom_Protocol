@@ -26,6 +26,7 @@ export const EstadoProvider = ({ children }: EstadoProviderProps) => {
   useEffect(() => {
     const getMyUser = async () => {
       const myUser = (await backend.getMyUser()) as UserType[]
+      console.log(myUser)
       return myUser
     }
 

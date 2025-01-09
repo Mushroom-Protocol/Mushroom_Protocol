@@ -220,6 +220,22 @@ module {
             startupWallet : Text;
         };
 
+        public type CollectionPreview = {
+            imgSrc: Text;
+            logoSrc: Blob;
+            startUpName: Text;
+            shortDes: Text;
+            story: Text;
+            status: Bool;
+            opendate: Int;
+            closedate: Int;
+            badgeSrc: [Blob]; // Array de insignias
+            owner: Text;
+            url: Text;
+            canisterId: Text;
+        };
+
+
         public type Tier = {
             tierName: Text; 
             price: Nat; 
@@ -245,12 +261,12 @@ module {
         //     period: Int //In days
         // };
         
-        public type CollectionPreview = {
-            name : Text;
-            symbol : Text;
-            logo: Blob;
-            canister : Text;
-        };
+        // public type CollectionPreview = {
+        //     name : Text;
+        //     symbol : Text;
+        //     logo: Blob;
+        //     canister : Text;
+        // };
 
         public type CollectionMetadata = {
             name: Text;

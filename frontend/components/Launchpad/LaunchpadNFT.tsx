@@ -39,71 +39,71 @@ const LaunchpadNFT: React.FC = () => {
     
     // Datos hardcodeados para prueba
     const hardcodedData = [
-      {
-        imgSrc: Mushroomfounders,
-        logoSrc: faviconico,
-        startUpName: "Mushroom Founders",
-        shortDes: "Mushroom Founders",
-        story: "Alien race of mushrooms traveling the universe, founding civilizations and decentralizing science and technology.",
-        status: "Active",
-        opendate: "12.06.24",
-        closedate: "12.08.24",
-        badgeSrc: [SyntheticTech], // Array de insignias
-        owner: "Owner1",
-        url: "/founders" // Ruta específica para este startup
-      },
-      {
-        imgSrc: Landoppnft01, // Utilizando el video Landoppnft01 directamente
-        logoSrc: Landoppicon,
-        startUpName: "Landopp",
-        shortDes: "NoPlas",
-        story: "Mysterious Organic Gems from sacred plants, can fuse with elements, regenerate, and create strong, flexible matter in harmony with nature.",
-        status: "Coming Soon",
-        opendate: "31.07.24",
-        closedate: "31.09.24",
-        badgeSrc: [GreenTech, FoodTech], // Array de insignias
-        owner: "Owner2",
-        url: "/landopp" // Ruta específica para este startup
-      },
-      {
-        imgSrc: Silkongv1,
-        logoSrc: ReciqloLogo,
-        startUpName: "Reciqlo",
-        shortDes: "Reciqlo",
-        story: "Stellar gorillas who guard the healing power of silicon. These extraordinary beings act as powerful regenerators of planets throughout the universe.",
-        status: "Coming Soon",
-        opendate: "31.09.24",
-        closedate: "31.11.24",
-        badgeSrc: [GreenTech, SyntheticTech], // Array de insignias
-        owner: "Owner3",
-        url: "/reciqlo" // Ruta específica para este startup
-      },
-      {
-        imgSrc: NatheraNFTv1,
-        logoSrc: Natheralogo,
-        startUpName: "Nathera",
-        shortDes: "Warriors Cells",
-        story: "A powerful army of fibroblasts uses its potent nanofilaments to accelerate tissue regeneration, a medical breakthrough pioneered in the galaxy.",
-        status: "Coming Soon",
-        opendate: "17.10.24",
-        closedate: "17.11.24",
-        badgeSrc: [HealthTech], // Array de insignias
-        owner: "Owner4",
-        url: "/nathera" // Ruta específica para este startup
-      },
-      {
-        imgSrc: EONNFTV1,
-        logoSrc: EONlogo,
-        startUpName: "EON",
-        shortDes: "Broccoli Pickers",
-        story: "Plant creatures genetically created in the laboratory to collect garbage and clean the city, symbols of hope.",
-        status: "Coming Soon",
-        opendate: "17.11.24",
-        closedate: "17.12.24",
-        badgeSrc: [FoodTech], // Array de insignias
-        owner: "Owner5",
-        url: "/eon" // Ruta específica para este startup
-      },
+      // {
+      //   imgSrc: Mushroomfounders,
+      //   logoSrc: faviconico,
+      //   startUpName: "Mushroom Founders",
+      //   shortDes: "Mushroom Founders",
+      //   story: "Alien race of mushrooms traveling the universe, founding civilizations and decentralizing science and technology.",
+      //   status: "Active",
+      //   opendate: "12.06.24",
+      //   closedate: "12.08.24",
+      //   badgeSrc: [SyntheticTech], // Array de insignias
+      //   owner: "Owner1",
+      //   url: "/founders" // Ruta específica para este startup
+      // },
+      // {
+      //   imgSrc: Landoppnft01, // Utilizando el video Landoppnft01 directamente
+      //   logoSrc: Landoppicon,
+      //   startUpName: "Landopp",
+      //   shortDes: "NoPlas",
+      //   story: "Mysterious Organic Gems from sacred plants, can fuse with elements, regenerate, and create strong, flexible matter in harmony with nature.",
+      //   status: "Coming Soon",
+      //   opendate: "31.07.24",
+      //   closedate: "31.09.24",
+      //   badgeSrc: [GreenTech, FoodTech], // Array de insignias
+      //   owner: "Owner2",
+      //   url: "/landopp" // Ruta específica para este startup
+      // },
+      // {
+      //   imgSrc: Silkongv1,
+      //   logoSrc: ReciqloLogo,
+      //   startUpName: "Reciqlo",
+      //   shortDes: "Reciqlo",
+      //   story: "Stellar gorillas who guard the healing power of silicon. These extraordinary beings act as powerful regenerators of planets throughout the universe.",
+      //   status: "Coming Soon",
+      //   opendate: "31.09.24",
+      //   closedate: "31.11.24",
+      //   badgeSrc: [GreenTech, SyntheticTech], // Array de insignias
+      //   owner: "Owner3",
+      //   url: "/reciqlo" // Ruta específica para este startup
+      // },
+      // {
+      //   imgSrc: NatheraNFTv1,
+      //   logoSrc: Natheralogo,
+      //   startUpName: "Nathera",
+      //   shortDes: "Warriors Cells",
+      //   story: "A powerful army of fibroblasts uses its potent nanofilaments to accelerate tissue regeneration, a medical breakthrough pioneered in the galaxy.",
+      //   status: "Coming Soon",
+      //   opendate: "17.10.24",
+      //   closedate: "17.11.24",
+      //   badgeSrc: [HealthTech], // Array de insignias
+      //   owner: "Owner4",
+      //   url: "/nathera" // Ruta específica para este startup
+      // },
+      // {
+      //   imgSrc: EONNFTV1,
+      //   logoSrc: EONlogo,
+      //   startUpName: "EON",
+      //   shortDes: "Broccoli Pickers",
+      //   story: "Plant creatures genetically created in the laboratory to collect garbage and clean the city, symbols of hope.",
+      //   status: "Coming Soon",
+      //   opendate: "17.11.24",
+      //   closedate: "17.12.24",
+      //   badgeSrc: [FoodTech], // Array de insignias
+      //   owner: "Owner5",
+      //   url: "/eon" // Ruta específica para este startup
+      // },
     ];
 
     // setIncomingCollectionsRequests(hardcodedData);

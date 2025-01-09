@@ -142,6 +142,13 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         assert(authorizedCaller(caller));
         ignore HashMap.remove(nftCollections, thash, p);
     };
+
+    ////// Pasar para abajo esto ///////////////
+
+    // public query func getCollectionsPreview(): []
+
+
+    //////////////////////
     ////////////////////////////////// Newsletter & alert activity section //////////////////////////////////////
 
     stable let newslettersEmailSubs = Set.new<Text>();
@@ -781,7 +788,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                         ignore HashMap.replace(startUps, thash, project.startupID, { st with projects = projectsUpdate })
                     }
                 };
-
                 return #ok(projectId)
             }
         };
@@ -1067,7 +1073,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             case (?project){
                 vestingTime := project.projectDuration;
                 // ExperimentalCycles.add<system>(200_000_000_000);
-                ExperimentalCycles.add(200_000_000_000);
+                ExperimentalCycles.add(600_000_000_000 + 350_005_043_530);
                 try {
                     let newCanister = await NFT.Dip721NFT(cfg.custodian, {init with distribution = cfg.distribution}, cfg.baseUrl, cfg.composition, vestingTime, cfg.document, cfg.startupWallet);
                     let canisterId = Principal.fromActor(newCanister);
@@ -1080,8 +1086,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     };
                     HashMap.delete<StartupID,CollectionPreInit>(incommingCollections, thash, stID);
                     let updateNftCollections = Prim.Array_tabulate<Principal>(
-                        project.nftCollections.size(),
-                        func x = if(x == 0) {canisterId} else {project.nftCollections[ x -1]}
+                        project.nftCollections.size() + 1,
+                        func x = if(x == 0) {canisterId} else {project.nftCollections[ x - 1]}
                     );
                     ignore  HashMap.put<ProjectID, Project>(projects, thash, cfg.projectId, {project with nftCollections = updateNftCollections });
                     //TODO verificar initializeCollection() 
