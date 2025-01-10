@@ -81,6 +81,7 @@ export interface ProjectCard {
   pojectID: string
   coverImage: Uint8Array
   problemSolving: string
+  collectionCanisterId: string
 }
 
 export interface DataProject {

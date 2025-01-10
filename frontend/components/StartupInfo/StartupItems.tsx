@@ -400,7 +400,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
                 onClick={() => handleSelectTier(tierPrice.tierName)}
                 borderColor="#1FAFC8"
               >
-                Price {tierPrice.tierName}: {Number(tierPrice.price)}
+                Price {tierPrice.tierName}: {Number(tierPrice.price)/1000000000}
                 <img
                   src={favicon}
                   alt="Icon"

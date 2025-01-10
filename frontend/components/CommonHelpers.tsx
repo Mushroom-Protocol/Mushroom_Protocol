@@ -1,4 +1,4 @@
-import { Startup, StartupCard } from "./CommonTypes";
+import { ProjectCard, Startup, StartupCard } from "./CommonTypes";
 
 //--------------------- funciones para codificar y decodificar imagenes entre base64 y Blob -----------------
 export function base64ToBlob(dataUrl: String) {
@@ -103,6 +103,15 @@ export const getStartUpsPreview = async (backend: any): Promise<StartupCard[]> =
     return resGetStartUpsPreview
   } catch (error) {
     console.error("Error on backend.getStartUpsPreview() call:", error)
+  }
+}
+
+export const getProjectsPreview = async (backend: any): Promise<ProjectCard[]> => {
+  try {
+    const resGetProjectsPreview = (await backend.getProjectsPreview()) as ProjectCard[]
+    return resGetProjectsPreview
+  } catch (error) {
+    console.error("Error on backend.getProjectsPreview() call:", error)
   }
 }
 
