@@ -116,6 +116,7 @@ export default function WithSubnavigation1() {
   useEffect(() => {
     const getMyUser = async () => {
       const myUser = await backend.getMyUser()
+      console.log(myUser)
       return myUser as [UserType]
     }
 
