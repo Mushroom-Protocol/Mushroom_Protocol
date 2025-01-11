@@ -31,16 +31,12 @@ const LaunchpadNFT: React.FC = () => {
   useEffect(() => {
     const getProjectsInfo = async (backend: any): Promise<ProjectCard[]> => {
       const projectCards: ProjectCard[] = await getProjectsPreview(backend)
-      console.log({projectCards})
       const projectsWithCanister: ProjectCard[] = projectCards.filter(projectCard => projectCard.collectionCanisterId.length > 0)
-      console.log({projectsWithCanister})
       return projectsWithCanister
     }
     
     getProjectsInfo(backend).then(resProjectsInfo => {
-      console.log({resProjectsInfo})
       const buildedStartups = resProjectsInfo.map(projectInfo => {
-        console.log({projectInfo})
         return {
           imgSrc: Mushroomfounders,
           logoSrc: Mushroomfounders,
@@ -56,7 +52,6 @@ const LaunchpadNFT: React.FC = () => {
           url: "/Project/" + projectInfo.pojectID
         }
       })
-      console.log({buildedStartups})
       setIncomingCollectionsRequests(buildedStartups);
     }).catch(error => console.error(error))
   }, []);
@@ -102,8 +97,6 @@ const LaunchpadNFT: React.FC = () => {
       <Flex color="#FFFFFF" flexDirection="column" alignItems="center" position="relative" marginLeft="0px" marginTop="0px" width="100%">
         <Slider {...settings} style={{ width: '100%' }}>
           {incomingCollectionsRequests.map((collection, index) => {
-            console.log({collection})
-            console.log({index})
             return <Box
               key={index}
               border="1px solid #1E1E1E"

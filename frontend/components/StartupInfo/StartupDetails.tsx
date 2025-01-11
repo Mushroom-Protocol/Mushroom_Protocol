@@ -14,29 +14,26 @@ import {
 import { Link } from "@chakra-ui/react"
 import { ExternalLinkIcon } from "@chakra-ui/icons"
 import { useCanister } from "@connect2ic/react"
-import { useLocation, useParams } from "react-router-dom"
-import { Startup } from "../CommonTypes"
 
-const StartupDetails = ({ startup: startupFetched }) => {
+const StartupDetails = ({ project: project }) => {
   const [backend] = useCanister("backend")
-  const [projectId, setProjectId] = useState<string>(null)
+  const [startup, setStartup] = useState<any>(null)
   const [canisterId, setCanisterId] = useState<string>(null)
   const [totalSupply, setTotalSupply] = useState<number>(0)
   const [baseUrlCanister, setBaseUrlCanister] = useState<string>(null)
 
   useEffect(() => {
-    const getProjectIdByStartup = async (currentStartup: string) => {
+    const getStartUpByID = async (startupId: string) => {
       try {
-        const resProjectsByStartup: string[] | null | undefined =
-          (await backend.getProjectsByStartup(currentStartup)) as
-            | string[]
+        const resGetStartUpByID: any[] | null | undefined =
+          (await backend.getStartUpByID(startupId)) as
+            | any[]
             | null
             | undefined
-        const resProjectId = resProjectsByStartup[0][0]
-        setProjectId(resProjectId)
-        return resProjectId
+        setStartup(resGetStartUpByID[0])
+        return resGetStartUpByID[0]
       } catch (error) {
-        console.error("Error on backend.getProjectsByStartup() call:", error)
+        console.error("Error on backend.getStartUpByID() call:", error)
       }
     }
 
@@ -51,20 +48,18 @@ const StartupDetails = ({ startup: startupFetched }) => {
       }
     }
 
-    getProjectIdByStartup(startupFetched.startupId)
-      .then((dataProjectIdByStartup) => {
-        // setProjectsByStartup(dataProjectsByStartup)
-        return getCanisterIdByProject(dataProjectIdByStartup)
-          .then((resCanisterIdByProject) => {
-            // return backend.getBaseUrl("br5f7-7uaaa-aaaaa-qaaca-cai").then(resBaseUrl => {
-            return backend.getBaseUrl(resCanisterIdByProject).then((resBaseUrl: string) => {
-              setBaseUrlCanister(resBaseUrl)
-              return resBaseUrl
-            }).catch(error => console.error(error))
-          })
-          .catch((error) => console.error(error))
-      })
-      .catch((error) => console.error(error))
+      getStartUpByID(project.startupID).then(dataStartUpByID => {
+        setStartup(dataStartUpByID)
+      }).catch(error => console.error(error))
+
+      getCanisterIdByProject(project.projectId)
+        .then((resCanisterIdByProject) => {
+          return backend.getBaseUrl(resCanisterIdByProject).then((resBaseUrl: string) => {
+            setBaseUrlCanister(resBaseUrl)
+            return resBaseUrl
+          }).catch(error => console.error(error))
+        })
+        .catch((error) => console.error(error))
   }, [])
 
   return (
@@ -92,9 +87,9 @@ const StartupDetails = ({ startup: startupFetched }) => {
               height="50px"
             />
             <Box ml="10px">
-              <Text fontSize="18px">{startupFetched?.startUpName}</Text>
+              <Text fontSize="18px">{startup?.startUpName}</Text>
               <Text fontSize="12px" color="#737373" fontStyle="italic">
-                {startupFetched?.startUpSlogan}
+                {startup?.startUpSlogan}
               </Text>
             </Box>
           </Box>
@@ -104,7 +99,7 @@ const StartupDetails = ({ startup: startupFetched }) => {
           </Text>
           <Text fontSize="15px" color="#737373" textAlign="justify">
             <br />
-            {startupFetched?.shortDes}
+            {startup?.shortDes}
             <br />
             <br />
             The protocol allows investors from around the world to fund science

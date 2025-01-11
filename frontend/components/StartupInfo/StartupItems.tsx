@@ -12,9 +12,6 @@ import {
   Button,
   Tag,
   TagLabel,
-  TagLeftIcon,
-  TagRightIcon,
-  TagCloseButton,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -30,16 +27,8 @@ import { FaClock } from "react-icons/fa6"
 import MpFavicon from "../../assets/MpFavicon.png"
 import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
-import { CollectionPreInit, Startup } from "../CommonTypes"
+import { Project } from "../CommonTypes"
 import { useCanister } from "@connect2ic/react"
-
-// import { CollectionActorClass } from "../../../src/declarations/backend/backend.did"
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { AuthClient } from "@dfinity/auth-client";
-import { idlFactory as CollectionActorClass } from "../../../src/declarations/backend/backend.did"; // Assuming you have an IDL file for the canister.
-import { Principal } from "@dfinity/principal";
-import { IDL } from "@dfinity/candid"
-import { error } from "console"
 
 const ckUSDCIdlFactory = ({ IDL }) => {
   return IDL.Service({
@@ -48,16 +37,13 @@ const ckUSDCIdlFactory = ({ IDL }) => {
 };
 
 interface PropsType {
-  startup: Startup
+  project: Project
 }
 
-const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
+const StartupItems: React.FC<PropsType> = ({ project: project }) => {
   const [quantity, setQuantity] = useState(1)
   const toast = useToast()
   const [backend] = useCanister("backend")
-  const [collectionRequest, setCollectionRequest] = useState<CollectionPreInit | any | null | undefined>({})
-  const [maxLimit, setMaxLimit] = useState(0)
-  const [projectsByStartup, setProjectsByStartup] = useState([])
   const [tiersPrices, setTiersPrices] = useState<{tierName: string, price: number}[]>([])
   const [selectedTier, setSelectedTier] = useState<string>(null)
   const [canisterId, setCanisterId] = useState<string>("")
@@ -66,20 +52,6 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
   let null_address: string = "aaaaa-aa"
 
   useEffect(() => {
-    const getProjectsByStartup = async (currentStartup: string) => {
-      try {
-        const resProjectsByStartup: string[] | null | undefined =
-          (await backend.getProjectsByStartup(currentStartup)) as
-            | string[]
-            | null
-            | undefined
-        // setProjectsByStartup(resProjectsByStartup)
-        return resProjectsByStartup
-      } catch (error) {
-        console.error("Error on backend.getProjectsByStartup() call:", error)
-      }
-    }
-
     const callGetPrices = async (projectID: string) => {
       try {
         const resCallGetPrices: {tierName: string, price: number}[] | null | undefined =
@@ -103,48 +75,13 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
       }
     }
 
-    const getCollectionRequestByStartUp = async (startupId: string): Promise<CollectionPreInit | any | null | undefined> => {
-      try {
-        const resGetCollectionRequestByStartUp: CollectionPreInit | any | null | undefined = (await backend.getCollectionRequestByStartUp(startupId)) as CollectionPreInit | any | null | undefined
-        setCollectionRequest(resGetCollectionRequestByStartUp[0])
-        return resGetCollectionRequestByStartUp[0]
-      }
-      catch(error) {
-        console.error("Error on backend.getCollectionRequestByStartUp() call:", error)
-      }
-    }
-
-    // getProjectsByStartup(startupFetched.startupId)
-    //   .then((dataProjectsByStartup) => {
-    //     setProjectsByStartup(dataProjectsByStartup)
-    //     return getCanisterIdByProject(dataProjectsByStartup[0][0])
-    //       .then((resCanisterIdByProject) => {
-    //         return backend.getTotalSupply(resCanisterIdByProject).then(resTotalSupply => {
-    //           const numTotalSupply = Number(resTotalSupply)
-    //           setTotalSupply(numTotalSupply)
-    //           return numTotalSupply
-    //         }).catch(error => console.error(error))
-    //       })
-    //       .catch((error) => console.error(error))
-    //   })
-    //   .catch((error) => console.error(error))
-
-    getProjectsByStartup(startupFetched.startupId)
-      .then((dataProjectsByStartup) => {
-        setProjectsByStartup(dataProjectsByStartup)
-        return Promise.all([getCanisterIdByProject(dataProjectsByStartup[0][0]), callGetPrices(dataProjectsByStartup[0][0])]).then(([resCanisterIdByProject, resCallGetPrices]) => {
-          setCanisterId(resCanisterIdByProject)
-          setTiersPrices(resCallGetPrices)
-          return backend.getMetadataNFTColl(dataProjectsByStartup[0][0]).then(resMetadataNFTColl => {
-            setMetadataNFTColl(resMetadataNFTColl)
-            return resMetadataNFTColl
-          }).catch(error => console.error(error))
-        }).catch(error => console.error(error))
-      })
-      .catch((error) => console.error(error))
-
-    getCollectionRequestByStartUp(startupFetched.startupId).then(dataCollectionRequestByStartUp => {
-      return dataCollectionRequestByStartUp
+    Promise.all([getCanisterIdByProject(project.projectId), callGetPrices(project.projectId)]).then(([resCanisterIdByProject, resCallGetPrices]) => {
+      setCanisterId(resCanisterIdByProject)
+      setTiersPrices(resCallGetPrices)
+      return backend.getMetadataNFTColl(project.projectId).then(resMetadataNFTColl => {
+        setMetadataNFTColl(resMetadataNFTColl)
+        return resMetadataNFTColl
+      }).catch(error => console.error(error))
     }).catch(error => console.error(error))
   }, [])
 
@@ -211,7 +148,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
 
         const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
         console.log(dataTransaction)
-        resMintNFT = (await backend.mintNFT(projectsByStartup[0][0], selectedTier, dataTransaction)) as {
+        resMintNFT = (await backend.mintNFT(project.projectId, selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }
@@ -318,7 +255,7 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
               justifyContent="center"
             >
               <Text fontSize="19px" color="#FFFFFF">
-                {startupFetched?.startUpName}
+                {project.projectTitle}
               </Text>
               <Tag
                 variant="subtle"
@@ -334,11 +271,11 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
             </Box>
             <Spacer />
             <HStack spacing={4}>
-              {["lg"].map((size) => (
+              {["lg"].map((size, idx) => (
                 <Tag
                   // size="lg" // Tamaño del tag (puedes ajustarlo según tus necesidades)
                   size={size} // Tamaño del tag (puedes ajustarlo según tus necesidades)
-                  key={size} // Tamaño del tag (puedes ajustarlo según tus necesidades)
+                  key={idx} // Tamaño del tag (puedes ajustarlo según tus necesidades)
                   variant="subtle"
                   colorScheme="orange" // Cambia a naranja
                   backgroundColor="#000000"
@@ -387,8 +324,9 @@ const StartupItems: React.FC<PropsType> = ({ startup: startupFetched }) => {
           padding="30px"
         >
           <Box display="flex" alignItems="flex-start">
-            {tiersPrices.map(tierPrice => {
+            {tiersPrices.map((tierPrice, idx) => {
               return <Box
+                key={idx}
                 backgroundColor="#000000"
                 color="#FFFFFF"
                 fontSize="18px"

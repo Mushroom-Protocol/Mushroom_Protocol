@@ -112,7 +112,8 @@ export const router = createBrowserRouter([
       { path: "FungiDAO", element: <FungiDAOPage /> },
       { path: "Staking", element: <StakingPage /> },
       { path: "Vault", element: <VaultPage /> },
-      { path: "/StartUp/:startupId", element: <StartupPage /> }
+      { path: "/StartUp/:startupId", element: <StartupPage /> },
+      { path: "/Project/:projectId", element: <StartupPage /> }
     ],
   },
 ])
