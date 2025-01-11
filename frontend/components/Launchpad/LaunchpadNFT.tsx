@@ -19,9 +19,9 @@ import EONlogo from "../../assets/EONlogo.png";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ProjectCard, Startup, StartupCard } from "../CommonTypes";
+import { ProjectCard } from "../CommonTypes";
 import { useCanister } from "@connect2ic/react";
-import { getProjectsPreview, getStartUpByID, getStartUpsPreview } from "../CommonHelpers";
+import { getProjectsPreview } from "../CommonHelpers";
 
 const LaunchpadNFT: React.FC = () => {
   const navigate = useNavigate();
@@ -37,95 +37,27 @@ const LaunchpadNFT: React.FC = () => {
       return projectsWithCanister
     }
     
-    // Datos hardcodeados para prueba
-    const hardcodedData = [
-      // {
-      //   imgSrc: Mushroomfounders,
-      //   logoSrc: faviconico,
-      //   startUpName: "Mushroom Founders",
-      //   shortDes: "Mushroom Founders",
-      //   story: "Alien race of mushrooms traveling the universe, founding civilizations and decentralizing science and technology.",
-      //   status: "Active",
-      //   opendate: "12.06.24",
-      //   closedate: "12.08.24",
-      //   badgeSrc: [SyntheticTech], // Array de insignias
-      //   owner: "Owner1",
-      //   url: "/founders" // Ruta específica para este startup
-      // },
-      // {
-      //   imgSrc: Landoppnft01, // Utilizando el video Landoppnft01 directamente
-      //   logoSrc: Landoppicon,
-      //   startUpName: "Landopp",
-      //   shortDes: "NoPlas",
-      //   story: "Mysterious Organic Gems from sacred plants, can fuse with elements, regenerate, and create strong, flexible matter in harmony with nature.",
-      //   status: "Coming Soon",
-      //   opendate: "31.07.24",
-      //   closedate: "31.09.24",
-      //   badgeSrc: [GreenTech, FoodTech], // Array de insignias
-      //   owner: "Owner2",
-      //   url: "/landopp" // Ruta específica para este startup
-      // },
-      // {
-      //   imgSrc: Silkongv1,
-      //   logoSrc: ReciqloLogo,
-      //   startUpName: "Reciqlo",
-      //   shortDes: "Reciqlo",
-      //   story: "Stellar gorillas who guard the healing power of silicon. These extraordinary beings act as powerful regenerators of planets throughout the universe.",
-      //   status: "Coming Soon",
-      //   opendate: "31.09.24",
-      //   closedate: "31.11.24",
-      //   badgeSrc: [GreenTech, SyntheticTech], // Array de insignias
-      //   owner: "Owner3",
-      //   url: "/reciqlo" // Ruta específica para este startup
-      // },
-      // {
-      //   imgSrc: NatheraNFTv1,
-      //   logoSrc: Natheralogo,
-      //   startUpName: "Nathera",
-      //   shortDes: "Warriors Cells",
-      //   story: "A powerful army of fibroblasts uses its potent nanofilaments to accelerate tissue regeneration, a medical breakthrough pioneered in the galaxy.",
-      //   status: "Coming Soon",
-      //   opendate: "17.10.24",
-      //   closedate: "17.11.24",
-      //   badgeSrc: [HealthTech], // Array de insignias
-      //   owner: "Owner4",
-      //   url: "/nathera" // Ruta específica para este startup
-      // },
-      // {
-      //   imgSrc: EONNFTV1,
-      //   logoSrc: EONlogo,
-      //   startUpName: "EON",
-      //   shortDes: "Broccoli Pickers",
-      //   story: "Plant creatures genetically created in the laboratory to collect garbage and clean the city, symbols of hope.",
-      //   status: "Coming Soon",
-      //   opendate: "17.11.24",
-      //   closedate: "17.12.24",
-      //   badgeSrc: [FoodTech], // Array de insignias
-      //   owner: "Owner5",
-      //   url: "/eon" // Ruta específica para este startup
-      // },
-    ];
-
-    // setIncomingCollectionsRequests(hardcodedData);
     getProjectsInfo(backend).then(resProjectsInfo => {
+      console.log({resProjectsInfo})
       const buildedStartups = resProjectsInfo.map(projectInfo => {
+        console.log({projectInfo})
         return {
           imgSrc: Mushroomfounders,
           logoSrc: Mushroomfounders,
-          startUpName: projectInfo[0].startUpName,
-          shortDes: projectInfo[0].projectTitle,
-          story: projectInfo[0].problemSolving,
-          status: projectInfo[0].startupStatus,
+          startUpName: projectInfo.startupName,
+          shortDes: projectInfo.projectTitle,
+          story: projectInfo.problemSolving,
+          status: projectInfo.collectionCanisterId.length > 0,
           opendate: "17.11.24",
           closedate: "17.12.24",
           badgeSrc: [Mushroomfounders], // Array de insignias
-          owner: String(projectInfo[0].owner),
+          owner: String(projectInfo.owner),
           // url: startUpInfo[0].website // Ruta específica para este startup
-          url: "/Project/" + projectInfo[0].pojectID
+          url: "/Project/" + projectInfo.pojectID
         }
       })
-      const concatenatedData = hardcodedData.concat(buildedStartups)
-      setIncomingCollectionsRequests(concatenatedData);
+      console.log({buildedStartups})
+      setIncomingCollectionsRequests(buildedStartups);
     }).catch(error => console.error(error))
   }, []);
 
@@ -169,8 +101,10 @@ const LaunchpadNFT: React.FC = () => {
     <Center>
       <Flex color="#FFFFFF" flexDirection="column" alignItems="center" position="relative" marginLeft="0px" marginTop="0px" width="100%">
         <Slider {...settings} style={{ width: '100%' }}>
-          {incomingCollectionsRequests.map((collection, index) => (
-            <Box
+          {incomingCollectionsRequests.map((collection, index) => {
+            console.log({collection})
+            console.log({index})
+            return <Box
               key={index}
               border="1px solid #1E1E1E"
               borderRadius="8px"
@@ -235,7 +169,7 @@ const LaunchpadNFT: React.FC = () => {
                 </Button>
               </Flex>
             </Box>
-          ))}
+          })}
         </Slider>
       </Flex>
     </Center>
