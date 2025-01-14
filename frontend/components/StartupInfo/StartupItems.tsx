@@ -101,8 +101,8 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
 
       const params = {
         to: metadataNFTColl.wallet,
-        amount: tier.price,
-        memo: "123456789"
+        amount: Number(tier.price),
+        memo: 1234
       }
       console.log({params})
 

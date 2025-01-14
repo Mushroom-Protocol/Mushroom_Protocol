@@ -14,7 +14,7 @@ const ckUSDCIdlFactory = ({ IDL }) => {
       //   args: {
       //     to: string,
       //     amount: number,
-      //     memo: BigInt}
+      //     memo: BigInt}6e5bb326a5d778a525f33e3d88967a719e94fb8979800ca034d6799b1b3b2f72
       //   }
       // ) => Promise<any>;
       requestConnect: (params?: RequestConnectParams) => Promise<string>;
@@ -22,7 +22,7 @@ const ckUSDCIdlFactory = ({ IDL }) => {
       requestTransfer: ({
         to: string,
         amount: number,
-        memo: string
+        memo: number
       }
       ) => Promise<{ height: Number }>;
       requestBalance: () => Promise<Number>;
