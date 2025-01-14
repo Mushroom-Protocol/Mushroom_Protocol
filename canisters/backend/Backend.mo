@@ -630,6 +630,30 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
 
     };
 
+    public query func getProjectsWithCollection(): async [ProjectCard] {
+        let bufferProjectCards = Buffer.fromArray<ProjectCard>([]);
+        for((projectID, project) in HashMap.toArray<ProjectID, Project>(projects).vals()) {
+            if(project.nftCollections.size() > 0){
+                let startupName = switch (HashMap.get<StartupID, Startup>(startUps, thash, project.startupID)){
+                    case null "";
+                    case (?startup) {
+                        startup.startUpName
+                    };
+                };
+                let projectCard: ProjectCard = {
+                    project with
+                    owner = Principal.fromText("aaaaa-aa"); 
+                    startupName;
+                    collectionCanisterId = ?Principal.toText(project.nftCollections[0]);
+                    pojectID = projectID
+                };
+                bufferProjectCards.add(projectCard)
+            }
+        };
+        Buffer.toArray<ProjectCard>(bufferProjectCards)
+
+    };
+
     public query ({ caller }) func getIncomingStartupByOwner(p : Principal) : async Result.Result<IncomingStartUp, Text> {
         assert authorizedCaller(caller);
         let startup = HashMap.get(incomingStartUps, phash, p);
@@ -655,7 +679,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     };
 
     public query ({ caller }) func getProjectByID(id : Text) : async ?Project {
-        assert authorizedCaller(caller);
+        // assert authorizedCaller(caller);
         HashMap.get(projects, thash, id)
     };
 
@@ -940,12 +964,12 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         Iter.toArray(HashMap.keys<StartupID, CollectionPreInit>(incommingCollections))
     };
 
-    public shared ({ caller }) func clear(): async Bool{
-        assert (authorizedCaller(caller));
-        HashMap.clear<StartupID, CollectionPreInit>(incommingCollections);
-        HashMap.clear<ProjectID, CollectionActorClass>(nftCollections);
-        true
-    };
+    // public shared ({ caller }) func clear(): async Bool{
+    //     assert (authorizedCaller(caller));
+    //     HashMap.clear<StartupID, CollectionPreInit>(incommingCollections);
+    //     HashMap.clear<ProjectID, CollectionActorClass>(nftCollections);
+    //     true
+    // };
 
     public query ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
         assert (authorizedCaller(caller));
