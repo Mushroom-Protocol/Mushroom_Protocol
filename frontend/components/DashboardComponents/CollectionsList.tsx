@@ -90,9 +90,7 @@ const CollectionsList: React.FC = () => {
                   </Heading>
                   <Center>
                     <Image
-                      src={
-                        "data:image/png;base64," + blobToBase64(collectionMetadata?.logo)
-                      }
+                      src={collectionMetadata?.logo.data}
                       alt={collectionMetadata?.name}
                       borderRadius="lg"
                       height="150px"
@@ -124,14 +122,25 @@ const CollectionsList: React.FC = () => {
           <ModalHeader>Collection Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Center>
+              <Image
+                src={currentCollection?.logo?.data}
+                alt={currentCollection?.name}
+                borderRadius="lg"
+                height="150px"
+                width="150px"
+              />
+            </Center>
             <UnorderedList>
-              <ListItem>Name: {currentCollection?.name}</ListItem>
-              <ListItem>Symbol: {currentCollection?.symbol}</ListItem>
-              <ListItem>Base URL: {currentCollection?.baseUrl}</ListItem>
-              <ListItem>Wallet: {currentCollection?.wallet}</ListItem>
-              <ListItem>Maximum Limit: {currentCollection?.maxLimit}</ListItem>
-              <ListItem>Total Supply: {currentCollection?.totalSupply}</ListItem>
-              <ListItem>Canister Id: {currentCollection?.canisterId}</ListItem>
+              <ListItem><b>Name:</b> {currentCollection?.name}</ListItem>
+              <ListItem><b>Symbol:</b> {currentCollection?.symbol}</ListItem>
+              <ListItem><b>Base URL:</b> <ChakraLink href={currentCollection?.baseUrl} isExternal>
+                {currentCollection?.baseUrl} <ExternalLinkIcon mx="2px" />
+              </ChakraLink></ListItem>
+              <ListItem><b>Wallet:</b> {currentCollection?.wallet}</ListItem>
+              <ListItem><b>Maximum Limit:</b> {currentCollection?.maxLimit}</ListItem>
+              <ListItem><b>Total Supply:</b> {currentCollection?.totalSupply}</ListItem>
+              <ListItem><b>Canister Id:</b> {currentCollection?.canisterId}</ListItem>
             </UnorderedList>
           </ModalBody>
           <ModalFooter>

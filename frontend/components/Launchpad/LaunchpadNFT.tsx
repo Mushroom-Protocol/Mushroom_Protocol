@@ -19,9 +19,9 @@ import EONlogo from "../../assets/EONlogo.png";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ProjectCard } from "../CommonTypes";
+import { ProjectCard, Startup } from "../CommonTypes";
 import { useCanister } from "@connect2ic/react";
-import { getProjectsPreview } from "../CommonHelpers";
+import { blobToBase64, getProjectsWithCollection, getStartUpByID } from "../CommonHelpers";
 
 const LaunchpadNFT: React.FC = () => {
   const navigate = useNavigate();
@@ -30,29 +30,38 @@ const LaunchpadNFT: React.FC = () => {
 
   useEffect(() => {
     const getProjectsInfo = async (backend: any): Promise<ProjectCard[]> => {
-      const projectCards: ProjectCard[] = await getProjectsPreview(backend)
-      const projectsWithCanister: ProjectCard[] = projectCards.filter(projectCard => projectCard.collectionCanisterId.length > 0)
-      return projectsWithCanister
+      const projectCards: ProjectCard[] = await getProjectsWithCollection(backend)
+      return projectCards
+    }
+
+    const getStartUpByIDInfo = async (startupId: string, backend: any): Promise<Startup> => {
+      const startupById: Startup = await getStartUpByID(startupId, backend)
+      return startupById
     }
     
     getProjectsInfo(backend).then(resProjectsInfo => {
-      const buildedStartups = resProjectsInfo.map(projectInfo => {
-        return {
-          imgSrc: Mushroomfounders,
-          logoSrc: Mushroomfounders,
-          startUpName: projectInfo.startupName,
-          shortDes: projectInfo.projectTitle,
-          story: projectInfo.problemSolving,
-          status: projectInfo.collectionCanisterId.length > 0,
-          opendate: "17.11.24",
-          closedate: "17.12.24",
-          badgeSrc: [Mushroomfounders], // Array de insignias
-          owner: String(projectInfo.owner),
-          // url: startUpInfo[0].website // Ruta específica para este startup
-          url: "/Project/" + projectInfo.pojectID
-        }
+      const buildedStartups = resProjectsInfo.map(async projectInfo => {
+        return getStartUpByIDInfo(projectInfo.startupId, backend).then(dataStartUpByIDInfo => {
+          const startupByIdLogo = "data:image/png;base64," + blobToBase64(dataStartUpByIDInfo[0].logo)
+          return {
+            imgSrc: startupByIdLogo,
+            logoSrc: startupByIdLogo,
+            startUpName: projectInfo.startupName,
+            shortDes: projectInfo.projectTitle,
+            story: projectInfo.problemSolving,
+            status: projectInfo.collectionCanisterId.length > 0,
+            opendate: "17.11.24",
+            closedate: "17.12.24",
+            badgeSrc: [startupByIdLogo], // Array de insignias
+            //owner: String(projectInfo.owner),
+            url: "/Project/" + projectInfo.pojectID
+          }
+        }).catch(error => console.error(error))
       })
-      setIncomingCollectionsRequests(buildedStartups);
+
+      Promise.all(buildedStartups).then(dataBuildedStartups => {
+        setIncomingCollectionsRequests(dataBuildedStartups);
+      }).catch(error => console.error(error))
     }).catch(error => console.error(error))
   }, []);
 
@@ -144,7 +153,7 @@ const LaunchpadNFT: React.FC = () => {
               </Text>
               <Flex justifyContent="space-between" alignItems="center" mt="20px" width="100%">
                 <HStack spacing="10px">
-                  {collection.badgeSrc.map((badge, badgeIndex) => (
+                  {collection.badgeSrc?.map((badge, badgeIndex) => (
                     <Image key={badgeIndex} src={badge} alt={`Badge ${badgeIndex}`} w="50px" h="50px" />
                   ))}
                 </HStack>

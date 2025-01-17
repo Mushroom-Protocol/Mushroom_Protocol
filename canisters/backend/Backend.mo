@@ -608,12 +608,15 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         for ((owner, pr) in HashMap.entries(incomingProjects)) {
             let startUp = HashMap.get(startUps, thash, pr.startupID);
             var startupName = "";
+            var startupId = "";
             switch startUp {
                 case (?st) {
                     startupName := st.startUpName;
+                    startupId := st.startupId;
                     let entrie = {
                         owner;
                         startupName;
+                        startupId;
                         pojectID = "";
                         projectTitle = pr.projectTitle;
                         coverImage = pr.coverImage;
@@ -634,9 +637,11 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         let bufferProjectCards = Buffer.fromArray<ProjectCard>([]);
         for((projectID, project) in HashMap.toArray<ProjectID, Project>(projects).vals()) {
             if(project.nftCollections.size() > 0){
+                var startupId = "";
                 let startupName = switch (HashMap.get<StartupID, Startup>(startUps, thash, project.startupID)){
                     case null "";
                     case (?startup) {
+                        startupId := startup.startupId;
                         startup.startUpName
                     };
                 };
@@ -644,6 +649,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     project with
                     owner = Principal.fromText("aaaaa-aa"); 
                     startupName;
+                    startupId;
                     collectionCanisterId = ?Principal.toText(project.nftCollections[0]);
                     pojectID = projectID
                 };
@@ -847,9 +853,10 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         for ((id, pr) in HashMap.entries(projects)) {
             let startUp = HashMap.get(startUps, thash, pr.startupID);
             var startupName = "";
+            var startupId = "";
             switch startUp {
                 case null { return [] };
-                case (?st) { startupName := st.startUpName }
+                case (?st) { startupName := st.startUpName; startupId := st.startupId }
             };
             let collectionCanisterId: ?Text = switch (pr.nftCollections.size()){
                 case 0 {null};
@@ -858,6 +865,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             let entrie = {
                 owner = Principal.fromText("aaaaa-aa");
                 startupName;
+                startupId;
                 projectTitle = pr.projectTitle;
                 problemSolving = pr.problemSolving;
                 pojectID = id;

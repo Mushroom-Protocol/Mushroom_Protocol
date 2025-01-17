@@ -75,8 +75,9 @@ export interface Project {
 }
 
 export interface ProjectCard {
-  owner: object
+  owner: { _arr: Uint8Array; _isPrincipal: boolean }
   startupName: string
+  startupId: string
   projectTitle: string
   pojectID: string
   coverImage: Uint8Array

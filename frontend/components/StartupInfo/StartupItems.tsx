@@ -48,6 +48,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
   const [selectedTier, setSelectedTier] = useState<string>(null)
   const [canisterId, setCanisterId] = useState<string>("")
   const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
+  const [alreadyLoaded, setAlreadyLoaded] = useState<boolean>(false)
 
   let null_address: string = "aaaaa-aa"
 
@@ -80,6 +81,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
       setTiersPrices(resCallGetPrices)
       return backend.getMetadataNFTColl(project.projectId).then(resMetadataNFTColl => {
         setMetadataNFTColl(resMetadataNFTColl)
+        setAlreadyLoaded(true)
         return resMetadataNFTColl
       }).catch(error => console.error(error))
     }).catch(error => console.error(error))
@@ -393,6 +395,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
               variant="solid"
               ml="10px"
               borderRadius="10px"
+              isDisabled={!alreadyLoaded}
               onClick={onOpen} // Abre modal de confirmación de minted
               _hover={{
                 backgroundColor: "#f9f9f9",

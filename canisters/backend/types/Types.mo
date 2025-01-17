@@ -94,6 +94,7 @@ module {
     public type ProjectCard = {
         owner : Principal;
         startupName : Text;
+        startupId : Text;
         projectTitle : Text;
         pojectID : Text;
         coverImage : ?Blob;

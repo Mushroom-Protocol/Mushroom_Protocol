@@ -115,6 +115,15 @@ export const getProjectsPreview = async (backend: any): Promise<ProjectCard[]> =
   }
 }
 
+export const getProjectsWithCollection = async (backend: any): Promise<ProjectCard[]> => {
+  try {
+    const resGetProjectsPreview = (await backend.getProjectsWithCollection()) as ProjectCard[]
+    return resGetProjectsPreview
+  } catch (error) {
+    console.error("Error on backend.getProjectsWithCollection() call:", error)
+  }
+}
+
 export const getStartUpByID = async (
   startupId: string,
   backend: any,
