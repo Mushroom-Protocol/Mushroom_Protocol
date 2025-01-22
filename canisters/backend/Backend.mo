@@ -141,6 +141,13 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
     public shared ({ caller }) func removeCollection(p: ProjectID ): async () {
         assert(authorizedCaller(caller));
         ignore HashMap.remove(nftCollections, thash, p);
+        let project = HashMap.get(projects, thash, p);
+        switch project {
+            case null {};
+            case (?project) {
+                ignore HashMap.put(projects, thash, p, {project with nftCollections = []})
+            }
+        }
     };
 
     ////// Pasar para abajo esto ///////////////
@@ -607,19 +614,15 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         let resultBuffer = Buffer.fromArray<ProjectCard>([]);
         for ((owner, pr) in HashMap.entries(incomingProjects)) {
             let startUp = HashMap.get(startUps, thash, pr.startupID);
-            var startupName = "";
-            var startupId = "";
             switch startUp {
                 case (?st) {
-                    startupName := st.startUpName;
-                    startupId := st.startupId;
-                    let entrie = {
+                    let entrie: ProjectCard = {
                         owner;
-                        startupName;
-                        startupId;
-                        pojectID = "";
+                        startUpName = pr.startUpName;
+                        projectID = "";
                         projectTitle = pr.projectTitle;
                         coverImage = pr.coverImage;
+                        startupID = pr.startupID;
                         problemSolving = pr.problemSolving;
                         collectionCanisterId = null;
                     };
@@ -637,21 +640,10 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         let bufferProjectCards = Buffer.fromArray<ProjectCard>([]);
         for((projectID, project) in HashMap.toArray<ProjectID, Project>(projects).vals()) {
             if(project.nftCollections.size() > 0){
-                var startupId = "";
-                let startupName = switch (HashMap.get<StartupID, Startup>(startUps, thash, project.startupID)){
-                    case null "";
-                    case (?startup) {
-                        startupId := startup.startupId;
-                        startup.startUpName
-                    };
-                };
                 let projectCard: ProjectCard = {
                     project with
                     owner = Principal.fromText("aaaaa-aa"); 
-                    startupName;
-                    startupId;
                     collectionCanisterId = ?Principal.toText(project.nftCollections[0]);
-                    pojectID = projectID
                 };
                 bufferProjectCards.add(projectCard)
             }
@@ -683,6 +675,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             case (?project) { #ok(project) }
         }
     };
+    
+    public func getProjectsQty() :async Nat { HashMap.size(projects)};
 
     public query ({ caller }) func getProjectByID(id : Text) : async ?Project {
         // assert authorizedCaller(caller);
@@ -793,11 +787,11 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                 return #err("There is no project request associated with the Principal ID")
             };
             case (?projectData) {
-                let projectId = await generateId("PR");
+                let projectID = await generateId("PR");
                 let project : Project = {
                     projectData with
                     approvalDate = Time.now();
-                    projectId;
+                    projectID;
                     documents : [Blob] = [];
                     weeklyReports : [Types.Report] = [];
                     tokenAddress : [Principal] = [];
@@ -811,18 +805,73 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
                     };
                     case (?st) {
                         let projectsBuffer = Buffer.fromArray<Text>(st.projects);
-                        projectsBuffer.add(projectId);
+                        projectsBuffer.add(projectID);
                         let projectsUpdate = Buffer.toArray(projectsBuffer);
 
-                        ignore HashMap.add(projects, thash, projectId, project);
+                        ignore HashMap.add(projects, thash, projectID, project);
                         ignore HashMap.replace(startUps, thash, project.startupID, { st with projects = projectsUpdate })
                     }
                 };
-                return #ok(projectId)
+                return #ok(projectID)
             }
         };
 
     };
+    /*
+    public shared ({ caller }) func clearProjects(): async (){
+        assert (authorizedCaller(caller));
+        HashMap.clear(projects)
+    };
+
+    public shared ({ caller }) func restoreLandoppProject(): async (){
+        let project: Project = {
+            startupID =  "ST232884";
+            projectTitle = "NoPlas";
+            startUpName = "Landopp";
+            coverImage = null;
+            problemSolving = "Industry generates 480 million tons of plastics annually, 91% of which are not recycled, causing massive contamination of soils and oceans. These plastics can take hundreds of years to degrade, and as they do so generate micro and nanoparticles that are harmful to every ecosystem, including soil, water, air, plants, animals and humans. In addition, the industry is responsible for 3.8% of global CO2 emissions.";
+            yoursolution = "We are currently developing a 100% organic and biodegradable biopolymer from hemp biomass as a sustainable alternative to traditional plastic. The process involves R&D to obtain a material with physicochemical properties specifically designed to meet the demands of various applications. Some of its applications include the design of eco-friendly containers, innovative packaging and consumer products that not only meet quality standards, but also make a positive contribution to environmental protection.";
+            impact = "Implementation of the biopolymer reduces the carbon footprint by using hemp as a renewable source. Moreover, being 100% biodegradable, it helps to reduce the accumulation of plastic waste in the environment, facilitating the transition to a bioeconomy model with biodegradable plastic substitutes. ";
+            productStatus = "";
+            fundsRequired = 31_550;
+            projectDuration = 18;
+            implementation = "Research Phase";
+            milestones : [Text] = [
+                "Milestone 1: Prototype with 30% biomass (Q2 2025).",
+                "Milestone 2: Prototype with 70% biomass (Q4 2025).",
+                "Milestone 3: 100% organic biopolymer (Q2 2026)."
+            ];
+            budget : [Text] = [
+                "Research | Total: $16,250 USD",
+                "Technology & Equipment | Total: $9,000 USD",
+                "Intellectual Property | Total: $1,800 USD",
+                "Outreach & Marketing | Total: $1,500 USD",
+                "Management | Total: $3,000 USD"  
+            ];
+            team : [Text] = [
+                "Pablo Surazsky: Co-founder & CEO",
+                "Pablo Kohan: Co-founder & COO",
+                "María Laura Fernández: Co-founder & CMO",
+                "Diego Fort: Technical Director"
+            ]; 
+            approvalDate = Time.now() - 130 * 24 * 60 * 60 * 1000000000;
+            projectID = "PR958576";
+            documents : [Blob] = [];
+            weeklyReports : [Types.Report] = [];
+            tokenAddress : [Principal] = [];
+            nftCollections : [Principal] = [];
+        };
+        ignore HashMap.put<ProjectID, Project>(projects, thash, project.projectID, project);
+        let landopp = HashMap.get(startUps, thash, project.startupID);
+        switch landopp {
+            case null {};
+            case (?st) {
+                
+                ignore HashMap.put(startUps, thash, project.startupID, { st with projects = [project.projectID]});
+            }
+        }
+    };
+    */
 
     public shared ({ caller }) func rejectProject(owner : Principal) : async ?DataProject {
         assert (authorizedCaller(caller));
@@ -852,11 +901,10 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         let resultBuffer = Buffer.fromArray<ProjectCard>([]);
         for ((id, pr) in HashMap.entries(projects)) {
             let startUp = HashMap.get(startUps, thash, pr.startupID);
-            var startupName = "";
-            var startupId = "";
+            var startUpName = "";
             switch startUp {
                 case null { return [] };
-                case (?st) { startupName := st.startUpName; startupId := st.startupId }
+                case (?st) { startUpName := st.startUpName }
             };
             let collectionCanisterId: ?Text = switch (pr.nftCollections.size()){
                 case 0 {null};
@@ -864,11 +912,11 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             };
             let entrie = {
                 owner = Principal.fromText("aaaaa-aa");
-                startupName;
-                startupId;
+                startUpName;
                 projectTitle = pr.projectTitle;
                 problemSolving = pr.problemSolving;
-                pojectID = id;
+                projectID = id;
+                startupID = pr.startupID;
                 coverImage = pr.coverImage;
                 collectionCanisterId = collectionCanisterId;
             };
@@ -1044,53 +1092,12 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
     };
 
-    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async Types.NFT.CollectionMetadata {
+    public shared ({ caller }) func getMetadataNFTColl(projectID : Text) : async ?Types.NFT.CollectionMetadata {
         let actorRef = HashMap.get<ProjectID, CollectionActorClass>(nftCollections, thash, projectID);
-        switch (actorRef) {
-            case (?value) {
-                let fetchedName = await value.nameDip721();
-                let fetchedSymbol = await value.symbolDip721();
-                let fetchedBaseUrl = await value.getBaseUrl();
-                let fetchedWallet = await value.getWallet();
-                let fetchedMaxLimit = await value.getMaxLimitDip721();
-                let fetchedTotalSupplyDip721 = await value.totalSupplyDip721();
-                let fetchedLogo = await value.logoDip721();
-                let fetchedHoldersDip721 = await value.holdersDip721();
-                let fetchedPricesDip721 = await value.getPricesDip721();
-                let fetchedCustodians = await value.getCustodians();
-                let obtainedCanisterId = await getCanisterIdByProject(projectID);
-
-                let nftCollMetadata = {
-                    name = fetchedName;
-                    symbol = fetchedSymbol;
-                    baseUrl = fetchedBaseUrl;
-                    wallet = fetchedWallet;
-                    maxLimit = fetchedMaxLimit;
-                    totalSupply = fetchedTotalSupplyDip721;
-                    logo = fetchedLogo;
-                    holders = fetchedHoldersDip721;
-                    prices = fetchedPricesDip721;
-                    custodians = fetchedCustodians;
-                    canisterId = obtainedCanisterId;
-                };
-                return nftCollMetadata
-            };
-            case null {
-                {
-                    name = "";
-                    symbol = "";
-                    baseUrl = "";
-                    wallet = "";
-                    maxLimit = 0;
-                    totalSupply = 0;
-                    logo = {data = ""; logo_type = ""};
-                    holders = [];
-                    prices = [];
-                    custodians = [];
-                    canisterId = "";
-                }
-            };
-        };
+        switch actorRef {
+            case null { null };
+            case (?actorRef) { ? (await actorRef.getMetadata()) }
+        }
     };
     /////////////////////////////// Deploy Canister Collection ///////////////////////////
 

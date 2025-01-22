@@ -93,10 +93,10 @@ module {
 
     public type ProjectCard = {
         owner : Principal;
-        startupName : Text;
-        startupId : Text;
+        startUpName : Text;
+        startupID: Text;
         projectTitle : Text;
-        pojectID : Text;
+        projectID : Text;
         coverImage : ?Blob;
         problemSolving : Text;
         collectionCanisterId: ?Text;
@@ -104,6 +104,7 @@ module {
 
     public type DataProject = {
         startupID : Text;
+        startUpName: Text;
         projectTitle : Text;
         coverImage : ?Blob;
         problemSolving : Text;
@@ -126,6 +127,7 @@ module {
 
     public type Project = {
         startupID : Text;
+        startUpName: Text;
         projectTitle : Text;
         coverImage : ?Blob;
         problemSolving : Text;
@@ -140,7 +142,7 @@ module {
         team : [Text]; //Miembros del equipo
 
         approvalDate : Int;
-        projectId : Text;
+        projectID : Text;
         documents : [Blob];
         weeklyReports : [Report];
         tokenAddress : [Principal];

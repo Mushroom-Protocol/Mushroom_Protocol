@@ -6,6 +6,7 @@ import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Types "Types";
+import GlobalTypes "../backend/types/Types";
 import Rand "mo:random/Rand";
 import Set "mo:map/Set";
 import Map "mo:map/Map";
@@ -309,6 +310,24 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
     public query func getWallet() : async Text {
         return wallet
     };
+    
+    public func getMetadata() : async GlobalTypes.NFT.CollectionMetadata {
+        return {
+            name = name;
+            symbol = symbol;
+            baseUrl = baseUrl;
+            wallet = wallet;
+            maxLimit = maxLimit;
+            totalSupply = totalSupply;
+            logo = logo;
+            holders = holders;
+            prices = await getPrices();
+            custodians = await getCustodians();
+            canisterId = Principal.toText(Principal.fromActor(Self))
+        }
+    };
+
+    
 
     public func getMetadataForUserDip721(user : Principal) : async Types.ExtendedMetadataResult {
         for (token in Map.vals<Nat64, Nft>(nfts)) {
@@ -321,6 +340,8 @@ shared ({ caller }) actor class Dip721NFT(custodian : Text, init : Types.Dip721N
         };
         return #Err(#Other)
     };
+
+
 
     public query func getTokenIdsForUserDip721(user : Principal) : async [TokenId] {
         let items = Map.vals<TokenId, Nft>(nfts);
