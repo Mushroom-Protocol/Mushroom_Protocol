@@ -135,5 +135,5 @@ module {
             #Burn;
             #Stacking
         }
-    }
+    };
 }
