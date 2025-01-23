@@ -41,12 +41,12 @@ const LaunchpadNFT: React.FC = () => {
     
     getProjectsInfo(backend).then(resProjectsInfo => {
       const buildedStartups = resProjectsInfo.map(async projectInfo => {
-        return getStartUpByIDInfo(projectInfo.startupId, backend).then(dataStartUpByIDInfo => {
+        return getStartUpByIDInfo(projectInfo.startupID, backend).then(dataStartUpByIDInfo => {
           const startupByIdLogo = "data:image/png;base64," + blobToBase64(dataStartUpByIDInfo[0].logo)
           return {
             imgSrc: startupByIdLogo,
             logoSrc: startupByIdLogo,
-            startUpName: projectInfo.startupName,
+            startUpName: projectInfo.startUpName,
             shortDes: projectInfo.projectTitle,
             story: projectInfo.problemSolving,
             status: projectInfo.collectionCanisterId.length > 0,
@@ -54,7 +54,7 @@ const LaunchpadNFT: React.FC = () => {
             closedate: "17.12.24",
             badgeSrc: [startupByIdLogo], // Array de insignias
             //owner: String(projectInfo.owner),
-            url: "/Project/" + projectInfo.pojectID
+            url: "/Project/" + projectInfo.projectID
           }
         }).catch(error => console.error(error))
       })

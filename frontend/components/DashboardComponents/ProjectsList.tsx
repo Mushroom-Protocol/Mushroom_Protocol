@@ -31,13 +31,13 @@ import { ExternalLinkIcon } from "@chakra-ui/icons"
 const initialStateProjectsPreview = [
   {
     owner: {},
-    startupName: "",
+    startUpName: "",
     projectTitle: "",
-    pojectID: "",
+    projectID: "",
     coverImage: new Uint8Array(),
     problemSolving: "",
   },
-] as [ProjectCard]
+] as ProjectCard[]
 
 function blobToBase64(buffer: Uint8Array) {
   var binary = ""
@@ -51,7 +51,7 @@ function blobToBase64(buffer: Uint8Array) {
 
 const ProjectsList: React.FC = () => {
   const [backend] = useCanister("backend")
-  const [projectsPreview, setProjectsPreview] = useState<[ProjectCard]>(
+  const [projectsPreview, setProjectsPreview] = useState<ProjectCard[]>(
     initialStateProjectsPreview,
   )
   const [projectDetails, setProjectDetails] = useState<Project>()
@@ -91,7 +91,7 @@ const ProjectsList: React.FC = () => {
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl">
-                    {project.projectTitle} ({project.pojectID})
+                    {project.projectTitle} ({project.projectID})
                   </Heading>
                   <Center>
                     <Image
@@ -108,7 +108,7 @@ const ProjectsList: React.FC = () => {
                   </Center>
                   <Stack mt="6" spacing="3">
                     <Text size="md">{project.problemSolving}</Text>
-                    <Text size="md">{project.startupName}</Text>
+                    <Text size="md">{project.startUpName}</Text>
                   </Stack>
                 </CardBody>
                 <Divider />
@@ -116,7 +116,7 @@ const ProjectsList: React.FC = () => {
                   <ButtonGroup spacing="2">
                     <Button
                       colorScheme="blue"
-                      onClick={() => openDetails(project.pojectID)}
+                      onClick={() => openDetails(project.projectID)}
                     >
                       Details
                     </Button>
@@ -133,7 +133,7 @@ const ProjectsList: React.FC = () => {
         <ModalContent>
           <ModalHeader>
             <Heading color="blue.600" fontSize="2xl">
-              {projectDetails?.projectTitle} ({projectDetails?.projectId})
+              {projectDetails?.projectTitle} ({projectDetails?.projectID})
             </Heading>
           </ModalHeader>
           <ModalCloseButton />

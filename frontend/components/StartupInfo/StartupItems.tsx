@@ -76,14 +76,11 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
       }
     }
 
-    Promise.all([getCanisterIdByProject(project.projectId), callGetPrices(project.projectId)]).then(([resCanisterIdByProject, resCallGetPrices]) => {
+    Promise.all([getCanisterIdByProject(project.projectID), callGetPrices(project.projectID), backend.getMetadataNFTColl(project.projectID)]).then(([resCanisterIdByProject, resCallGetPrices, resMetadataNFTColl]) => {
       setCanisterId(resCanisterIdByProject)
       setTiersPrices(resCallGetPrices)
-      return backend.getMetadataNFTColl(project.projectId).then(resMetadataNFTColl => {
-        setMetadataNFTColl(resMetadataNFTColl)
-        setAlreadyLoaded(true)
-        return resMetadataNFTColl
-      }).catch(error => console.error(error))
+      setMetadataNFTColl(resMetadataNFTColl[0])
+      setAlreadyLoaded(true)
     }).catch(error => console.error(error))
   }, [])
 
@@ -150,7 +147,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
 
         const dataTransaction = {...params, height: transferStatus.height.height, from: window.ic.plug.accountId}
         console.log(dataTransaction)
-        resMintNFT = (await backend.mintNFT(project.projectId, selectedTier, dataTransaction)) as {
+        resMintNFT = (await backend.mintNFT(project.projectID, selectedTier, dataTransaction)) as {
           Ok: any
           Err: String
         }

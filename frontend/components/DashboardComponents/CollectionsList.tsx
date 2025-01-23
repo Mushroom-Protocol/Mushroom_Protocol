@@ -50,20 +50,20 @@ const CollectionsList: React.FC = () => {
   const toast = useToast()
 
   useEffect(() => {
-    const getProjectsPreview = async () => {
+    const getProjectsWithCollection = async () => {
       try {
-        const resGetProjectsPreview: any[] = (await backend.getProjectsPreview()) as any[]
-        return resGetProjectsPreview
+        const resProjectsWithCollection: any[] = (await backend.getProjectsWithCollection()) as any[]
+        return resProjectsWithCollection
       } catch (error) {
-        console.error("Error on backend.getProjectsPreview() call:", error)
+        console.error("Error on backend.getProjectsWithCollection() call:", error)
       }
     }
 
-    getProjectsPreview().then((dataProjectsPreview: any[]) => {
-      return Promise.all(dataProjectsPreview.filter(x => x.collectionCanisterId.length > 0).map(projectCard => {
-        return backend.getMetadataNFTColl(projectCard.pojectID) as any
+    getProjectsWithCollection().then((dataProjectsWithCollection: any[]) => {
+      return Promise.all(dataProjectsWithCollection.map(projectCard => {
+        return backend.getMetadataNFTColl(projectCard.projectID) as any
       })).then((allMetadata: any[]) => {
-        setCollectionsMetadata(allMetadata)
+        setCollectionsMetadata(allMetadata.flat())
         return allMetadata
       }).catch(error => console.error(error))
     }).catch(error => console.error(error))
@@ -82,7 +82,7 @@ const CollectionsList: React.FC = () => {
       <List spacing={3}>
         {collectionsMetadata?.map((collectionMetadata, collectionMetadataIndex) => {
           return (
-            <ListItem>
+            <ListItem key={collectionMetadataIndex}>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl" marginBottom="15px">
@@ -138,8 +138,8 @@ const CollectionsList: React.FC = () => {
                 {currentCollection?.baseUrl} <ExternalLinkIcon mx="2px" />
               </ChakraLink></ListItem>
               <ListItem><b>Wallet:</b> {currentCollection?.wallet}</ListItem>
-              <ListItem><b>Maximum Limit:</b> {currentCollection?.maxLimit}</ListItem>
-              <ListItem><b>Total Supply:</b> {currentCollection?.totalSupply}</ListItem>
+              <ListItem><b>Maximum Limit:</b> {String(currentCollection?.maxLimit)}</ListItem>
+              <ListItem><b>Total Supply:</b> {String(currentCollection?.totalSupply)}</ListItem>
               <ListItem><b>Canister Id:</b> {currentCollection?.canisterId}</ListItem>
             </UnorderedList>
           </ModalBody>

@@ -52,7 +52,7 @@ const StartupDetails = ({ project: project }) => {
         setStartup(dataStartUpByID)
       }).catch(error => console.error(error))
 
-      getCanisterIdByProject(project.projectId)
+      getCanisterIdByProject(project.projectID)
         .then((resCanisterIdByProject) => {
           return backend.getBaseUrl(resCanisterIdByProject).then((resBaseUrl: string) => {
             setBaseUrlCanister(resBaseUrl)

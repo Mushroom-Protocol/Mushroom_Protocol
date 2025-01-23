@@ -32,8 +32,8 @@ export default function ApplyPage() {
       isClosable: false,
       variant: "solid",
     })
-    hasRoleStartupProject(getRoleStartup(currentUser?.roles)[0])
-      .then((resHasRoleStartupProject) => console.log("hasRoleStartupProject"))
+    hasRoleStartupProject(getRoleStartup(currentUser?.roles)[0] || "")
+      .then((resHasRoleStartupProject) => {console.log({resHasRoleStartupProject})})
       .catch((error) => console.error(error))
     // setHasStartupProject(await hasRoleStartupProject(getRoleStartup(currentUser.roles)[0]))
   }, [currentUser])

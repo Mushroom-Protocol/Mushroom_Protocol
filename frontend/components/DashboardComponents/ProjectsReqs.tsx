@@ -176,7 +176,7 @@ const ProjectsReqs: React.FC = () => {
                     />
                   </Center>
                   <Text size="md">{project.problemSolving}</Text>
-                  <Text size="md">{project.startupName}</Text>
+                  <Text size="md">{project.startUpName}</Text>
                 </CardBody>
                 <Divider />
                 <CardFooter>

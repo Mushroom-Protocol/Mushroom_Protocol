@@ -54,6 +54,7 @@ export interface StartupCard {
 
 export interface Project {
   startupID: string
+  startUpName: string
   projectTitle: string
   coverImage: Uint8Array
   problemSolving: string
@@ -67,7 +68,7 @@ export interface Project {
   budget: string[]
   team: string[] //Miembros del equipo
   approvalDate: number
-  projectId: string
+  projectID: string
   documents: Uint8Array[]
   weeklyReports: object[]
   tokenAddress: any[]
@@ -76,10 +77,10 @@ export interface Project {
 
 export interface ProjectCard {
   owner: { _arr: Uint8Array; _isPrincipal: boolean }
-  startupName: string
-  startupId: string
+  startUpName: string
+  startupID: string
   projectTitle: string
-  pojectID: string
+  projectID: string
   coverImage: Uint8Array
   problemSolving: string
   collectionCanisterId: string

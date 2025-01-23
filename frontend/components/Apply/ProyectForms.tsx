@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
   Box,
   Center,
@@ -26,7 +26,8 @@ import { useNavigate } from "react-router-dom"
 const ProyectForms = () => {
   const [backend] = useCanister("backend")
   const { currentUser, setCurrentUser } = useContext(EstadoContext)
-  const [extractedRolesStartup, setExtractedRolesStartup] = useState<string[]>()
+  const [startupID, setStartupID] = useState<string>("")
+  const [startup, setStartup] = useState<any>(null)
   const { isOpen, onToggle } = useDisclosure()
   const toast = useToast()
   const navigate = useNavigate()
@@ -44,6 +45,25 @@ const ProyectForms = () => {
     budget: "",
     team: "",
   })
+
+  useEffect(() => {
+    const getStartUpByID = async (startupID: string): Promise<any[]> => {
+      try {
+        const resStartUpByID: any[] | null | undefined =
+          (await backend.getStartUpByID(startupID)) as any[] | null | undefined
+        return resStartUpByID
+      } catch (error) {
+        console.error("Error on backend.getStartUpByID() call:", error)
+      }
+    }
+
+    const startupId = getRoleStartup(currentUser.roles)[0]
+    setStartupID(startupId)
+
+    getStartUpByID(startupId).then(dataStartUpByID => {
+      setStartup(dataStartUpByID[0])
+    }).catch(error => console.error(error))
+  }, [currentUser])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -81,7 +101,8 @@ const ProyectForms = () => {
         projectDuration: parseInt(formData.projectDuration),
         milestones: formData.milestones.split(","),
         budget: [formData.budget],
-        startupID: getRoleStartup(currentUser.roles)[0],
+        startupID: startupID,
+        startUpName: startup.startUpName,
         coverImage: [],
         team: formData.team.split(","),
       }

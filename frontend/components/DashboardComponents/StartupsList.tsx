@@ -57,8 +57,6 @@ const StartupsList: React.FC = () => {
         const resGetStartUpsPreview = (await backend.getStartUpsPreview()) as [
           StartupCard,
         ]
-        console.log("backend.getIncomingStartUps")
-        console.log(resGetStartUpsPreview)
         setStartUpsPreview(resGetStartUpsPreview)
       } catch (error) {
         console.error("Error on backend.getStartUpsPreview() call:", error)
