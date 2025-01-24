@@ -50,7 +50,7 @@ const LaunchpadNFT: React.FC = () => {
             shortDes: projectInfo.projectTitle,
             story: projectInfo.problemSolving,
             status: projectInfo.collectionCanisterId.length > 0,
-            opendate: "17.11.24",
+            opendate: "01.01.25",
             closedate: "17.12.24",
             badgeSrc: [startupByIdLogo], // Array de insignias
             //owner: String(projectInfo.owner),
@@ -123,7 +123,7 @@ const LaunchpadNFT: React.FC = () => {
               <Center>
                 {collection.startUpName === "Landopp" ? (
                   <video
-                    src={collection.imgSrc} // Utilizando imgSrc para el video
+                    src={Landoppnft01} // Utilizando imgSrc para el video
                     autoPlay
                     loop
                     muted
@@ -147,15 +147,13 @@ const LaunchpadNFT: React.FC = () => {
                 {collection.story}
               </Text>
               <Text fontSize="16px" color="gray.500" my="10px" textAlign="justify">
-                Status: {collection.status}
+                Status: {collection.status ? "Active" : "Closed"}
                 <br />
-                Date: {collection.opendate} / {collection.closedate}
+                Date: {collection.opendate}
               </Text>
               <Flex justifyContent="space-between" alignItems="center" mt="20px" width="100%">
                 <HStack spacing="10px">
-                  {collection.badgeSrc?.map((badge, badgeIndex) => (
-                    <Image key={badgeIndex} src={badge} alt={`Badge ${badgeIndex}`} w="50px" h="50px" />
-                  ))}
+                  <Image src={GreenTech} alt="Badge" w="50px" h="50px" />
                 </HStack>
                 <Button
                   colorScheme="teal"
