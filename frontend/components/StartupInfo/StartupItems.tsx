@@ -312,7 +312,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
             style={{
               borderRadius: "10px",
               objectFit: "cover",
-              width: "300px",
+              width: "350px",
               height: "400px",
             }}
           />
