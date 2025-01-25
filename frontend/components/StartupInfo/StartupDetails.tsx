@@ -10,10 +10,13 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Link as ChakraLink,
+  Image
 } from "@chakra-ui/react"
 import { Link } from "@chakra-ui/react"
 import { ExternalLinkIcon } from "@chakra-ui/icons"
 import { useCanister } from "@connect2ic/react"
+import { blobToBase64 } from "../CommonHelpers"
 
 const StartupDetails = ({ project: project }) => {
   const [backend] = useCanister("backend")
@@ -67,10 +70,11 @@ const StartupDetails = ({ project: project }) => {
       <Grid
         templateColumns="40% 60%"
         templateRows="1fr"
-        h="580px"
+        // h="780px"
         w="1024px"
         color="#FFFFFF"
         p="25px"
+        overflow="auto"
       >
         <GridItem
           bg="#000000"
@@ -81,7 +85,7 @@ const StartupDetails = ({ project: project }) => {
         >
           <Box display="flex" alignItems="center" mb="20px">
             <img
-              src="https://mushroomprotocol.io/wp-content/uploads/2023/10/Mp-Favicon-1.png"
+              src={"data:image/png;base64," + blobToBase64(startup?.logo)}
               alt="Mushroom Protocol Logo"
               width="50px"
               height="50px"
@@ -102,22 +106,28 @@ const StartupDetails = ({ project: project }) => {
             {startup?.shortDes}
             <br />
             <br />
-            The protocol allows investors from around the world to fund science
-            through a system of tokenization of biotechnology-based research,
-            using intellectual property as collateral. Users can access
-            BioTokens (Dynamic NFTs), generated from the intellectual property
-            value of the research by exchanging their cryptoassets for NFTs and
-            use them to fund, exchange, vote or win in our decentralized funding
-            ecosystem.
+            <p><b>Industry:</b> {startup?.industry}</p>
+            <p><b>Country:</b> {startup?.country}</p>
+            <p><b>Startup status:</b> {startup?.startupStatus}</p>
+            <p>
+              <b>Website: </b><ChakraLink href={startup?.baseUrl} isExternal>
+                {startup?.website} <ExternalLinkIcon mx="2px" />
+              </ChakraLink>
+            </p>
+            <p>
+              <b>Team leader: </b><ChakraLink href={startup?.linkedinTL} isExternal>
+                {startup?.fullNameTl} <ExternalLinkIcon mx="2px" />
+              </ChakraLink>
+            </p>
           </Text>
         </GridItem>
         <GridItem>
           <Tabs color="#737373" size="md" ml="20" mr="0">
             <TabList>
               <Tab>Collection</Tab>
-              <Tab>Details</Tab>
+              <Tab>Project</Tab>
               <Tab>Story</Tab>
-              <Tab>Links</Tab>
+              <Tab>Tokenomics</Tab>
             </TabList>
 
             <TabPanels>
@@ -125,19 +135,7 @@ const StartupDetails = ({ project: project }) => {
                 {/* Contenido para la pestaña "Collection" */}
                 <>
                   <Text fontSize="12px" color="#737373" textAlign="justify">
-                    Mushroom Founders is a collection of 500 NFTs, unique
-                    digital collectibles living on the Internet Computer
-                    blockchain. Your Mushroom Founders acts as your access card
-                    to Mushroom Protocol. The funds obtained from the sale of
-                    the collection will allow us to develop our protocol and
-                    finance the innovation of Latam scientists. As the
-                    collection is sold, various functions related to the
-                    usefulness of the NFT, Staking and FungiDAO will be
-                    activated.
-                    <br />
-                    <br />
-                    Become a founder of Mushroom Protocol with your NFT and help
-                    us revolutionize biotech development
+                    NoPlas is an innovative initiative by Landopp, designed to fund environmental research and develop revolutionary sustainable solutions, such as bioplastic based on the hemp plant. This is the first tokenized biotech IP in Latin America in history, marking a historic milestone for decentralized science (DeSci) and the development of Real World Assets (RWA).
                     <br />
                     <br />
                     <span style={{fontSize: "15px", color: "#FFFFFF"}}>
@@ -146,34 +144,31 @@ const StartupDetails = ({ project: project }) => {
                     <br />
                     <br />
                     <span style={{fontSize: "12px", color: "#FFFFFF"}}>
-                      AIRDROPS:
-                    </span>
-                    <br />
-                    You will receive 25 $FUNGI tokens before listing on the
-                    market. and IP-NFTs of the first research batch.
-                    <br />
-                    <br />
-                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       IP-NFT:
                     </span>
                     <br />
-                    Stake Mushroom Founders NFT and get $FUNGI token rewards.
+                    The NFT accredits part of the ownership of the intellectual and commercialization rights of the technologies developed with the funds.
                     <br />
                     <br />
                     <span style={{fontSize: "12px", color: "#FFFFFF"}}>
-                      MEMBERSHIP:
+                      AIRDROPS:
                     </span>
                     <br />
-                    Early access to the Mushroom Protocol DeFi services and
-                    Metaverse.
+                    NFT holders will receive exclusive Fungi token airdrops as a reward for supporting the successful completion of the Landopp project.
                     <br />
                     <br />
                     <span style={{fontSize: "12px", color: "#FFFFFF"}}>
                       GOVERNANCE:
                     </span>
                     <br />
-                    Vote and monitor the development of project progress on the
-                    FungiDAO.
+                    Each NFT holder has the power to vote and oversee the development of research and project progress on the FungiDAO.
+                    <br />
+                    <br />
+                    <span style={{fontSize: "12px", color: "#FFFFFF"}}>
+                      DEFI:
+                    </span>
+                    <br />
+                    The NFT becomes a valuable asset that can be used in various DeFi services within the future Mushroom Protocol platform.
                   </Text>
                 </>
               </TabPanel>
@@ -181,58 +176,38 @@ const StartupDetails = ({ project: project }) => {
                 {/* Contenido para la pestaña "Tokenomics" */}
                 <>
                   <Text fontSize="16px" color="#737373" textAlign="justify">
-                    The «Mushroom Founders» NFT collection is available on the
-                    Internet Computer Protocol (ICP) network, which offers
-                    interoperability with the Ethereum network. The Founders are
-                    stored as DIP-721 tokens.
+                    {project.yoursolution}
                     <br />
                     <br />
-                    Each founder is unique and is generated randomly at the time
-                    of minting.
+                    <b>Product status:</b> {project.productStatus}
                     <br />
                     <br />
-                    Firstly, you can mint 250 directly from our page, at a
-                    preferential price. Then another 250 will be available on
-                    Founded. <br />
+                    <b>Funds required:</b> {project.fundsRequired}
                     <br />
-                    25 Founders are excluded from the sale. These will be used
-                    for giveaways, rewards, and creator memberships.
+                    <br />
+                    <b>Project duration:</b> {project.projectDuration}
+                    <br />
+                    <br />
+                    <b>Milestones:</b> {project.milestones}
                   </Text>
                 </>
               </TabPanel>
               <TabPanel>
-                {/* Contenido para la pestaña "R&D Project" */}
                 <>
-                  {" "}
-                  <Text fontSize="16px" color="#737373" textAlign="justify">
-                    «Mushroom Founders» NFT collection tells the story of 500
-                    extraterrestrial mushrooms, who managed to escape the
-                    technological cataclysm that devastated their home 10 eons
-                    ago.
-                    <br />
-                    <br />
-                    Each NFT possesses a unique specialty, which is vital in
-                    their mission to spread knowledge and guide civilizations of
-                    the universe to a path of balance and harmony as a form of
-                    redemption. <br />
-                    <br />
-                    As they travel the universe in their ships, they become the
-                    disseminators of transcendental knowledge.
-                  </Text>
+                  The «NoPlas» NFT collection features 650 organic gems, discovered on the planet Nurius. These gems can fuse with elements, regenerate matter, and expand consciousness. 
+                  <br /><br />
+                  These mysterious gems are more than just beautiful objects—they are symbols of the future. Sourced from sacred plants, these gems can fuse with elements, regenerate, and create strong, flexible matter in harmony with nature. With them, you will be able to invest directly in biotechnology, meet with the Landopp team and participate in its community.
                 </>
               </TabPanel>
               <TabPanel>
-                {/* Contenido para la pestaña "Team" */}
                 <>
-                  {" "}
-                  <Link href={baseUrlCanister} isExternal>
-                    Collection Website <ExternalLinkIcon mx="2px" />
-                  </Link>
+                  The NoPlas collection allocates tokens as follows: 70% goes to the Public Sale, funding the development of 455 NFTs. Inventors, the team behind Landopp, receive 15.1% of the tokens. An 8% reserve fund supports the Mushroom Protocol treasury, ensuring long-term stability. Finally, 6.9% of tokens are set aside for Airdrops.
+                  <br /><br />
+                  NFTs are available in three tiers: Level 1 offers basic access, Level 2 provides enhanced benefits, and Level 3 delivers premium rewards, each reflecting different levels of support and involvement.
                   <br />
-                  <br />
-                  <Link href="https://mushroomprotocol.io/" isExternal>
-                    Protocol Website <ExternalLinkIcon mx="2px" />
-                  </Link>
+                  <Center>
+                    <Image src="https://mushroomprotocol.io/wp-content/uploads/2024/08/LandoppTokenomics.png" alt="Tokenomics" w="300px" h="300px" borderRadius="10px" />
+                  </Center>
                 </>
               </TabPanel>
             </TabPanels>

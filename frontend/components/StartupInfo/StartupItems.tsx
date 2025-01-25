@@ -29,6 +29,7 @@ import Mushroomfounders from "../../assets/Mushroomfounders.gif"
 import favicon from "../../assets/favicon.ico"
 import { Project } from "../CommonTypes"
 import { useCanister } from "@connect2ic/react"
+import Landoppnft01 from "../../assets/Landoppnft01.mp4";
 
 const ckUSDCIdlFactory = ({ IDL }) => {
   return IDL.Service({
@@ -223,12 +224,13 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
                       "nav footer"`}
         gridTemplateRows={"120px 1fr 30px"}
         gridTemplateColumns={"450px 1fr"}
-        h="530px"
+        // h="530px"
         w="1024px"
         gap="0"
         color="#000"
         fontWeight="bold"
         marginRight="30px"
+        overflow="auto"
       >
         <GridItem
           pl="20"
@@ -239,12 +241,12 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
         >
           <Flex>
             <Box
-              bgImage={MpFavicon}
-              bgSize="60px 60px"
+              bgImage="https://mushroomprotocol.io/wp-content/uploads/2024/09/Logo-NoPlas-blanco.png"
+              bgSize="100px 100px"
               bgRepeat="no-repeat"
-              w="60px"
-              h="60px"
-              marginTop="10px"
+              w="100px"
+              h="100px"
+              marginTop="0px"
             />
             <Box
               ml="4"
@@ -287,9 +289,9 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
                   display="flex"
                   alignItems="center" // Alinea el icono y el texto verticalmente
                 >
-                  <FaClock color="#F47629" style={{ marginRight: "9px" }} />{" "}
+                  <FaClock color="#00FF00" style={{ marginRight: "9px" }} />{" "}
                   {/* Cambia el color del icono a naranja */}
-                  <TagLabel>Coming Soon</TagLabel>
+                  <TagLabel>{metadataNFTColl?.totalSupply > 0 ? "Active" : "Closed"}</TagLabel>
                 </Tag>
               ))}
             </HStack>
@@ -301,13 +303,26 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
           alignItems="center"
           justifyContent="center"
         >
-          <Image
-            src={Mushroomfounders}
+          <video
+            src={Landoppnft01} // Utilizando imgSrc para el video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              borderRadius: "10px",
+              objectFit: "cover",
+              width: "300px",
+              height: "400px",
+            }}
+          />
+          {/* <Image
+            src={Landoppnft01}
             alt="Descripción de la imagen"
             objectFit="cover"
             width="300px" // Ajusta el ancho según tus necesidades
             height="400px" // Ajusta la altura según tus necesidades
-          />
+          /> */}
         </GridItem>
         <GridItem
           bg="#000000"
@@ -322,14 +337,14 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
           borderRadius="10px"
           padding="30px"
         >
-          <Box display="flex" alignItems="flex-start">
+          <Box display="flex" alignItems="center" gap={4}>
             {tiersPrices.map((tierPrice, idx) => {
               return <Box
                 key={idx}
                 backgroundColor="#000000"
                 color="#FFFFFF"
                 fontSize="18px"
-                display="flex"
+                // display="flex"
                 alignItems="center"
                 p="8px"
                 borderRadius="15px"
@@ -337,14 +352,17 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
                 onClick={() => handleSelectTier(tierPrice.tierName)}
                 borderColor="#1FAFC8"
               >
-                Price {tierPrice.tierName}: {Number(tierPrice.price)/1000000000}
-                <img
-                  src={favicon}
-                  alt="Icon"
-                  width="22"
-                  height="22"
-                  style={{ marginLeft: "5px" }}
-                />
+                <p>Price1 {tierPrice.tierName}:</p>
+                <div style={{display: "flex"}}>
+                  {Number(tierPrice.price)/1000000000} ICP
+                  <img
+                    src={favicon}
+                    alt="Icon"
+                    width="22"
+                    height="22"
+                    style={{ marginLeft: "5px" }}
+                  />
+                </div>
               </Box>
             })}
           </Box>
