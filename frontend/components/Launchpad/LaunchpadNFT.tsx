@@ -121,7 +121,7 @@ const LaunchpadNFT: React.FC = () => {
               color="#FFFFFF"
             >
               <Center>
-                {collection.startUpName === "Landopp" ? (
+                {collection.startUpName === "NoPlas" ? (
                   <video
                     src={Landoppnft01} // Utilizando imgSrc para el video
                     autoPlay
