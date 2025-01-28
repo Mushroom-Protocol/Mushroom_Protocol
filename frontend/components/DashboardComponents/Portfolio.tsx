@@ -1,8 +1,8 @@
 import { useCanister } from "@connect2ic/react"
 import React, { useEffect, useState } from "react"
-import { MetadataResultExtended } from "../CommonTypes"
+import { MetadataResultExtended, ProjectCard } from "../CommonTypes"
 import { Button, ButtonGroup, Card, CardBody, CardFooter, Center, Divider, Heading, Image, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text, useDisclosure } from "@chakra-ui/react"
-import { blobToBase64 } from "../CommonHelpers"
+import { getProjectsWithCollection } from "../CommonHelpers"
 
 const Portfolio: React.FC = () => {
   const [backend] = useCanister("backend")
@@ -10,7 +10,7 @@ const Portfolio: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [metadataNFTColl, setMetadataNFTColl] = useState<any>({})
   const [currentNFT, setCurrentNFT] = useState<any>({})
-  let nftImageUrl = ""
+  const [projectsWithCollection, setProjectsWithCollection] = useState<ProjectCard[]>([])
 
   useEffect(() => {
     const getMyNfts = async () => {
@@ -24,6 +24,9 @@ const Portfolio: React.FC = () => {
     }
 
     getMyNfts()
+    getProjectsWithCollection(backend).then(dataProjectsWithCollection => {
+      setProjectsWithCollection(dataProjectsWithCollection)
+    }).catch(error => console.error(error))
   }, [])
 
   const openMetadata = async (currNft: any) => {
@@ -44,25 +47,43 @@ const Portfolio: React.FC = () => {
       </Heading>
       <List spacing={3}>
         {myNfts?.map((myNft) => {
+          const projectWithCollection: ProjectCard = projectsWithCollection.find(oneProjectWithCollection => oneProjectWithCollection.projectID === myNft.projectId)
           return (
             <ListItem>
               <Card maxW="sm">
                 <CardBody>
                   <Heading color="blue.600" fontSize="2xl" marginBottom="15px">
-                    {myNft.tokenId + " (" + myNft.projectId + ")"}
+                    {projectWithCollection.projectTitle + " " + myNft.metadata.Ok[0].tier + " #" + myNft.tokenId}
                   </Heading>
                   <Center>
-                    <Image
-                      src={
-                        myNft.metadata.Ok[0].key_val_data[0].val.TextContent
-                      }
-                      alt={myNft.tokenId}
-                      borderRadius="lg"
-                      height="150px"
-                      width="150px"
-                      textAlign="center"
-                    />
+                    {myNft.projectId === "PR958576" ?
+                      (
+                        <video
+                          src={myNft.metadata.Ok[0].key_val_data[0].val.TextContent}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          style={{
+                            borderRadius: "10px",
+                            objectFit: "cover",
+                            width: "150px",
+                            height: "150px",
+                          }}
+                        />
+                      ) :
+                      (
+                        <Image
+                          src={myNft.metadata.Ok[0].key_val_data[0].val.TextContent}
+                          alt={myNft.tokenId}
+                          borderRadius="lg"
+                          height="150px"
+                          width="150px"
+                          textAlign="center"
+                        />
+                    )}
                   </Center>
+                  <Heading color="blue.600" fontSize="xl" marginTop="10px">By {projectWithCollection.startUpName}</Heading>
                   <Stack mt="6" spacing="3">
                     {/* <Text size="md">{startup.startUpSlogan}</Text> */}
                   </Stack>
