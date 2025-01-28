@@ -354,7 +354,7 @@ const StartupItems: React.FC<PropsType> = ({ project: project }) => {
               >
                 <p>Price1 {tierPrice.tierName}:</p>
                 <div style={{display: "flex"}}>
-                  {Number(tierPrice.price)/1000000000} ICP
+                  {Number(tierPrice.price)/100000000} ICP
                   <img
                     src={favicon}
                     alt="Icon"
