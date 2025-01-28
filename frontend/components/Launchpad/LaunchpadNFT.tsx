@@ -47,6 +47,7 @@ const LaunchpadNFT: React.FC = () => {
             imgSrc: startupByIdLogo,
             logoSrc: startupByIdLogo,
             startUpName: projectInfo.startUpName,
+            startUpShortDes: dataStartUpByIDInfo[0].shortDes,
             shortDes: projectInfo.projectTitle,
             story: projectInfo.problemSolving,
             status: projectInfo.collectionCanisterId.length > 0,
@@ -121,7 +122,7 @@ const LaunchpadNFT: React.FC = () => {
               color="#FFFFFF"
             >
               <Center>
-                {collection.startUpName === "NoPlas" ? (
+                {collection.startUpName === "Landopp" ? (
                   <video
                     src={Landoppnft01} // Utilizando imgSrc para el video
                     autoPlay
@@ -144,7 +145,7 @@ const LaunchpadNFT: React.FC = () => {
                 <Text fontSize="25px">{collection.shortDes}</Text>
               </Box>
               <Text fontSize="18px" my="10px" textAlign="justify">
-                {collection.story}
+                {collection.startUpShortDes}
               </Text>
               <Text fontSize="16px" color="gray.500" my="10px" textAlign="justify">
                 Status: {collection.status ? "Active" : "Closed"}
