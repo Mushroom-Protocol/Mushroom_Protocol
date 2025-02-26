@@ -59,7 +59,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
 
     // TODO agregar HashMap preview collections deployed
 
-    ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
     public shared ({ caller }) func removeStartUp(st : Text) : async () {
         assert authorizedCaller(caller);
@@ -96,6 +95,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         assert(authorizedCaller(caller));
         ignore HashMap.remove(users, phash, p);
     };
+
+    ////////////////////////////////////  Random ID generation  /////////////////////////////////////////////////
 
     let randomStore = Random.Rand();
 
@@ -379,7 +380,8 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
             email;
             avatar;
             verified = #Code("");
-            roles : [Types.Role] = []
+            roles : [Types.Role] = [];
+            wallets: [Principal] = [];
         };
         ignore HashMap.put<Principal, User>(users, phash, caller, newUser);
         ?newUser
@@ -583,7 +585,7 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
 
     };
-
+    
     /////////////////////////// Getters functions only Controllers or DAO ///////////////////////////////////////
 
     public query ({ caller }) func getUser(p: Principal): async ?User{ 
@@ -817,61 +819,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         };
 
     };
-    /*
-    public shared ({ caller }) func clearProjects(): async (){
-        assert (authorizedCaller(caller));
-        HashMap.clear(projects)
-    };
-
-    public shared ({ caller }) func restoreLandoppProject(): async (){
-        let project: Project = {
-            startupID =  "ST232884";
-            projectTitle = "NoPlas";
-            startUpName = "Landopp";
-            coverImage = null;
-            problemSolving = "Industry generates 480 million tons of plastics annually, 91% of which are not recycled, causing massive contamination of soils and oceans. These plastics can take hundreds of years to degrade, and as they do so generate micro and nanoparticles that are harmful to every ecosystem, including soil, water, air, plants, animals and humans. In addition, the industry is responsible for 3.8% of global CO2 emissions.";
-            yoursolution = "We are currently developing a 100% organic and biodegradable biopolymer from hemp biomass as a sustainable alternative to traditional plastic. The process involves R&D to obtain a material with physicochemical properties specifically designed to meet the demands of various applications. Some of its applications include the design of eco-friendly containers, innovative packaging and consumer products that not only meet quality standards, but also make a positive contribution to environmental protection.";
-            impact = "Implementation of the biopolymer reduces the carbon footprint by using hemp as a renewable source. Moreover, being 100% biodegradable, it helps to reduce the accumulation of plastic waste in the environment, facilitating the transition to a bioeconomy model with biodegradable plastic substitutes. ";
-            productStatus = "";
-            fundsRequired = 31_550;
-            projectDuration = 18;
-            implementation = "Research Phase";
-            milestones : [Text] = [
-                "Milestone 1: Prototype with 30% biomass (Q2 2025).",
-                "Milestone 2: Prototype with 70% biomass (Q4 2025).",
-                "Milestone 3: 100% organic biopolymer (Q2 2026)."
-            ];
-            budget : [Text] = [
-                "Research | Total: $16,250 USD",
-                "Technology & Equipment | Total: $9,000 USD",
-                "Intellectual Property | Total: $1,800 USD",
-                "Outreach & Marketing | Total: $1,500 USD",
-                "Management | Total: $3,000 USD"  
-            ];
-            team : [Text] = [
-                "Pablo Surazsky: Co-founder & CEO",
-                "Pablo Kohan: Co-founder & COO",
-                "María Laura Fernández: Co-founder & CMO",
-                "Diego Fort: Technical Director"
-            ]; 
-            approvalDate = Time.now() - 130 * 24 * 60 * 60 * 1000000000;
-            projectID = "PR958576";
-            documents : [Blob] = [];
-            weeklyReports : [Types.Report] = [];
-            tokenAddress : [Principal] = [];
-            nftCollections : [Principal] = [];
-        };
-        ignore HashMap.put<ProjectID, Project>(projects, thash, project.projectID, project);
-        let landopp = HashMap.get(startUps, thash, project.startupID);
-        switch landopp {
-            case null {};
-            case (?st) {
-                
-                ignore HashMap.put(startUps, thash, project.startupID, { st with projects = [project.projectID]});
-            }
-        }
-    };
-    */
 
     public shared ({ caller }) func rejectProject(owner : Principal) : async ?DataProject {
         assert (authorizedCaller(caller));
@@ -1020,13 +967,6 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
         Iter.toArray(HashMap.keys<StartupID, CollectionPreInit>(incommingCollections))
     };
 
-    // public shared ({ caller }) func clear(): async Bool{
-    //     assert (authorizedCaller(caller));
-    //     HashMap.clear<StartupID, CollectionPreInit>(incommingCollections);
-    //     HashMap.clear<ProjectID, CollectionActorClass>(nftCollections);
-    //     true
-    // };
-
     public query ({ caller }) func getCollectionRequestByStartUp(st : StartupID) : async ?CollectionPreInit {
         assert (authorizedCaller(caller));
         HashMap.get<StartupID, CollectionPreInit>(incommingCollections, thash, st)
@@ -1165,21 +1105,37 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
 
     type DataTransaction = {from: Text; to: Text; amount: Nat64; height: Nat64};
 
-    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text, toVerify: DataTransaction) : async TypesNft.MintReceipt {
+    public shared ({ caller }) func mintNFT(project : ProjectID, _tierName: Text, txArgs: DataTransaction) : async TypesNft.MintReceipt {
         
-        let transactionOk = await verifyTransaction(toVerify);
+        let transactionOk = await verifyTransaction(txArgs);
         if(not transactionOk){
             return #Err(#TransactionIsNotVerified)
         };
-        // assert(activeMint);
-        assert (isUser(caller));
-        let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
-        switch collection {
-            case null { return #Err(#InvalidTokenId) };
-            case (?collection) {
-                await collection.mintDip721(caller, _tierName)
+        switch (HashMap.get<Principal, User>(users, phash, caller)){
+            case null { return #Err(#Unauthorized) };
+            case (?user) { 
+                let collection = HashMap.get<Text, CollectionActorClass>(nftCollections, thash, project);
+                switch collection {
+                    case null { return #Err(#InvalidTokenId) };
+                    case (?collection) {
+                        let txResponse = await collection.mintDip721(Principal.fromText(txArgs.to), _tierName);
+                        switch txResponse {
+                            case (#Ok(_)){
+                                let wallets = Prim.Array_tabulate<Principal>(
+                                    user.wallets.size() + 1,
+                                    func x = if(x == 0) {Principal.fromText(txArgs.to)} else {user.wallets[x - 1]}
+                                );
+                                ignore HashMap.put<Principal, User>(users, phash, caller, {user with wallets});
+                                txResponse
+                            };
+                            case e { e }
+                        }
+                        
+                    }
+                }
             }
-        }
+        };
+        
     };
 
 
@@ -1240,24 +1196,30 @@ shared ({ caller = DEPLOYER }) actor class Mushroom() = Mushroom {
 
     /////////////////////// getNFT ///////////////////////////////////
     public shared ({ caller }) func getMyNfts() : async [MetadataResultExtended] {
-        if (not isUser(caller)) { return [] };
-        await nftsOwnedBy(caller)
+        await getNftByPrincipal(caller)
     };
 
     public shared ({ caller }) func getNftByPrincipal(userPrincipal : Principal) : async [MetadataResultExtended] {
         assert (authorizedCaller(caller));
-        await nftsOwnedBy(userPrincipal)
+        switch (HashMap.get<Principal, User>(users, phash, userPrincipal)) {
+            case null { [] };
+            case (?user) {
+                await nftsOwnedBy(user.wallets)
+            }
+        }
     };
 
-    func nftsOwnedBy(userPrincipal : Principal) : async [MetadataResultExtended] {
+    func nftsOwnedBy(walletsIds : [Principal]) : async [MetadataResultExtended] {
         let tempBuffer = Buffer.fromArray<MetadataResultExtended>([]);
-        for ((projectId, collection) in HashMap.entries<ProjectID, CollectionActorClass>(nftCollections)) {
-            let tokensInCurrentCollection = await collection.getTokenIdsForUserDip721(userPrincipal);
-            for (tokenId in tokensInCurrentCollection.vals()) {
-                let metadata = await collection.getMetadataDip721(tokenId);
-                tempBuffer.add({ projectId; tokenId; metadata });
-            }
-        };
+        for (userWallet in walletsIds.vals()) {
+            for ((projectId, collection) in HashMap.entries<ProjectID, CollectionActorClass>(nftCollections)) {
+                let tokensInCurrentCollection = await collection.getTokenIdsForUserDip721(userWallet);
+                for (tokenId in tokensInCurrentCollection.vals()) {
+                    let metadata = await collection.getMetadataDip721(tokenId);
+                    tempBuffer.add({ projectId; tokenId; metadata });
+                }
+            };  
+        }; 
         Buffer.toArray<MetadataResultExtended>(tempBuffer)
     };
 

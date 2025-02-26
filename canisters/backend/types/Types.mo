@@ -25,7 +25,8 @@ module {
         avatar : ?Blob;
         email : Text;
         verified : { #Code : Text; #Success : Bool };
-        roles : [Role]
+        roles : [Role];
+        wallets: [Principal];
     };
 
     public type IncomingStartUp = {
