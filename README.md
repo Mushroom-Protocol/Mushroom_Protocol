@@ -1,5 +1,6 @@
 
 #### Canister url. Test Frontend &emsp;&emsp; https://nys2z-xaaaa-aaaak-qddoq-cai.icp0.io/
+Eliminado automáticamente por falta de actividad
 
 #### Starting
 #### ```git clone https://github.com/Mushroom-Protocol/Mushroom_Protocol.git```
